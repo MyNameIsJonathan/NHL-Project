@@ -69,18 +69,18 @@ df_2012_2013[edited_columns] = round(df_2012_2013[edited_columns] * 1/0.5854, 0)
 df_2012_2013[edited_columns] = df_2012_2013[edited_columns].astype(int) #Convert resulting floats to ints
 
 # Select for these columns:
-columns_to_keep = ['Player', 'GP', 'Goals', 'Total Assists', 'Total Points']
+# columns_to_keep = ['Player', 'GP', 'Goals', 'Total Assists', 'Total Points']
 
-df_2017_2018 = df_2017_2018[columns_to_keep]
-df_2016_2017 = df_2016_2017[columns_to_keep]
-df_2015_2016 = df_2015_2016[columns_to_keep]
-df_2014_2015 = df_2014_2015[columns_to_keep]
-df_2013_2014 = df_2013_2014[columns_to_keep]
-df_2012_2013 = df_2012_2013[columns_to_keep]
-df_2011_2012 = df_2011_2012[columns_to_keep]
-df_2010_2011 = df_2010_2011[columns_to_keep]
-df_2009_2010 = df_2009_2010[columns_to_keep]
-df_2008_2009 = df_2008_2009[columns_to_keep]
+# df_2017_2018 = df_2017_2018[columns_to_keep]
+# df_2016_2017 = df_2016_2017[columns_to_keep]
+# df_2015_2016 = df_2015_2016[columns_to_keep]
+# df_2014_2015 = df_2014_2015[columns_to_keep]
+# df_2013_2014 = df_2013_2014[columns_to_keep]
+# df_2012_2013 = df_2012_2013[columns_to_keep]
+# df_2011_2012 = df_2011_2012[columns_to_keep]
+# df_2010_2011 = df_2010_2011[columns_to_keep]
+# df_2009_2010 = df_2009_2010[columns_to_keep]
+# df_2008_2009 = df_2008_2009[columns_to_keep]
 
 
 # Set player as the index for all DataFrames

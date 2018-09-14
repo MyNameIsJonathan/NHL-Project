@@ -23,4 +23,5 @@ class hockey_player(person):
         self.team = team
         self.player_number = hockey_player.player_number
         hockey_player.player_number += 1
+        self.stats_dataframe = None
 
