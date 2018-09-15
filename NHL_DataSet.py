@@ -111,14 +111,14 @@ df_2008_2009.columns = [str(col) + ' 2008_2009' for col in df_2008_2009.columns]
 
 #Create master DF across all years, per player
 all_2008_2018 = (pd.merge(df_2008_2009, df_2009_2010, how='outer', left_index=True, right_index=True)
- .merge(df_2010_2011, how='right', left_index=True, right_index=True)
- .merge(df_2011_2012, how='right', left_index=True, right_index=True)
- .merge(df_2012_2013, how='right', left_index=True, right_index=True)
- .merge(df_2013_2014, how='right', left_index=True, right_index=True)
- .merge(df_2014_2015, how='right', left_index=True, right_index=True)
- .merge(df_2015_2016, how='right', left_index=True, right_index=True)
- .merge(df_2016_2017, how='right', left_index=True, right_index=True)
- .merge(df_2017_2018, how='right', left_index=True, right_index=True))
+ .merge(df_2010_2011, how='outer', left_index=True, right_index=True)
+ .merge(df_2011_2012, how='outer', left_index=True, right_index=True)
+ .merge(df_2012_2013, how='outer', left_index=True, right_index=True)
+ .merge(df_2013_2014, how='outer', left_index=True, right_index=True)
+ .merge(df_2014_2015, how='outer', left_index=True, right_index=True)
+ .merge(df_2015_2016, how='outer', left_index=True, right_index=True)
+ .merge(df_2016_2017, how='outer', left_index=True, right_index=True)
+ .merge(df_2017_2018, how='outer', left_index=True, right_index=True))
 
 # Select top 6 goal scorers from 2008 to 2018
 all_2008_2018['Career Goals'] = all_2008_2018[['Goals 2008_2009', 
