@@ -23,4 +23,5 @@ class hockey_player(person):
         self.team = team
         self.player_number = hockey_player.player_number
         hockey_player.player_number += 1
+        # Update the below stats_dataframe to host stats for each player. Should I do this or keep the stats solely within the dataframe, my_data?
         self.stats_dataframe = None

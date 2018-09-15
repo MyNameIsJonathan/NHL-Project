@@ -5,6 +5,8 @@ This file will hold the function UpdatePlayers(), that will scrape the web, add 
 """
 
 def UpdatePlayers():
+    """The intent here is for this function to scrape NHL.com for recent stat updates during games, adding them to the player's current totals
+    """
     return
 
 from My_Classes import hockey_player, NHL_Team
