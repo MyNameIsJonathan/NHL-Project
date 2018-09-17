@@ -32,16 +32,16 @@ from unicodedata import normalize
 # df_raw_2008_2009 = pd.read_html(filename_2008_2009)[0].to_pickle('df_raw_2008_2009')
 
 # Read pickles to get dataframes
-df_raw_2017_2018 = pd.read_pickle('/Users/jonathanolson/Documents/GitHub/NHL-Project/df_raw_2017_2018')
-df_raw_2016_2017 = pd.read_pickle('/Users/jonathanolson/Documents/GitHub/NHL-Project/df_raw_2016_2017')
-df_raw_2015_2016 = pd.read_pickle('/Users/jonathanolson/Documents/GitHub/NHL-Project/df_raw_2015_2016')
-df_raw_2014_2015 = pd.read_pickle('/Users/jonathanolson/Documents/GitHub/NHL-Project/df_raw_2014_2015')
-df_raw_2013_2014 = pd.read_pickle('/Users/jonathanolson/Documents/GitHub/NHL-Project/df_raw_2013_2014')
-df_raw_2012_2013 = pd.read_pickle('/Users/jonathanolson/Documents/GitHub/NHL-Project/df_raw_2012_2013')
-df_raw_2011_2012 = pd.read_pickle('/Users/jonathanolson/Documents/GitHub/NHL-Project/df_raw_2011_2012')
-df_raw_2010_2011 = pd.read_pickle('/Users/jonathanolson/Documents/GitHub/NHL-Project/df_raw_2010_2011')
-df_raw_2009_2010 = pd.read_pickle('/Users/jonathanolson/Documents/GitHub/NHL-Project/df_raw_2009_2010')
-df_raw_2008_2009 = pd.read_pickle('/Users/jonathanolson/Documents/GitHub/NHL-Project/df_raw_2008_2009')
+df_raw_2017_2018 = pd.read_pickle('df_raw_2017_2018')
+df_raw_2016_2017 = pd.read_pickle('df_raw_2016_2017')
+df_raw_2015_2016 = pd.read_pickle('df_raw_2015_2016')
+df_raw_2014_2015 = pd.read_pickle('df_raw_2014_2015')
+df_raw_2013_2014 = pd.read_pickle('df_raw_2013_2014')
+df_raw_2012_2013 = pd.read_pickle('df_raw_2012_2013')
+df_raw_2011_2012 = pd.read_pickle('df_raw_2011_2012')
+df_raw_2010_2011 = pd.read_pickle('df_raw_2010_2011')
+df_raw_2009_2010 = pd.read_pickle('df_raw_2009_2010')
+df_raw_2008_2009 = pd.read_pickle('df_raw_2008_2009')
 
 my_dfs = [
     df_raw_2017_2018,
@@ -133,7 +133,7 @@ my_columns_to_int = [item for sublist in my_columns_to_int for item in sublist]
 #Change selected columns
 all_2008_2018[my_columns_to_int] = all_2008_2018[my_columns_to_int].astype(int)
 
-#Select all columns that contain the word 'Faceoff', to convert from dtype Object to Float. Same process as above, for ints
+#Select all columns that contain the word 'Faceoff', to convert from dtype Object to Float. Same process as above, for floats instead of ints
 columns_to_float = ['Faceoffs']
 my_columns_to_float = [[a for a in all_2008_2018.columns if b in a] for b in columns_to_float]
 my_columns_to_float = [item for sublist in my_columns_to_float for item in sublist]
