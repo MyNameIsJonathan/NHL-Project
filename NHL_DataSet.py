@@ -71,7 +71,6 @@ my_years = [
 #The 2012-2013 year was truncated -- extrapolate data to mimic 82-game season
     # The following categories were multiplied by 1/0.5854, to bring them to an 82-game similar
     #GP, Goals, Total Assists, First Assists, Second Assists, Total Points, Shots, Rush Attempts, Rebounds Created, PIM, Giveaways, Takeaways, Hits, Hits Taken, Shots Blocked, Faceoffs Won, Faceoffs Lost
-
 edited_columns = ['GP', 'Goals', 'Total Assists', 'First Assists', 'Second Assists', 
                   'Total Points', 'Shots', 'Rush Attempts', 'Rebounds Created', 'PIM', 
                   'Giveaways', 'Takeaways', 'Hits', 'Hits Taken', 'Shots Blocked', 
