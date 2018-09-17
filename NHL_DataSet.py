@@ -5,18 +5,19 @@ This file is where I will import the data via a web-scrape and create the main d
 """
 
 import pandas as pd
+from unicodedata import normalize
 
 #Gather filenames for the complete season stats for all NHL players from 2008 through 2018
-filename_2017_2018 = 'https://www.naturalstattrick.com/playerteams.php?season=20172018&stype=2&sit=all&score=all&stdoi=std&rate=n&team=ALL&pos=S&loc=B&toi=0&gpfilt=none&fd=&td=&tgp=82&lines=single'
-filename_2016_2017 = 'https://www.naturalstattrick.com/playerteams.php?season=20162017&stype=2&sit=all&score=all&stdoi=std&rate=n&team=ALL&pos=S&loc=B&toi=0&gpfilt=none&fd=&td=&tgp=82&lines=single'
-filename_2015_2016 = 'https://www.naturalstattrick.com/playerteams.php?season=20152016&stype=2&sit=all&score=all&stdoi=std&rate=n&team=ALL&pos=S&loc=B&toi=0&gpfilt=none&fd=&td=&tgp=82&lines=single'
-filename_2014_2015 = 'https://www.naturalstattrick.com/playerteams.php?season=20142015&stype=2&sit=all&score=all&stdoi=std&rate=n&team=ALL&pos=S&loc=B&toi=0&gpfilt=none&fd=&td=&tgp=82&lines=single'
-filename_2013_2014 = 'https://www.naturalstattrick.com/playerteams.php?season=20132014&stype=2&sit=all&score=all&stdoi=std&rate=n&team=ALL&pos=S&loc=B&toi=0&gpfilt=none&fd=&td=&tgp=82&lines=single'
-filename_2012_2013 = 'https://www.naturalstattrick.com/playerteams.php?season=20122013&stype=2&sit=all&score=all&stdoi=std&rate=n&team=ALL&pos=S&loc=B&toi=0&gpfilt=none&fd=&td=&tgp=82&lines=single'
-filename_2011_2012 = 'https://www.naturalstattrick.com/playerteams.php?season=20112012&stype=2&sit=all&score=all&stdoi=std&rate=n&team=ALL&pos=S&loc=B&toi=0&gpfilt=none&fd=&td=&tgp=82&lines=single'
-filename_2010_2011 = 'https://www.naturalstattrick.com/playerteams.php?season=20102011&stype=2&sit=all&score=all&stdoi=std&rate=n&team=ALL&pos=S&loc=B&toi=0&gpfilt=none&fd=&td=&tgp=82&lines=single'
-filename_2009_2010 = 'https://www.naturalstattrick.com/playerteams.php?season=20092010&stype=2&sit=all&score=all&stdoi=std&rate=n&team=ALL&pos=S&loc=B&toi=0&gpfilt=none&fd=&td=&tgp=82&lines=single'
-filename_2008_2009 = 'https://www.naturalstattrick.com/playerteams.php?season=20082009&stype=2&sit=all&score=all&stdoi=std&rate=n&team=ALL&pos=S&loc=B&toi=0&gpfilt=none&fd=&td=&tgp=82&lines=single'
+# filename_2017_2018 = 'https://www.naturalstattrick.com/playerteams.php?season=20172018&stype=2&sit=all&score=all&stdoi=std&rate=n&team=ALL&pos=S&loc=B&toi=0&gpfilt=none&fd=&td=&tgp=82&lines=single'
+# filename_2016_2017 = 'https://www.naturalstattrick.com/playerteams.php?season=20162017&stype=2&sit=all&score=all&stdoi=std&rate=n&team=ALL&pos=S&loc=B&toi=0&gpfilt=none&fd=&td=&tgp=82&lines=single'
+# filename_2015_2016 = 'https://www.naturalstattrick.com/playerteams.php?season=20152016&stype=2&sit=all&score=all&stdoi=std&rate=n&team=ALL&pos=S&loc=B&toi=0&gpfilt=none&fd=&td=&tgp=82&lines=single'
+# filename_2014_2015 = 'https://www.naturalstattrick.com/playerteams.php?season=20142015&stype=2&sit=all&score=all&stdoi=std&rate=n&team=ALL&pos=S&loc=B&toi=0&gpfilt=none&fd=&td=&tgp=82&lines=single'
+# filename_2013_2014 = 'https://www.naturalstattrick.com/playerteams.php?season=20132014&stype=2&sit=all&score=all&stdoi=std&rate=n&team=ALL&pos=S&loc=B&toi=0&gpfilt=none&fd=&td=&tgp=82&lines=single'
+# filename_2012_2013 = 'https://www.naturalstattrick.com/playerteams.php?season=20122013&stype=2&sit=all&score=all&stdoi=std&rate=n&team=ALL&pos=S&loc=B&toi=0&gpfilt=none&fd=&td=&tgp=82&lines=single'
+# filename_2011_2012 = 'https://www.naturalstattrick.com/playerteams.php?season=20112012&stype=2&sit=all&score=all&stdoi=std&rate=n&team=ALL&pos=S&loc=B&toi=0&gpfilt=none&fd=&td=&tgp=82&lines=single'
+# filename_2010_2011 = 'https://www.naturalstattrick.com/playerteams.php?season=20102011&stype=2&sit=all&score=all&stdoi=std&rate=n&team=ALL&pos=S&loc=B&toi=0&gpfilt=none&fd=&td=&tgp=82&lines=single'
+# filename_2009_2010 = 'https://www.naturalstattrick.com/playerteams.php?season=20092010&stype=2&sit=all&score=all&stdoi=std&rate=n&team=ALL&pos=S&loc=B&toi=0&gpfilt=none&fd=&td=&tgp=82&lines=single'
+# filename_2008_2009 = 'https://www.naturalstattrick.com/playerteams.php?season=20082009&stype=2&sit=all&score=all&stdoi=std&rate=n&team=ALL&pos=S&loc=B&toi=0&gpfilt=none&fd=&td=&tgp=82&lines=single'
 
 #Read html tables into Pandas DataFrames, selecting the first table detected ([0]), saving these as pickles for reuse
 # df_raw_2017_2018 = pd.read_html(filename_2017_2018)[0].to_pickle('df_raw_2017_2018')
@@ -80,6 +81,10 @@ edited_columns = ['GP', 'Goals', 'Total Assists', 'First Assists', 'Second Assis
 df_raw_2012_2013[edited_columns] = round(df_raw_2012_2013[edited_columns] * 1/0.5854, 0)
 df_raw_2012_2013[edited_columns] = df_raw_2012_2013[edited_columns].astype(int) #Convert resulting floats to ints
 
+#Set player name as the index in each df
+for df in my_dfs:
+    df.set_index(['Player'], inplace=True)
+
 #Rename columns to reflect years
 for df in range(len(my_dfs)):
     my_dfs[df].columns = [str(col) + ' '  + my_years[df] for col in my_dfs[df].columns]
@@ -95,6 +100,9 @@ all_2008_2018 = (pd.merge(df_raw_2008_2009, df_raw_2009_2010, how='outer', left_
  .merge(df_raw_2016_2017, how='outer', left_index=True, right_index=True)
  .merge(df_raw_2017_2018, how='outer', left_index=True, right_index=True))
 
+#Normalize the string text from the players' names in the index
+all_2008_2018.index = [normalize("NFKD", player_name) for player_name in all_2008_2018.index]
+
 #Drop the first, empty column from each DataFrame
 all_2008_2018 = all_2008_2018.loc[:, ~all_2008_2018.columns.str.startswith('Unnamed:')]
 
@@ -107,6 +115,5 @@ all_2008_2018['Career Assists'] = all_2008_2018[['Total Assists ' + year for yea
 # Sort the dataframe by goals
 all_2008_2018 = all_2008_2018.sort_values('Career Goals', ascending=False)
 
-#CHECK LENGTH
-# Save the dataframe 
+# Save the dataframe. Length should = 2111
 all_2008_2018.to_pickle('NHL_2008_to_2018_TRIAL2')
