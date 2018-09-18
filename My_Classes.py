@@ -21,6 +21,10 @@ class person(object):
         self.name = name
         self.title = title
 
+    def __str__(self):
+        # return 'Player Name: ', self.name, '\tTeam:', self.team, 'Position:', self.position
+        return self.name
+
 class hockey_player(person):
     # Initiate a player number that will be unique to each player and will be ascribed to them at creation
     player_number = 1
@@ -34,3 +38,5 @@ class hockey_player(person):
         hockey_player.player_number += 1
         # Update the below stats_dataframe to host stats for each player. Should I do this or keep the stats solely within the dataframe, my_data?
         self.stats_dataframe = None
+
+a = hockey_player('Jonathan Olson')
