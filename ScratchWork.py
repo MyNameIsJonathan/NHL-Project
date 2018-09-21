@@ -1,63 +1,72 @@
 import pandas as pd
 from My_Classes import person
 from My_Classes import hockey_player
+import pickle
+import requests
+from bs4 import BeautifulSoup
+import datetime
+import time
 
-#Initialize list of players
-my_players_list = []
 
-def game_stats(filename, my_players_list):
+def game_stats_total(filename):
+    # Read table from hockey-reference
+    df = pd.read_html(filename, header=1)
+    # except ValueError:
+    #     return
+    df_away = df[2].iloc[:-1, 1:18]
+    df_home = df[4].iloc[:-1, 1:18]
+    # Set player name to index
+    df_away = df_away.set_index('Player')
+    df_home = df_home.set_index('Player')
+    # Rename columns for better readability
+    df_away = df_away.rename(columns = {'EV.1':'EV', 'PP.1':'PP', 'SH.1':'SH', 'SHFT':'Shifts'})
+    df_home = df_home.rename(columns = {'EV.1':'EV', 'PP.1':'PP', 'SH.1':'SH', 'SHFT':'Shifts'})
+    #Fill NaN values to convert to int. Convert to in
+    df_away = df_away.fillna(0)
+    df_home = df_home.fillna(0)
+    columns_to_int = ['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'EV', 'PP', 'SH', 'S', 'Shifts']
+    for column in columns_to_int:
+        df_away[column] = df_away[column].astype(int)
+        df_home[column] = df_home[column].astype(int)
+    #Convert time on ice from str to datetime, so that time on ice can be summed later
+    df_away['TOI'] = pd.to_datetime(df_away['TOI'], format='%M:%S')
+    df_home['TOI'] = pd.to_datetime(df_home['TOI'], format='%M:%S')
+    # return (df_away, df_home)
+    return pd.concat([df_away, df_home])
 
-    """Scrapes the web for updated game-by-game stats, importing and cleaning data, appending it to the overaching dataframe
-    
-    Returns:
-        None (can be edited to return the game's stats)
-        [dataframe] -- [stats from the day's game]
-    """
+def get_html_links(month, day, year):
+    url = 'https://www.hockey-reference.com/boxscores/index.fcgi?month={}&day={}&year={}'.format(month, day, year)
+    r = requests.get(url)
+    html_content = r.text
+    soup = BeautifulSoup(html_content, 'lxml')
+    links = soup.find_all('a')
+    links = [a.get('href') for a in soup.find_all('a', href=True)]
+    boxscore_links = []
+    for link in links:
+        if link[:10] == '/boxscores':
+            boxscore_links.append('www.hockey-reference.com' + link)
+    boxscore_links = boxscore_links[5:-7]
+    boxscore_links = ['https://' + link for link in boxscore_links]
+    return boxscore_links
 
-    # df = pd.read_html('https://www.hockey-reference.com/boxscores/201806070VEG.html')[0]
-    # df.to_pickle('df_todays_game_trial')
-    df = pd.read_pickle(filename).iloc[:, :5]
-    df[2] = df[2].astype(str)
-    df[2] = df[2].str.split()
 
-    #Rename columns
-    df.columns = ['Time', 'Team', 'Goal Scorer', 'Primary Assist', 'Secondary Assist']
+my_date = datetime.datetime(2000, 10, 4)
+end_date = datetime.datetime(2000, 10, 7)
+today = datetime.datetime.now().date()
 
-    for i in range(len(df)):
-        if len(df.iloc[i, 2]) < 8:
-            my_length = len(df.iloc[i, 2])
-            df.iloc[i, 2].extend(['-' for j in range(10 - my_length)])
-        df.iloc[i, 3] = str(df.iloc[i, 2][-5]) + ' ' + str(df.iloc[i, 2][-4])
-        df.iloc[i, 4] = str(df.iloc[i, 2][-2]) + ' ' + str(df.iloc[i, 2][-1])
-        if str(df.iloc[i, 2][0]) == 'PP':
-            df.iloc[i, 2] = str(df.iloc[i, 2][2]) + ' ' + str(df.iloc[i, 2][3])
-        else:
-            df.iloc[i, 2] = str(df.iloc[i, 2][0]) + ' ' + str(df.iloc[i, 2][1])
+my_games = {}
 
-    #Only count rows of the df that are actual goals, not other information. Also, accomodate "PP" indication
-    for player in range(len(df)):
-        if df.iloc[player, 2][:3] == 'nan':
-            pass
-        elif df.iloc[player, 2][0] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
-            pass
-        else:
-            current_player = hockey_player(name=df.iloc[player, 2], team=df.iloc[player, 1])
-            my_players_list.append(current_player)
 
-    #Remove period name from 'Time' column, create new 'Period' column
-    df['Period'] = df.Time[df['Time'].str.contains('Period')]
-    df['Period'] = df['Period'].fillna(method='ffill')
+while my_date != end_date:
+    # Get the html links for the tables
+    my_html_links = get_html_links(my_date.month, my_date.day, my_date.year)
+    # Use these html links to create games' dataframes
+    for index, filename in enumerate(my_html_links):
+        my_games[index] = game_stats_total(filename)
+        time.sleep(1)
+    my_date += datetime.timedelta(days=1)
 
-    #Convert 'Time' column to datetime
-    df['Time'] = pd.to_datetime(df['Time'], errors='coerce')
-    df['Time'] = pd.DatetimeIndex(df['Time']).hour + pd.DatetimeIndex(df['Time']).minute
+if len(my_games) > 0:
+    for game in range(1, len(my_games)):
+        my_games[0].add(my_games[game], fill_value=0)
 
-    #Remove rows that only served to indicate the period
-    df = df[df['Time'].notnull()]
-
-    #Set Period, Time Multiindex
-    df = df.set_index(['Period', 'Time'])
-
-    return df
-
-a = game_stats('df_todays_game_trial', my_players_list)
