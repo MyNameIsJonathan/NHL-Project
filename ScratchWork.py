@@ -8,7 +8,7 @@ import datetime
 import time
 
 
-def game_stats_total(filename, home_team_name, away_team_name):
+def gameStatsTotal(filename, home_team_name, away_team_name):
 
     # Read table from hockey-reference
     df = pd.read_html(filename, header=1)
@@ -42,7 +42,7 @@ def game_stats_total(filename, home_team_name, away_team_name):
     
     return df
 
-def get_html_links(month, day, year):
+def getHTMLLinks(month, day, year):
 
     # Create the hockey-reference link for the day's games
     url = 'https://www.hockey-reference.com/boxscores/index.fcgi?month={}&day={}&year={}'.format(month, day, year)
@@ -77,7 +77,7 @@ def get_html_links(month, day, year):
     # Return 1 - boxscore links, 2 - home team names, 3 - away team names
     return (boxscore_links, my_home_teams, my_away_teams)
 
-def create_stats_table(start_date='2000/10/4', end_date='2000/12/01'):
+def getStats(starting_df=None, start_date='2000/10/4', end_date='2000/12/01'):
 
     start_date = pd.to_datetime(start_date, format='%Y/%m/%d')
     end_date = pd.to_datetime(end_date, format='%Y/%m/%d')
@@ -90,7 +90,7 @@ def create_stats_table(start_date='2000/10/4', end_date='2000/12/01'):
 
     while start_date != end_date:
         # Get the html links for the tables
-        my_html_results = get_html_links(start_date.month, start_date.day, start_date.year)
+        my_html_results = getHTMLLinks(start_date.month, start_date.day, start_date.year)
         my_html_links = my_html_results[0]
         my_home_teams = my_html_results[1]
         my_away_teams = my_html_results[2]
@@ -99,7 +99,7 @@ def create_stats_table(start_date='2000/10/4', end_date='2000/12/01'):
     
     # Use these html links to create games' dataframes
     for i in range(len(my_html_links)):
-        my_games[my_game_index] = game_stats_total(my_html_links[i], home_team_name=my_home_teams[i],  away_team_name=my_away_teams[i])
+        my_games[my_game_index] = gameStatsTotal(my_html_links[i], home_team_name=my_home_teams[i],  away_team_name=my_away_teams[i])
         my_game_index += 1
         time.sleep(1/5)
 
@@ -107,12 +107,16 @@ def create_stats_table(start_date='2000/10/4', end_date='2000/12/01'):
         # Pickle the 'my_games' dictionary using the highest protocol available.
         pickle.dump(my_games, f, pickle.HIGHEST_PROTOCOL)
 
-    # Create master df, initialized with first df in my_games dictionary
-    my_df = my_games[0].copy(deep=True)
-
+    # Create master df, initialized with first df in my_games dictionary &
     # Iterate through games' dfs, merging them into the main df, then adding their values to the main df (Ex: Adding Goal totals)
-    for game in range(1, len(my_games)):
-        my_df = my_df.add(my_games[game], fill_value=0)
+    if starting_df is None:
+        my_df = my_games[0].copy(deep=True)
+        for game in range(1, len(my_games)):
+            my_df = my_df.add(my_games[game], fill_value=0)
+    else:
+        my_df = starting_df.copy(deep=True)
+        for game in range(len(my_games)):
+            my_df = my_df.add(my_games[game], fill_value=0)
 
     # Convert columns to int
     columns_to_int = ['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'EV', 'PP', 'SH', 'S', 'Shifts']
@@ -123,8 +127,7 @@ def create_stats_table(start_date='2000/10/4', end_date='2000/12/01'):
     return my_df
 
 
-
-my_df = create_stats_table(start_date='2000/10/4', end_date='2000/10/6')
+my_df = getStats(start_date='2000/10/4', end_date='2000/10/6')
 # 32 games between 10/4 and 10/10, inclusive 
 
 # Save my_df
