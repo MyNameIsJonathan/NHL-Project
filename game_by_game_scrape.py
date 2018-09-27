@@ -110,9 +110,13 @@ def getStats(starting_df=None, start_date='2000/10/4', end_date='2000/12/01'):
         my_game_index += 1
         time.sleep(1/5)
 
+    # Pickle the 'my_games' dictionary using the highest protocol available.
     with open('my_games.pickle', 'wb') as f:
-        # Pickle the 'my_games' dictionary using the highest protocol available.
         pickle.dump(my_games, f, pickle.HIGHEST_PROTOCOL)
+
+    # Pickle the 'all_html_links' dict using the highest protocol available.
+    with open('all_html_links.pickle', 'wb') as f:
+        pickle.dump(all_html_links, f, pickle.HIGHEST_PROTOCOL)
 
     # Create master df, initialized with first df in my_games dictionary &
     # Iterate through games' dfs, merging them into the main df, then adding their values to the main df (Ex: Adding Goal totals)
@@ -122,13 +126,18 @@ def getStats(starting_df=None, start_date='2000/10/4', end_date='2000/12/01'):
         for game in range(1, len(my_games)):
             my_game = my_games[game]
             my_df = my_df[columns_to_add].add(my_game[columns_to_add], fill_value=0)
+            # Update the 'Date' column of the main df with the game's date, for each player who scored
             my_df.loc[my_game[my_game['G'] > 0].index, 'Date'] = my_game.loc[my_game['G'] > 0, 'Date']
     else:
         my_df = starting_df.copy(deep=True)
         for game in range(len(my_games)):
             my_game = my_games[game]
-            my_df = my_df[columns_to_add].add(my_game[columns_to_add], fill_value=0)
+            my_df = my_df[columns_to_add].add(my_game[columns_to_add], fill_value=0) #This leaves NaN in the 'Date' column
+            # Update the 'Date' column of the main df with the game's date, for each player who scored
             my_df.loc[my_game[my_game['G'] > 0].index, 'Date'] = my_game.loc[my_game['G'] > 0, 'Date']
+
+    #Convert NaN in the 'Date' column to October 4, 2000
+    my_df['Date'] = my_df['Date'].fillna('2000/10/4')
 
     # Convert columns to int
     columns_to_int = ['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'EV', 'PP', 'SH', 'S', 'Shifts']
@@ -136,10 +145,15 @@ def getStats(starting_df=None, start_date='2000/10/4', end_date='2000/12/01'):
         if column in my_df.columns:
             my_df[column] = my_df[column].astype(int)
 
+    # Create a column 'Days Since Last Goal'
+    today = pd.to_datetime('today')
+    my_df['DateTime'] = pd.to_datetime(my_df['Date'], format='%Y/%m/%d')
+    my_df['Days Since Last Goal'] = today - my_df['DateTime']
+    
     return my_df
 
 
-my_df = getStats(start_date='2000/10/4', end_date='2000/10/7')
+my_df = getStats(start_date='2000/10/4', end_date='2000/10/6')
 # 32 games between 10/4 and 10/10, inclusive 
 
 # Save my_df
@@ -148,10 +162,13 @@ with open('my_df.pickle', 'wb') as f:
     pickle.dump(my_df, f, pickle.HIGHEST_PROTOCOL)
 
 # open my_df
-my_df = pd.read_pickle('my_df.pickle')
+# my_df = pd.read_pickle('my_df.pickle')
 
 # Open my_games
-my_games = pd.read_pickle('my_games.pickle')
+# my_games = pd.read_pickle('my_games.pickle')
+
+# Open all_html_links
+# all_html_links = pd.read_pickle('all_html_links.pickle')
 
 
 #HERES MY ERROR
