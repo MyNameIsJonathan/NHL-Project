@@ -9,45 +9,17 @@ from bs4 import BeautifulSoup
 import datetime
 import time
 
-
-def gameStatsTotal(filename, game_date, home_team_name, away_team_name):
-
-    # Read table from hockey-reference
-    df = pd.read_html(filename, header=1)
-    df_away = df[2].iloc[:-1, 1:18]
-    df_home = df[4].iloc[:-1, 1:18]
-
-    # Make 'Team' column
-    df_away['Team'] = away_team_name
-    df_home['Team'] = home_team_name
-
-    #Combine the two teams' dataframes
-    df = pd.concat([df_away, df_home])
-
-    #Make a 'Date' column, which will eventually be used to represent the last time each player scored a goal
-    df['Date'] = game_date
-
-    # Set player name to index
-    df = df.set_index(['Team', 'Player'])
-
-    # Delete columns that are only present in the datasets starting in 2014-2015 season
-    cols_to_drop = ['EV.2', 'PP.2', 'SH.2', 'Unnamed: 15', 'Unnamed: 16', 'Unnamed: 17']
-    df = df.drop([column for column in cols_to_drop if column in df.columns], axis=1)
-
-    # Rename columns for better readability
-    df = df.rename(columns = {'EV.1':'EV', 'PP.1':'PP', 'SH.1':'SH', 'SHFT':'Shifts'})
-
-    #Fill NaN values to convert to int
-    df = df.fillna(0)
-
-    #Get int of minutes on ice
-    df['TOI'] = df['TOI'].str.split(':')
-    df['TOI'] = df['TOI'].apply(lambda x: int(x[0]) + int(x[1])/60)
-    df['TOI'] = df['TOI'].round(2)
-    
-    return df
-
 def getHTMLLinks(month, day, year):
+
+    """[Function to use the given date to create the html links to www.hockey-reference.com for that day's games. 
+        Scrapes that website and creates the link for each of the games on that day]
+    
+    Returns:
+        [list] -- [boxscore_links : html links to the boxsxcores for each game of each day]
+        [list] -- [my_home_teams : list of home teams. The ith game's home team is in the ith position in this list]
+        [list] -- [my_away_teams : list of away teams. The ith game's away team is in the ith position in this list]
+        [list] -- [my_game_dates : dates for each game. ith game is in ith position in this list]
+    """
 
     # Create the hockey-reference link for the day's games
     url = 'https://www.hockey-reference.com/boxscores/index.fcgi?month={}&day={}&year={}'.format(month, day, year)
@@ -85,7 +57,59 @@ def getHTMLLinks(month, day, year):
     # Return 1 - boxscore links, 2 - home team names, 3 - away team names
     return (boxscore_links, my_home_teams, my_away_teams, my_game_dates)
 
+
+def gameStatsTotal(my_url, game_date, home_team_name, away_team_name):
+
+    """[Function to pull stats from a single game, given the url (attained through getHTMLLinks), the date (also from getHTMLLinks), home and away teams]
+
+    Returns:
+        [Pandas DataFrame] -- [a clean df that has the game's stats]
+    """
+
+
+    # Read table from hockey-reference
+    df = pd.read_html(my_url, header=1)
+    df_away = df[2].iloc[:-1, 1:18]
+    df_home = df[4].iloc[:-1, 1:18]
+
+    # Make 'Team' column
+    df_away['Team'] = away_team_name
+    df_home['Team'] = home_team_name
+
+    #Combine the two teams' dataframes
+    df = pd.concat([df_away, df_home])
+
+    #Make a 'Date' column, which will eventually be used to represent the last time each player scored a goal
+    df['Date'] = game_date
+
+    # Set player name to index
+    df = df.set_index(['Team', 'Player'])
+
+    # Delete columns that are only present in the datasets starting in 2014-2015 season
+    cols_to_drop = ['EV.2', 'PP.2', 'SH.2', 'Unnamed: 15', 'Unnamed: 16', 'Unnamed: 17']
+    df = df.drop([column for column in cols_to_drop if column in df.columns], axis=1)
+
+    # Rename columns for better readability
+    df = df.rename(columns = {'EV.1':'EV', 'PP.1':'PP', 'SH.1':'SH', 'SHFT':'Shifts'})
+
+    #Fill NaN values to convert to int
+    df = df.fillna(0)
+
+    #Get int of minutes on ice from string "mm:ss"
+    df['TOI'] = df['TOI'].str.split(':')
+    df['TOI'] = df['TOI'].apply(lambda x: int(x[0]) + int(x[1])/60)
+    df['TOI'] = df['TOI'].round(2)
+    
+    return df
+
+
 def getStats(starting_df=None, start_date='2000/10/4', end_date='2000/12/01'):
+
+    """[Function to call the previous functions]
+    
+    Returns:
+        [Pandas DataFrame] -- [Statistical summary of games between given dates]
+    """
 
     start_date = pd.to_datetime(start_date, format='%Y/%m/%d')
     end_date = pd.to_datetime(end_date, format='%Y/%m/%d')
@@ -154,7 +178,6 @@ def getStats(starting_df=None, start_date='2000/10/4', end_date='2000/12/01'):
 
 
 my_df = getStats(start_date='2000/10/4', end_date='2000/10/6')
-# 32 games between 10/4 and 10/10, inclusive 
 
 # Save my_df
 with open('my_df.pickle', 'wb') as f:
@@ -171,8 +194,6 @@ with open('my_df.pickle', 'wb') as f:
 # all_html_links = pd.read_pickle('all_html_links.pickle')
 
 
-#HERES MY ERROR
-# my_game = my_games[0]
-# my_df.loc[my_game[my_game['G'] > 0].index, 'Date'] = my_game.loc[my_game['G'] > 0, 'Date']
-
-# my_game.loc[my_game['G'] > 0, 'Date'] = '2000/10/5'
+# Potential next steps:
+    # 1 - Further modularize the functions. I don't need to be questioning the database everytime, now that I have the date under control. 
+    # 2 - Look into how the 'Days Since Last Goal' method can be applied to all the other categories!!
