@@ -54,7 +54,7 @@ def getHTMLLinks(month, day, year):
     boxscore_links = boxscore_links[5:-7]
     boxscore_links = ['https://' + link for link in boxscore_links]
 
-    # Return 1 - boxscore links, 2 - home team names, 3 - away team names
+    # Return 1 - boxscore links, 2 - home team names, 3 - away team names, 4 - game dates
     return (boxscore_links, my_home_teams, my_away_teams, my_game_dates)
 
 
@@ -83,10 +83,10 @@ def gameStatsTotal(my_url, game_date, home_team_name, away_team_name):
     df['Date'] = game_date
 
     # Set player name to index
-    df = df.set_index(['Team', 'Player'])
+    df = df.set_index('Player')
 
     # Delete columns that are only present in the datasets starting in 2014-2015 season
-    cols_to_drop = ['EV.2', 'PP.2', 'SH.2', 'Unnamed: 15', 'Unnamed: 16', 'Unnamed: 17']
+    cols_to_drop = ['S%', 'EV.2', 'PP.2', 'SH.2', 'Unnamed: 15', 'Unnamed: 16', 'Unnamed: 17']
     df = df.drop([column for column in cols_to_drop if column in df.columns], axis=1)
 
     # Rename columns for better readability
@@ -111,36 +111,59 @@ def getStats(starting_df=None, start_date='2000/10/4', end_date='2000/12/01'):
         [Pandas DataFrame] -- [Statistical summary of games between given dates]
     """
 
+    print('...getting html links...')
+
     start_date = pd.to_datetime(start_date, format='%Y/%m/%d')
     end_date = pd.to_datetime(end_date, format='%Y/%m/%d')
 
     my_games = {}
     all_html_links = {}
+
     my_game_index = 0
 
+    total_home_teams = []
+    total_away_teams = []
+    all_game_dates = []
+
+    # Get the html links for the tables
     while start_date != end_date:
-        # Get the html links for the tables
         my_html_results = getHTMLLinks(start_date.month, start_date.day, start_date.year)
-        my_html_links = my_html_results[0]
-        my_home_teams = my_html_results[1]
-        my_away_teams = my_html_results[2]
-        my_game_dates = my_html_results[3]
-        all_html_links[str(start_date)] = my_html_links
+        all_html_links[str(start_date)] = my_html_results[0]
+        total_home_teams.extend(my_html_results[1])
+        total_away_teams.extend(my_html_results[2])
+        all_game_dates.extend(my_html_results[3])
         start_date += datetime.timedelta(days=1)
     
+    # Pickle the 'all_html_links' dict using the highest protocol available.
+    with open('all_html_links.pickle', 'wb') as f:
+        pickle.dump(all_html_links, f, pickle.HIGHEST_PROTOCOL)
+
+    # Flatten list of game htmls
+    flat_list_game_links = [item for sublist in list(all_html_links.values()) for item in sublist]
+
+    #Save home teams, away teams, and game dates in df
+    teams_and_dates = pd.DataFrame([total_home_teams, total_away_teams, all_game_dates, flat_list_game_links])
+    with open('teams_and_dates.pickle', 'wb') as f:
+        pickle.dump(teams_and_dates, f, pickle.HIGHEST_PROTOCOL)
+
+    print('...getting game data...')
+
     # Use these html links to create games' dataframes
-    for i in range(len(my_html_links)):
-        my_games[my_game_index] = gameStatsTotal(my_html_links[i], game_date=my_game_dates[i], home_team_name=my_home_teams[i],  away_team_name=my_away_teams[i])
-        my_game_index += 1
-        time.sleep(1/5)
+    for date in all_html_links:
+        for link in all_html_links[date]:
+            my_games[my_game_index] = gameStatsTotal(
+                my_url=link, 
+                game_date=all_game_dates[my_game_index],
+                home_team_name=total_home_teams[my_game_index],
+                away_team_name=total_away_teams[my_game_index])
+            time.sleep(1/5)
+            my_game_index += 1
 
     # Pickle the 'my_games' dictionary using the highest protocol available.
     with open('my_games.pickle', 'wb') as f:
         pickle.dump(my_games, f, pickle.HIGHEST_PROTOCOL)
 
-    # Pickle the 'all_html_links' dict using the highest protocol available.
-    with open('all_html_links.pickle', 'wb') as f:
-        pickle.dump(all_html_links, f, pickle.HIGHEST_PROTOCOL)
+    print('...cleaning data...')
 
     # Create master df, initialized with first df in my_games dictionary &
     # Iterate through games' dfs, merging them into the main df, then adding their values to the main df (Ex: Adding Goal totals)
@@ -173,11 +196,12 @@ def getStats(starting_df=None, start_date='2000/10/4', end_date='2000/12/01'):
     today = pd.to_datetime('today')
     my_df['DateTime'] = pd.to_datetime(my_df['Date'], format='%Y/%m/%d')
     my_df['Days Since Last Goal'] = today - my_df['DateTime']
+    my_df['Days Since Last Goal'] = my_df['Days Since Last Goal'].dt.days
     
     return my_df
 
 
-my_df = getStats(start_date='2000/10/4', end_date='2000/10/6')
+my_df = getStats(start_date='2000/10/4', end_date='2000/10/31')
 
 # Save my_df
 with open('my_df.pickle', 'wb') as f:
@@ -193,7 +217,18 @@ with open('my_df.pickle', 'wb') as f:
 # Open all_html_links
 # all_html_links = pd.read_pickle('all_html_links.pickle')
 
+# Open teams_and_dates.pickle
+# teams_and_dates = pd.read_pickle('teams_and_dates.pickle')
 
 # Potential next steps:
     # 1 - Further modularize the functions. I don't need to be questioning the database everytime, now that I have the date under control. 
     # 2 - Look into how the 'Days Since Last Goal' method can be applied to all the other categories!!
+
+# Print QC information
+print('')
+print('Len my_df:', len(my_df))
+print('Max goals:', my_df['G'].max())
+print('Max TOI:  ', my_df['TOI'].max())
+print('Max TOI Player:', my_df[my_df['TOI'] == my_df['TOI'].max()].index[0])
+print('Chris Chelios present:', 'Chris Chelios' in my_df.index)
+
