@@ -57,8 +57,7 @@ def getHTMLLinks(month, day, year):
     # Return 1 - boxscore links, 2 - home team names, 3 - away team names, 4 - game dates
     return (boxscore_links, my_home_teams, my_away_teams, my_game_dates)
 
-
-def gameStatsTotal(my_url, game_date, home_team_name, away_team_name):
+def scrapeGame(my_url, game_date, home_team_name, away_team_name):
 
     """[Function to pull stats from a single game, given the url (attained through getHTMLLinks), the date (also from getHTMLLinks), home and away teams]
 
@@ -85,6 +84,13 @@ def gameStatsTotal(my_url, game_date, home_team_name, away_team_name):
     # Set player name to index
     df = df.set_index('Player')
 
+    return df
+
+def cleanGame(game_df):
+
+    # Copy df for editing
+    df = game_df.copy(deep=True)
+
     # Delete columns that are only present in the datasets starting in 2014-2015 season
     cols_to_drop = ['S%', 'EV.2', 'PP.2', 'SH.2', 'Unnamed: 15', 'Unnamed: 16', 'Unnamed: 17']
     df = df.drop([column for column in cols_to_drop if column in df.columns], axis=1)
@@ -102,8 +108,7 @@ def gameStatsTotal(my_url, game_date, home_team_name, away_team_name):
     
     return df
 
-
-def getStats(starting_df=None, start_date='2000/10/4', end_date='2000/12/01'):
+def getStats(starting_df=None, start_date='2000/10/4', end_date='2000/10/12'):
 
     """[Function to call the previous functions]
     
@@ -116,7 +121,9 @@ def getStats(starting_df=None, start_date='2000/10/4', end_date='2000/12/01'):
     start_date = pd.to_datetime(start_date, format='%Y/%m/%d')
     end_date = pd.to_datetime(end_date, format='%Y/%m/%d')
 
-    my_games = {}
+    my_games_unclean = {}
+    my_games_clean = {}
+
     all_html_links = {}
 
     my_game_index = 0
@@ -151,34 +158,39 @@ def getStats(starting_df=None, start_date='2000/10/4', end_date='2000/12/01'):
     # Use these html links to create games' dataframes
     for date in all_html_links:
         for link in all_html_links[date]:
-            my_games[my_game_index] = gameStatsTotal(
+            my_games_unclean[my_game_index] = scrapeGame(
                 my_url=link, 
                 game_date=all_game_dates[my_game_index],
                 home_team_name=total_home_teams[my_game_index],
                 away_team_name=total_away_teams[my_game_index])
+            if 'SV%' not in my_games_unclean[my_game_index].columns:
+                my_games_clean[my_game_index] = cleanGame(my_games_unclean[my_game_index])
             time.sleep(1/5)
             my_game_index += 1
 
     # Pickle the 'my_games' dictionary using the highest protocol available.
-    with open('my_games.pickle', 'wb') as f:
-        pickle.dump(my_games, f, pickle.HIGHEST_PROTOCOL)
+    with open('my_games_unclean.pickle', 'wb') as f:
+        pickle.dump(my_games_unclean, f, pickle.HIGHEST_PROTOCOL)
 
-    print('...cleaning data...')
+    with open('my_games_clean.pickle', 'wb') as f:
+        pickle.dump(my_games_clean, f, pickle.HIGHEST_PROTOCOL)
+
+    print('...combining data...')
 
     # Create master df, initialized with first df in my_games dictionary &
     # Iterate through games' dfs, merging them into the main df, then adding their values to the main df (Ex: Adding Goal totals)
-    columns_to_add = ['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'S%', 'Shifts', 'TOI']
+    columns_to_add = ['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Shifts', 'TOI']
     if starting_df is None:
-        my_df = my_games[0].copy(deep=True)
-        for game in range(1, len(my_games)):
-            my_game = my_games[game]
+        my_df = my_games_clean[0].copy(deep=True)
+        for game in range(1, len(my_games_clean)):
+            my_game = my_games_clean[game]
             my_df = my_df[columns_to_add].add(my_game[columns_to_add], fill_value=0)
             # Update the 'Date' column of the main df with the game's date, for each player who scored
             my_df.loc[my_game[my_game['G'] > 0].index, 'Date'] = my_game.loc[my_game['G'] > 0, 'Date']
     else:
         my_df = starting_df.copy(deep=True)
-        for game in range(len(my_games)):
-            my_game = my_games[game]
+        for game in range(len(my_games_clean)):
+            my_game = my_games_clean[game]
             my_df = my_df[columns_to_add].add(my_game[columns_to_add], fill_value=0) #This leaves NaN in the 'Date' column
             # Update the 'Date' column of the main df with the game's date, for each player who scored
             my_df.loc[my_game[my_game['G'] > 0].index, 'Date'] = my_game.loc[my_game['G'] > 0, 'Date']
@@ -201,7 +213,7 @@ def getStats(starting_df=None, start_date='2000/10/4', end_date='2000/12/01'):
     return my_df
 
 
-my_df = getStats(start_date='2000/10/4', end_date='2000/10/31')
+my_df = getStats(start_date='2000/10/4', end_date='2000/10/12')
 
 # Save my_df
 with open('my_df.pickle', 'wb') as f:
@@ -209,10 +221,13 @@ with open('my_df.pickle', 'wb') as f:
     pickle.dump(my_df, f, pickle.HIGHEST_PROTOCOL)
 
 # open my_df
-# my_df = pd.read_pickle('my_df.pickle')
+my_df = pd.read_pickle('my_df.pickle')
 
-# Open my_games
-# my_games = pd.read_pickle('my_games.pickle')
+# Open my_games_unclean
+# my_games_unclean = pd.read_pickle('my_games_unclean.pickle')
+
+# Open my_games_clean
+# my_games_clean = pd.read_pickle('my_games_clean.pickle')
 
 # Open all_html_links
 # all_html_links = pd.read_pickle('all_html_links.pickle')
@@ -231,4 +246,3 @@ print('Max goals:', my_df['G'].max())
 print('Max TOI:  ', my_df['TOI'].max())
 print('Max TOI Player:', my_df[my_df['TOI'] == my_df['TOI'].max()].index[0])
 print('Chris Chelios present:', 'Chris Chelios' in my_df.index)
-
