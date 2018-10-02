@@ -91,6 +91,8 @@ def scrapeHTMLRange(start_date, end_date):
     with open('teams_and_dates.pickle', 'wb') as f:
         pickle.dump(teams_and_dates, f, pickle.HIGHEST_PROTOCOL)
 
+    print('Total game links scraped = {}'.format(len(teams_and_dates.columns)))
+
     return teams_and_dates
 
 def scrapeGame(my_url, game_date, home_team_name, away_team_name):
@@ -129,12 +131,13 @@ def scrapeAvailableGames():
 
     teams_and_dates = pd.read_pickle('teams_and_dates.pickle')
 
+    print('Number of games to scrape = {}'.format(len(teams_and_dates.columns)))
+
     my_games_unclean = {}
-    my_game_index = 0
 
     # Use  html links to create games' dataframes
     for game in range(len(teams_and_dates.columns)):
-        my_games_unclean[my_game_index] = scrapeGame(
+        my_games_unclean[game] = scrapeGame(
             my_url=teams_and_dates.iloc[3, game], 
             game_date=teams_and_dates.iloc[2, game],
             home_team_name=teams_and_dates.iloc[0, game],
@@ -144,6 +147,8 @@ def scrapeAvailableGames():
     # Pickle the 'my_games' dictionary using the highest protocol available.
     with open('my_games_unclean.pickle', 'wb') as f:
         pickle.dump(my_games_unclean, f, pickle.HIGHEST_PROTOCOL)
+
+    print('Number of games scraped = {}'.format(len(my_games_unclean)))
 
 def cleanGame(game_df):
 
@@ -172,12 +177,16 @@ def cleanUncleanGames():
     my_games_unclean = pd.read_pickle('my_games_unclean.pickle')
     my_games_clean = {}
 
+    print('Number of games to clean = {}'.format(len(my_games_unclean)))
+
     for index, game in my_games_unclean.items():
         if 'SV%' not in game.columns:
             my_games_clean[index] = cleanGame(game)
 
     with open('my_games_clean.pickle', 'wb') as f:
         pickle.dump(my_games_clean, f, pickle.HIGHEST_PROTOCOL)
+
+    print('Number of games cleaned = {}'.format(len(my_games_clean)))
 
 def incorporateNewStats(my_df):
 
@@ -216,32 +225,46 @@ def incorporateNewStats(my_df):
     with open('my_stats_df.pickle', 'wb') as f:
         pickle.dump(my_df, f, pickle.HIGHEST_PROTOCOL)
 
-my_df = pd.DataFrame(columns=['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Shifts', 'TOI', 'Team', 'Date'])
-scrapeHTMLRange('2000/10/4', '2000/10/10')
-scrapeAvailableGames()
-cleanUncleanGames()
-incorporateNewStats()
+
+
+def updateDF(df, startDate='2000/10/4', endDate='2000/10/10'):
+    scrapeHTMLRange(startDate, endDate)
+    scrapeAvailableGames()
+    cleanUncleanGames()
+    incorporateNewStats(df)
+
+
+
+my_df = pd.read_pickle('my_stats_df.pickle')
+
+updateDF(my_df, startDate='2000/10/10', endDate='2000/10/15')
+
+"""
+
+GLOBAL VARIABLE SECTION
+
+"""
 
 
 # Save my_df
+# my_df = pd.DataFrame(columns=['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Shifts', 'TOI', 'Team', 'Date'])
 # with open('my_df.pickle', 'wb') as f:
-    # Pickle the 'my_games' dictionary using the highest protocol available.
-    # pickle.dump(my_df, f, pickle.HIGHEST_PROTOCOL)
+#     pickle.dump(my_df, f, pickle.HIGHEST_PROTOCOL)
 
 # open my_df
-# my_df = pd.read_pickle('my_stats_df.pickle')
+my_df = pd.read_pickle('my_stats_df.pickle')
 
 # Open my_games_unclean
-# my_games_unclean = pd.read_pickle('my_games_unclean.pickle')
+my_games_unclean = pd.read_pickle('my_games_unclean.pickle')
 
 # Open my_games_clean
-# my_games_clean = pd.read_pickle('my_games_clean.pickle')
+my_games_clean = pd.read_pickle('my_games_clean.pickle')
 
 # Open all_html_links
-# all_html_links = pd.read_pickle('all_html_links.pickle')
+all_html_links = pd.read_pickle('all_html_links.pickle')
 
 # Open teams_and_dates.pickle
-# teams_and_dates = pd.read_pickle('teams_and_dates.pickle')
+teams_and_dates = pd.read_pickle('teams_and_dates.pickle')
 
 # Potential next steps:
     # 1 - Further modularize the functions. I don't need to be questioning the database everytime, now that I have the date under control. 
