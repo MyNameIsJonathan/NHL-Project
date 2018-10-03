@@ -78,6 +78,7 @@ def scrapeHTMLRange(start_date, end_date):
         total_away_teams.extend(my_html_results[2])
         all_game_dates.extend(my_html_results[3])
         start_date += datetime.timedelta(days=1)
+        time.sleep(1/5)
 
         # Pickle the 'all_html_links' dict using the highest protocol available.
     with open('all_html_links.pickle', 'wb') as f:
@@ -207,17 +208,15 @@ def incorporateNewStats(my_df):
     #Create main df for all day's games
     new_df = pd.concat([game for game in my_games_clean.values()])
 
+    #Combine stats for each player, between games
+    new_df = new_df.groupby(new_df.index).sum()
+
+    #Save new_df
+    with open('new_df.pickle', 'wb') as f:
+        pickle.dump(new_df, f, pickle.HIGHEST_PROTOCOL)
+
     #Add this day's games df to my_df
-    my_df = my_df[columns_to_add].add(new_df[columns_to_add], fill_value=0) #ADD LAST GOAL DATA COLUMN, ASSIST TOO
-
-    # for index, game in my_games_clean.items():
-    #     # if game['Date'].max() > my_df['Date'].max(): #Only update games that are not yet included in my_df
-    #     my_df = my_df[columns_to_add].add(game[columns_to_add], fill_value=0) #This leaves NaN in the 'Date' column
-    #     # Update the 'Date' column of the main df with the game's date, for each player who scored
-    #     # my_df.loc[game[game['G'] > 0].index, 'Date'] = game.loc[game['G'] > 0, 'Date']
-    #     my_df.loc[game[game['G'] > 0].index, 'Date'] = game.loc[game[game['G'] > 0].index, 'Date']
-        # Do the same with assists
-
+    my_df[columns_to_add] = my_df[columns_to_add].add(new_df[columns_to_add], fill_value=0) #ADD LAST GOAL DATA COLUMN, ASSIST TOO
 
     #Convert NaN in the 'Date' column to October 4, 2000
     my_df['Date'] = my_df['Date'].fillna('2000/10/4')
@@ -298,4 +297,18 @@ print('Max TOI Player:', my_df[my_df['TOI'] == my_df['TOI'].max()].index[0])
 print('Chris Chelios present:', 'Chris Chelios' in my_df.index)
 
 
-my_df[my_df['Date'] == 0] = '2000/10/4'
+
+
+columns_to_add = ['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Shifts', 'TOI']
+
+a = my_games_clean[0].copy(deep=True)
+b = my_games_clean[1].copy(deep=True)
+
+c = pd.DataFrame(columns=['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Shifts', 'TOI', 'Team', 'Date'])
+d = pd.DataFrame(columns=['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Shifts', 'TOI', 'Team', 'Date'])
+
+c[columns_to_add] = a[columns_to_add].add(b[columns_to_add], fill_value=0)
+d[columns_to_add] = c[columns_to_add].add(b[columns_to_add], fill_value=0)
+
+
+f = new_df.groupby(new_df.index).sum()
