@@ -99,11 +99,9 @@ def scrapeHTMLRange(start_date, end_date):
 def scrapeGame(my_url, game_date, home_team_name, away_team_name):
 
     """[Function to pull stats from a single game, given the url (attained through getHTMLLinks), the date (also from getHTMLLinks), home and away teams]
-
     Returns:
         [Pandas DataFrame] -- [a clean df that has the game's stats]
     """
-
 
     # Read table from hockey-reference
     df = pd.read_html(my_url, header=1)
@@ -153,6 +151,8 @@ def scrapeAvailableGames():
 
 def cleanGame(game_df):
 
+    """ Cleans individual game data """
+
     # Copy df for editing
     df = game_df.copy(deep=True)
 
@@ -175,6 +175,9 @@ def cleanGame(game_df):
 
 def cleanUncleanGames():
 
+    """[Cleans the data present in each game of my_games_unclean dictionary]
+    """
+
     my_games_unclean = pd.read_pickle('my_games_unclean.pickle')
     my_games_clean = {}
 
@@ -192,7 +195,6 @@ def cleanUncleanGames():
 def incorporateNewStats(my_df):
 
     """[updates my_df]
-    
     Returns:
         [none] -- [just updates my_df]
     """
@@ -245,6 +247,7 @@ def incorporateNewStats(my_df):
 
 
 def updateDF(df, startDate='2000/10/4', endDate='2000/10/10'):
+    """ Run all prescribed functions on my_df, pulling html links, game data, then incorporating it to the file 'my_df.pickle' """
     scrapeHTMLRange(startDate, endDate)
     scrapeAvailableGames()
     cleanUncleanGames()
@@ -263,52 +266,50 @@ GLOBAL VARIABLE SECTION
 """
 
 
-# Save my_df
-my_df = pd.DataFrame(columns=['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Shifts', 'TOI', 'Team', 'Date'])
-# with open('my_df.pickle', 'wb') as f:
-#     pickle.dump(my_df, f, pickle.HIGHEST_PROTOCOL)
+# Create a new, empty my_df
+def new_my_df():
+    """ Create a new, empty my_df """
+    return pd.DataFrame(columns=['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Shifts', 'TOI', 'Team', 'Date'])
+
+#Save my_df as a pickle file
+def save_my_df():
+    """ Save my_df as a pickle file """
+    with open('my_df.pickle', 'wb') as f:
+        pickle.dump(my_df, f, pickle.HIGHEST_PROTOCOL)
 
 # open my_df
-my_df = pd.read_pickle('my_stats_df.pickle')
+def open_my_df():
+    """ Open the pickle file 'my_stats_df.pickle' """
+    return pd.read_pickle('my_stats_df.pickle')
 
 # Open my_games_unclean
-my_games_unclean = pd.read_pickle('my_games_unclean.pickle')
+def open_my_games_unclean():
+    """ Open the pickle file 'my_games_unclean.pickle' """
+    return pd.read_pickle('my_games_unclean.pickle')
 
 # Open my_games_clean
-my_games_clean = pd.read_pickle('my_games_clean.pickle')
+def open_my_games_clean():
+    """ Open the pickle file 'my_games_clean.pickle' """
+    return pd.read_pickle('my_games_clean.pickle')
 
 # Open all_html_links
-all_html_links = pd.read_pickle('all_html_links.pickle')
+def open_all_html_links():
+    """ Open the pickle file 'all_html_links.pickle' """
+    return pd.read_pickle('all_html_links.pickle')
 
 # Open teams_and_dates.pickle
-teams_and_dates = pd.read_pickle('teams_and_dates.pickle')
-
-# Potential next steps:
-    # 1 - Further modularize the functions. I don't need to be questioning the database everytime, now that I have the date under control. 
-    # 2 - Look into how the 'Days Since Last Goal' method can be applied to all the other categories!!
+def open_teams_and_dates():
+    """ Open the pickle file 'teams_and_dates.pickle' """
+    return pd.read_pickle('teams_and_dates.pickle')
 
 # Print QC information
-print('')
-print('Len my_df:', len(my_df))
-print('Max goals:', my_df['G'].max())
-print('Max goalscorer:', my_df[my_df['G'] == my_df['G'].max()].index[0])
-print('Max TOI:  ', my_df['TOI'].max())
-print('Max TOI Player:', my_df[my_df['TOI'] == my_df['TOI'].max()].index[0])
-print('Chris Chelios present:', 'Chris Chelios' in my_df.index)
+def my_df_QC():
+    """ Run random QC tests on my_df """
+    print('Len my_df:', len(my_df))
+    print('Max goals:', my_df['G'].max())
+    print('Max goalscorer:', my_df[my_df['G'] == my_df['G'].max()].index[0])
+    print('Max TOI:  ', my_df['TOI'].max())
+    print('Max TOI Player:', my_df[my_df['TOI'] == my_df['TOI'].max()].index[0])
+    print('Chris Chelios present:', 'Chris Chelios' in my_df.index)
 
 
-
-
-columns_to_add = ['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Shifts', 'TOI']
-
-a = my_games_clean[0].copy(deep=True)
-b = my_games_clean[1].copy(deep=True)
-
-c = pd.DataFrame(columns=['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Shifts', 'TOI', 'Team', 'Date'])
-d = pd.DataFrame(columns=['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Shifts', 'TOI', 'Team', 'Date'])
-
-c[columns_to_add] = a[columns_to_add].add(b[columns_to_add], fill_value=0)
-d[columns_to_add] = c[columns_to_add].add(b[columns_to_add], fill_value=0)
-
-
-f = new_df.groupby(new_df.index).sum()
