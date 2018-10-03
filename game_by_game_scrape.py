@@ -198,14 +198,26 @@ def incorporateNewStats(my_df):
 
     my_games_clean = pd.read_pickle('my_games_clean.pickle')
 
+    print('Adding {} games to my_df'.format(len(my_games_clean)))
+
     # Create master df, initialized with first df in my_games dictionary &
     # Iterate through games' dfs, merging them into the main df, then adding their values to the main df (Ex: Adding Goal totals)
     columns_to_add = ['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Shifts', 'TOI']
 
-    for index, game in my_games_clean.items():
-        my_df = my_df[columns_to_add].add(game[columns_to_add], fill_value=0) #This leaves NaN in the 'Date' column
-        # Update the 'Date' column of the main df with the game's date, for each player who scored
-        my_df.loc[game[game['G'] > 0].index, 'Date'] = game.loc[game['G'] > 0, 'Date']
+    #Create main df for all day's games
+    new_df = pd.concat([game for game in my_games_clean.values()])
+
+    #Add this day's games df to my_df
+    my_df = my_df[columns_to_add].add(new_df[columns_to_add], fill_value=0) #ADD LAST GOAL DATA COLUMN, ASSIST TOO
+
+    # for index, game in my_games_clean.items():
+    #     # if game['Date'].max() > my_df['Date'].max(): #Only update games that are not yet included in my_df
+    #     my_df = my_df[columns_to_add].add(game[columns_to_add], fill_value=0) #This leaves NaN in the 'Date' column
+    #     # Update the 'Date' column of the main df with the game's date, for each player who scored
+    #     # my_df.loc[game[game['G'] > 0].index, 'Date'] = game.loc[game['G'] > 0, 'Date']
+    #     my_df.loc[game[game['G'] > 0].index, 'Date'] = game.loc[game[game['G'] > 0].index, 'Date']
+        # Do the same with assists
+
 
     #Convert NaN in the 'Date' column to October 4, 2000
     my_df['Date'] = my_df['Date'].fillna('2000/10/4')
@@ -222,6 +234,12 @@ def incorporateNewStats(my_df):
     my_df['Days Since Last Goal'] = today - my_df['DateTime']
     my_df['Days Since Last Goal'] = my_df['Days Since Last Goal'].dt.days
     
+    # Create a column 'Days Since Last Assist'
+    today = pd.to_datetime('today')
+    my_df['DateTime'] = pd.to_datetime(my_df['Date'], format='%Y/%m/%d')
+    my_df['Days Since Last Assist'] = today - my_df['DateTime']
+    my_df['Days Since Last Assist'] = my_df['Days Since Last Assist'].dt.days
+
     with open('my_stats_df.pickle', 'wb') as f:
         pickle.dump(my_df, f, pickle.HIGHEST_PROTOCOL)
 
@@ -247,7 +265,7 @@ GLOBAL VARIABLE SECTION
 
 
 # Save my_df
-# my_df = pd.DataFrame(columns=['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Shifts', 'TOI', 'Team', 'Date'])
+my_df = pd.DataFrame(columns=['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Shifts', 'TOI', 'Team', 'Date'])
 # with open('my_df.pickle', 'wb') as f:
 #     pickle.dump(my_df, f, pickle.HIGHEST_PROTOCOL)
 
@@ -271,11 +289,13 @@ teams_and_dates = pd.read_pickle('teams_and_dates.pickle')
     # 2 - Look into how the 'Days Since Last Goal' method can be applied to all the other categories!!
 
 # Print QC information
-# print('')
-# print('Len my_df:', len(my_df))
-# print('Max goals:', my_df['G'].max())
-# print('Max TOI:  ', my_df['TOI'].max())
-# print('Max TOI Player:', my_df[my_df['TOI'] == my_df['TOI'].max()].index[0])
-# print('Chris Chelios present:', 'Chris Chelios' in my_df.index)
+print('')
+print('Len my_df:', len(my_df))
+print('Max goals:', my_df['G'].max())
+print('Max goalscorer:', my_df[my_df['G'] == my_df['G'].max()].index[0])
+print('Max TOI:  ', my_df['TOI'].max())
+print('Max TOI Player:', my_df[my_df['TOI'] == my_df['TOI'].max()].index[0])
+print('Chris Chelios present:', 'Chris Chelios' in my_df.index)
 
 
+my_df[my_df['Date'] == 0] = '2000/10/4'
