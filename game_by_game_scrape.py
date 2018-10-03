@@ -9,6 +9,8 @@ from bs4 import BeautifulSoup
 import datetime
 import time
 
+#Continue implementing last_time_df to update last time each event happened for each player, from my_clean_games df. Maybe during incorporation
+
 def getHTMLLinks(month, day, year):
 
     """[Function to use the given date to create the html links to www.hockey-reference.com for that day's games. 
@@ -244,8 +246,6 @@ def incorporateNewStats(my_df):
     with open('my_stats_df.pickle', 'wb') as f:
         pickle.dump(my_df, f, pickle.HIGHEST_PROTOCOL)
 
-
-
 def updateDF(df, startDate='2000/10/4', endDate='2000/10/10'):
     """ Run all prescribed functions on my_df, pulling html links, game data, then incorporating it to the file 'my_df.pickle' """
     scrapeHTMLRange(startDate, endDate)
@@ -253,17 +253,6 @@ def updateDF(df, startDate='2000/10/4', endDate='2000/10/10'):
     cleanUncleanGames()
     incorporateNewStats(df)
 
-
-
-my_df = pd.read_pickle('my_stats_df.pickle')
-
-updateDF(my_df, startDate='2000/10/10', endDate='2000/10/15')
-
-"""
-
-GLOBAL VARIABLE SECTION
-
-"""
 
 
 # Create a new, empty my_df
@@ -281,6 +270,22 @@ def save_my_df():
 def open_my_df():
     """ Open the pickle file 'my_stats_df.pickle' """
     return pd.read_pickle('my_stats_df.pickle')
+
+def create_new_last_time_df():
+    """ Create a new last_time_df file """
+    return pd.DataFrame(columns=['Last Game Date', 'Last Goal', 'Last Assist', 'Last Point', 'Last + Game', 
+                                 'Last - Game', 'Last PIM', 'Last EV', 'Last PP', 'Last SH', 'Last GW', 'Last S'])
+
+# Save last_time_df as pickle file
+def save_last_time_df():
+    """ Save last_time_df as a pickle file """
+    with open('last_time_df.pickle', 'wb') as f:
+        pickle.dump(last_time_df, f, pickle.HIGHEST_PROTOCOL)
+
+# Open last_time_df pickle file
+def open_last_time_df():
+    """ Open the pickle file 'last_time_df.pickle' """
+    return pd.read_pickle('last_time_df.pickle')
 
 # Open my_games_unclean
 def open_my_games_unclean():
@@ -313,3 +318,8 @@ def my_df_QC():
     print('Chris Chelios present:', 'Chris Chelios' in my_df.index)
 
 
+
+
+if __name__ == __main__:
+    my_df = open_my_df()
+    updateDF(my_df, startDate='2000/10/10', endDate='2000/10/15')
