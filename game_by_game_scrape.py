@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 import datetime
 import time
 
-#Continue implementing last_time_df to update last time each event happened for each player, from my_clean_games df. Maybe during incorporation
+#Fix updateLastTime to actually edit last_time_df
 
 def getHTMLLinks(month, day, year):
 
@@ -119,6 +119,7 @@ def scrapeGame(my_url, game_date, home_team_name, away_team_name):
 
     #Make a 'Date' column, which will eventually be used to represent the last time each player scored a goal
     df['Date'] = game_date
+    my_df['Date'] = pd.to_datetime(my_df['Date'], format='%Y/%m/%d')
 
     # Set player name to index
     df = df.set_index('Player')
@@ -168,6 +169,9 @@ def cleanGame(game_df):
     #Fill NaN values to convert to int
     df = df.fillna(0)
 
+    #Convert Date to datetime, if it's not already
+    my_df['Date'] = pd.to_datetime(my_df['Date'], format='%Y/%m/%d')
+
     #Get int of minutes on ice from string "mm:ss"
     df['TOI'] = df['TOI'].str.split(':')
     df['TOI'] = df['TOI'].apply(lambda x: int(x[0]) + int(x[1])/60)
@@ -193,6 +197,38 @@ def cleanUncleanGames():
         pickle.dump(my_games_clean, f, pickle.HIGHEST_PROTOCOL)
 
     print('Number of games cleaned = {}'.format(len(my_games_clean)))
+
+def updateLastTime():
+
+    """Update df containing the dates of the last time each player scored, hit, etc"""
+
+    #Load in last_time_df
+    last_time_df = open_last_time_df()
+
+    #Load my_games_clean dictionary
+    my_games_clean = open_my_games_clean()
+
+    #Set columns to iterate through
+    cols = ['G', 'A', 'PTS', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S']
+
+    #Iterate through all games in my_games_clean dictionary
+    for index, game_df in my_games_clean.items():
+
+        #Create the new index, which is a union of the main one and the one from the specific game
+        new_index = last_time_df.index.union(game_df.index)
+        #Implement the new index, filling in empty values with the date '2000/10/4' (start of '00 season)
+        last_time_df = last_time_df.reindex(new_index, fill_value=pd.to_datetime('2000/10/3', format='%Y/%m/%d'))
+        #Collect the date of the game
+        game_date = game_df['Date'].mode()
+
+        #Iterate through columns to update date for goals, assists, etc.
+        for column in cols:
+            last_time_df.loc[game_df[game_df[column] > 0].index, column] = game_date[0]
+
+        last_time_df.loc[game_df.index, 'Last Game Date'] = game_date[0]
+
+    #Save last_time_df
+    save_last_time_df()
 
 def incorporateNewStats(my_df):
 
@@ -231,17 +267,8 @@ def incorporateNewStats(my_df):
         if column in my_df.columns:
             my_df[column] = my_df[column].astype(int)
 
-    # Create a column 'Days Since Last Goal'
-    today = pd.to_datetime('today')
-    my_df['DateTime'] = pd.to_datetime(my_df['Date'], format='%Y/%m/%d')
-    my_df['Days Since Last Goal'] = today - my_df['DateTime']
-    my_df['Days Since Last Goal'] = my_df['Days Since Last Goal'].dt.days
-    
-    # Create a column 'Days Since Last Assist'
-    today = pd.to_datetime('today')
-    my_df['DateTime'] = pd.to_datetime(my_df['Date'], format='%Y/%m/%d')
-    my_df['Days Since Last Assist'] = today - my_df['DateTime']
-    my_df['Days Since Last Assist'] = my_df['Days Since Last Assist'].dt.days
+    # Convery 'Date' column to datetime
+    my_df['Date'] = pd.to_datetime(my_df['Date'], format='%Y/%m/%d')
 
     with open('my_stats_df.pickle', 'wb') as f:
         pickle.dump(my_df, f, pickle.HIGHEST_PROTOCOL)
@@ -251,6 +278,7 @@ def updateDF(df, startDate='2000/10/4', endDate='2000/10/10'):
     scrapeHTMLRange(startDate, endDate)
     scrapeAvailableGames()
     cleanUncleanGames()
+    updateLastTime()
     incorporateNewStats(df)
 
 
@@ -273,8 +301,7 @@ def open_my_df():
 
 def create_new_last_time_df():
     """ Create a new last_time_df file """
-    return pd.DataFrame(columns=['Last Game Date', 'Last Goal', 'Last Assist', 'Last Point', 'Last + Game', 
-                                 'Last - Game', 'Last PIM', 'Last EV', 'Last PP', 'Last SH', 'Last GW', 'Last S'])
+    return pd.DataFrame(columns=['G', 'A', 'PTS', '+', '-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Last Game Date'])
 
 # Save last_time_df as pickle file
 def save_last_time_df():
@@ -320,6 +347,11 @@ def my_df_QC():
 
 
 
-if __name__ == __main__:
-    my_df = open_my_df()
-    updateDF(my_df, startDate='2000/10/10', endDate='2000/10/15')
+# if __name__ == '__main__':
+#     my_df = open_my_df()
+#     updateDF(my_df, startDate='2000/10/10', endDate='2000/10/15')
+
+
+last_time_df = create_new_last_time_df()
+updateLastTime()
+last_time_df = open_last_time_df()
