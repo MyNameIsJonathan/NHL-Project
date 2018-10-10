@@ -1,15 +1,13 @@
 # Scrape the website https://www.hockey-reference.com for game-by-game stats
 
 import pandas as pd
-from My_Classes import person
-from My_Classes import hockey_player
 import pickle
 import requests
 from bs4 import BeautifulSoup
 import datetime
 import time
 
-#Fix updateLastTime to actually edit last_time_df
+#Find way to not allow duplicate stats to be added to main df
 
 def getHTMLLinks(month, day, year):
 
@@ -119,7 +117,7 @@ def scrapeGame(my_url, game_date, home_team_name, away_team_name):
 
     #Make a 'Date' column, which will eventually be used to represent the last time each player scored a goal
     df['Date'] = game_date
-    my_df['Date'] = pd.to_datetime(my_df['Date'], format='%Y/%m/%d')
+    df['Date'] = pd.to_datetime(df['Date'], format='%Y/%m/%d')
 
     # Set player name to index
     df = df.set_index('Player')
@@ -196,7 +194,7 @@ def cleanUncleanGames():
     with open('my_games_clean.pickle', 'wb') as f:
         pickle.dump(my_games_clean, f, pickle.HIGHEST_PROTOCOL)
 
-    print('Number of games cleaned = {}'.format(len(my_games_clean)))
+    print('Number of games cleaned  = {}'.format(len(my_games_clean)))
 
 def updateLastTime():
 
@@ -225,10 +223,27 @@ def updateLastTime():
         for column in cols:
             last_time_df.loc[game_df[game_df[column] > 0].index, column] = game_date[0]
 
+        #Set last game date to current game's date
         last_time_df.loc[game_df.index, 'Last Game Date'] = game_date[0]
 
+    #Also add in last times the player was + or -
+    pmCols = ['+', '-']
+
+    #Iterate through columns to edit +/- columns
+    for column in pmCols:
+        if column == '+':
+            last_time_df.loc[game_df[game_df['+/-'] > 0].index, column] = game_date[0]
+        elif column == '-':
+            last_time_df.loc[game_df[game_df['+/-'] < 0].index, column] = game_date[0]
+
+    #Save only the date, not the time
+    for column in last_time_df.columns:
+        last_time_df[column] = last_time_df[column].dt.date
+
     #Save last_time_df
-    save_last_time_df()
+    save_last_time_df(last_time_df)
+
+    return last_time_df
 
 def incorporateNewStats(my_df):
 
@@ -245,6 +260,9 @@ def incorporateNewStats(my_df):
     # Iterate through games' dfs, merging them into the main df, then adding their values to the main df (Ex: Adding Goal totals)
     columns_to_add = ['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Shifts', 'TOI']
 
+    #Keep only these columns -- removes 'Date' column, which is in last_time_df
+    my_df = my_df[columns_to_add]
+
     #Create main df for all day's games
     new_df = pd.concat([game for game in my_games_clean.values()])
 
@@ -256,10 +274,7 @@ def incorporateNewStats(my_df):
         pickle.dump(new_df, f, pickle.HIGHEST_PROTOCOL)
 
     #Add this day's games df to my_df
-    my_df[columns_to_add] = my_df[columns_to_add].add(new_df[columns_to_add], fill_value=0) #ADD LAST GOAL DATA COLUMN, ASSIST TOO
-
-    #Convert NaN in the 'Date' column to October 4, 2000
-    my_df['Date'] = my_df['Date'].fillna('2000/10/4')
+    my_df = my_df.add(new_df[columns_to_add], fill_value=0) 
 
     # Convert columns to int
     columns_to_int = ['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'EV', 'PP', 'SH', 'S', 'Shifts']
@@ -267,11 +282,9 @@ def incorporateNewStats(my_df):
         if column in my_df.columns:
             my_df[column] = my_df[column].astype(int)
 
-    # Convery 'Date' column to datetime
-    my_df['Date'] = pd.to_datetime(my_df['Date'], format='%Y/%m/%d')
+    save_my_df(my_df)
 
-    with open('my_stats_df.pickle', 'wb') as f:
-        pickle.dump(my_df, f, pickle.HIGHEST_PROTOCOL)
+    return my_df
 
 def updateDF(df, startDate='2000/10/4', endDate='2000/10/10'):
     """ Run all prescribed functions on my_df, pulling html links, game data, then incorporating it to the file 'my_df.pickle' """
@@ -289,7 +302,7 @@ def new_my_df():
     return pd.DataFrame(columns=['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Shifts', 'TOI', 'Team', 'Date'])
 
 #Save my_df as a pickle file
-def save_my_df():
+def save_my_df(my_df):
     """ Save my_df as a pickle file """
     with open('my_df.pickle', 'wb') as f:
         pickle.dump(my_df, f, pickle.HIGHEST_PROTOCOL)
@@ -297,14 +310,14 @@ def save_my_df():
 # open my_df
 def open_my_df():
     """ Open the pickle file 'my_stats_df.pickle' """
-    return pd.read_pickle('my_stats_df.pickle')
+    return pd.read_pickle('my_df.pickle')
 
 def create_new_last_time_df():
     """ Create a new last_time_df file """
     return pd.DataFrame(columns=['G', 'A', 'PTS', '+', '-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Last Game Date'])
 
 # Save last_time_df as pickle file
-def save_last_time_df():
+def save_last_time_df(last_time_df):
     """ Save last_time_df as a pickle file """
     with open('last_time_df.pickle', 'wb') as f:
         pickle.dump(last_time_df, f, pickle.HIGHEST_PROTOCOL)
@@ -344,7 +357,11 @@ def my_df_QC():
     print('Max TOI Player:', my_df[my_df['TOI'] == my_df['TOI'].max()].index[0])
     print('Chris Chelios present:', 'Chris Chelios' in my_df.index)
 
+def randomFunction():
 
+    a = open_my_df()
+    a.iloc[:, 0] = 0
+    save_my_df(a)
 
 
 # if __name__ == '__main__':
@@ -352,6 +369,18 @@ def my_df_QC():
 #     updateDF(my_df, startDate='2000/10/10', endDate='2000/10/15')
 
 
-last_time_df = create_new_last_time_df()
-updateLastTime()
+# last_time_df = create_new_last_time_df()
+
+
+
+my_df = open_my_df()
+
+# all_html_links = open_all_html_links()
+# my_games_unclean = open_my_games_unclean()
+my_games_clean = open_my_games_clean()
+# teams_and_dates = open_teams_and_dates()
 last_time_df = open_last_time_df()
+
+# last_time_df = updateLastTime()
+
+
