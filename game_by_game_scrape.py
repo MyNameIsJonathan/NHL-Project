@@ -1,13 +1,13 @@
 # Scrape the website https://www.hockey-reference.com for game-by-game stats
 
 import pandas as pd
-from My_Classes import person
-from My_Classes import hockey_player
 import pickle
 import requests
 from bs4 import BeautifulSoup
 import datetime
 import time
+
+#Find way to not allow duplicate stats to be added to main df
 
 def getHTMLLinks(month, day, year):
 
@@ -32,7 +32,7 @@ def getHTMLLinks(month, day, year):
     my_game_dates = []
 
     # Iterate through returned list of dfs, to record home and away team names
-    for i in range(0, len(my_days_games)-1, 2):
+    for i in range(0, len(my_days_games)-2, 2):
         my_home_teams.append(my_days_games[i].iloc[1, 0])
         my_away_teams.append(my_days_games[i].iloc[0, 0])
         my_game_dates.append(my_date)
@@ -57,14 +57,51 @@ def getHTMLLinks(month, day, year):
     # Return 1 - boxscore links, 2 - home team names, 3 - away team names, 4 - game dates
     return (boxscore_links, my_home_teams, my_away_teams, my_game_dates)
 
+def scrapeHTMLRange(start_date, end_date):
+
+    """[scrapes all html links for each each between the given dates, exclusive of the end date, storing them in the file all_html_links.pickle'.
+    """
+
+    start_date = pd.to_datetime(start_date, format='%Y/%m/%d')
+    end_date = pd.to_datetime(end_date, format='%Y/%m/%d')
+    all_html_links = {}
+
+    total_home_teams = []
+    total_away_teams = []
+    all_game_dates = []
+
+    # Get the html links for the tables
+    while start_date != end_date:
+        my_html_results = getHTMLLinks(start_date.month, start_date.day, start_date.year)
+        all_html_links[str(start_date)] = my_html_results[0]
+        total_home_teams.extend(my_html_results[1])
+        total_away_teams.extend(my_html_results[2])
+        all_game_dates.extend(my_html_results[3])
+        start_date += datetime.timedelta(days=1)
+        time.sleep(1/5)
+
+        # Pickle the 'all_html_links' dict using the highest protocol available.
+    with open('all_html_links.pickle', 'wb') as f:
+        pickle.dump(all_html_links, f, pickle.HIGHEST_PROTOCOL)
+
+    # Flatten list of game htmls
+    flat_list_game_links = [item for sublist in list(all_html_links.values()) for item in sublist]
+
+    #Save home teams, away teams, and game dates in df
+    teams_and_dates = pd.DataFrame([total_home_teams, total_away_teams, all_game_dates, flat_list_game_links])
+    with open('teams_and_dates.pickle', 'wb') as f:
+        pickle.dump(teams_and_dates, f, pickle.HIGHEST_PROTOCOL)
+
+    print('Total game links scraped = {}'.format(len(teams_and_dates.columns)))
+
+    return teams_and_dates
+
 def scrapeGame(my_url, game_date, home_team_name, away_team_name):
 
     """[Function to pull stats from a single game, given the url (attained through getHTMLLinks), the date (also from getHTMLLinks), home and away teams]
-
     Returns:
         [Pandas DataFrame] -- [a clean df that has the game's stats]
     """
-
 
     # Read table from hockey-reference
     df = pd.read_html(my_url, header=1)
@@ -80,13 +117,42 @@ def scrapeGame(my_url, game_date, home_team_name, away_team_name):
 
     #Make a 'Date' column, which will eventually be used to represent the last time each player scored a goal
     df['Date'] = game_date
+    df['Date'] = pd.to_datetime(df['Date'], format='%Y/%m/%d')
 
     # Set player name to index
     df = df.set_index('Player')
 
     return df
 
+def scrapeAvailableGames():
+
+    """[scrapes game data in file 'teams_and_dates.pickle' incorporating the resulting dfs into the file 'my_games_unclean.pickle']
+    """
+
+    teams_and_dates = pd.read_pickle('teams_and_dates.pickle')
+
+    print('Number of games to scrape = {}'.format(len(teams_and_dates.columns)))
+
+    my_games_unclean = {}
+
+    # Use  html links to create games' dataframes
+    for game in range(len(teams_and_dates.columns)):
+        my_games_unclean[game] = scrapeGame(
+            my_url=teams_and_dates.iloc[3, game], 
+            game_date=teams_and_dates.iloc[2, game],
+            home_team_name=teams_and_dates.iloc[0, game],
+            away_team_name=teams_and_dates.iloc[1, game])
+        time.sleep(1/5)
+
+    # Pickle the 'my_games' dictionary using the highest protocol available.
+    with open('my_games_unclean.pickle', 'wb') as f:
+        pickle.dump(my_games_unclean, f, pickle.HIGHEST_PROTOCOL)
+
+    print('Number of games scraped = {}'.format(len(my_games_unclean)))
+
 def cleanGame(game_df):
+
+    """ Cleans individual game data """
 
     # Copy df for editing
     df = game_df.copy(deep=True)
@@ -101,6 +167,9 @@ def cleanGame(game_df):
     #Fill NaN values to convert to int
     df = df.fillna(0)
 
+    #Convert Date to datetime, if it's not already
+    my_df['Date'] = pd.to_datetime(my_df['Date'], format='%Y/%m/%d')
+
     #Get int of minutes on ice from string "mm:ss"
     df['TOI'] = df['TOI'].str.split(':')
     df['TOI'] = df['TOI'].apply(lambda x: int(x[0]) + int(x[1])/60)
@@ -108,95 +177,104 @@ def cleanGame(game_df):
     
     return df
 
-def getStats(starting_df=None, start_date='2000/10/4', end_date='2000/10/12'):
+def cleanUncleanGames():
 
-    """[Function to call the previous functions]
-    
-    Returns:
-        [Pandas DataFrame] -- [Statistical summary of games between given dates]
+    """[Cleans the data present in each game of my_games_unclean dictionary]
     """
 
-    print('...getting html links...')
-
-    start_date = pd.to_datetime(start_date, format='%Y/%m/%d')
-    end_date = pd.to_datetime(end_date, format='%Y/%m/%d')
-
-    my_games_unclean = {}
+    my_games_unclean = pd.read_pickle('my_games_unclean.pickle')
     my_games_clean = {}
 
-    all_html_links = {}
+    print('Number of games to clean = {}'.format(len(my_games_unclean)))
 
-    my_game_index = 0
-
-    total_home_teams = []
-    total_away_teams = []
-    all_game_dates = []
-
-    # Get the html links for the tables
-    while start_date != end_date:
-        my_html_results = getHTMLLinks(start_date.month, start_date.day, start_date.year)
-        all_html_links[str(start_date)] = my_html_results[0]
-        total_home_teams.extend(my_html_results[1])
-        total_away_teams.extend(my_html_results[2])
-        all_game_dates.extend(my_html_results[3])
-        start_date += datetime.timedelta(days=1)
-    
-    # Pickle the 'all_html_links' dict using the highest protocol available.
-    with open('all_html_links.pickle', 'wb') as f:
-        pickle.dump(all_html_links, f, pickle.HIGHEST_PROTOCOL)
-
-    # Flatten list of game htmls
-    flat_list_game_links = [item for sublist in list(all_html_links.values()) for item in sublist]
-
-    #Save home teams, away teams, and game dates in df
-    teams_and_dates = pd.DataFrame([total_home_teams, total_away_teams, all_game_dates, flat_list_game_links])
-    with open('teams_and_dates.pickle', 'wb') as f:
-        pickle.dump(teams_and_dates, f, pickle.HIGHEST_PROTOCOL)
-
-    print('...getting game data...')
-
-    # Use these html links to create games' dataframes
-    for date in all_html_links:
-        for link in all_html_links[date]:
-            my_games_unclean[my_game_index] = scrapeGame(
-                my_url=link, 
-                game_date=all_game_dates[my_game_index],
-                home_team_name=total_home_teams[my_game_index],
-                away_team_name=total_away_teams[my_game_index])
-            if 'SV%' not in my_games_unclean[my_game_index].columns:
-                my_games_clean[my_game_index] = cleanGame(my_games_unclean[my_game_index])
-            time.sleep(1/5)
-            my_game_index += 1
-
-    # Pickle the 'my_games' dictionary using the highest protocol available.
-    with open('my_games_unclean.pickle', 'wb') as f:
-        pickle.dump(my_games_unclean, f, pickle.HIGHEST_PROTOCOL)
+    for index, game in my_games_unclean.items():
+        if 'SV%' not in game.columns:
+            my_games_clean[index] = cleanGame(game)
 
     with open('my_games_clean.pickle', 'wb') as f:
         pickle.dump(my_games_clean, f, pickle.HIGHEST_PROTOCOL)
 
-    print('...combining data...')
+    print('Number of games cleaned  = {}'.format(len(my_games_clean)))
+
+def updateLastTime():
+
+    """Update df containing the dates of the last time each player scored, hit, etc"""
+
+    #Load in last_time_df
+    last_time_df = open_last_time_df()
+
+    #Load my_games_clean dictionary
+    my_games_clean = open_my_games_clean()
+
+    #Set columns to iterate through
+    cols = ['G', 'A', 'PTS', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S']
+
+    #Iterate through all games in my_games_clean dictionary
+    for index, game_df in my_games_clean.items():
+
+        #Create the new index, which is a union of the main one and the one from the specific game
+        new_index = last_time_df.index.union(game_df.index)
+        #Implement the new index, filling in empty values with the date '2000/10/4' (start of '00 season)
+        last_time_df = last_time_df.reindex(new_index, fill_value=pd.to_datetime('2000/10/3', format='%Y/%m/%d'))
+        #Collect the date of the game
+        game_date = game_df['Date'].mode()
+
+        #Iterate through columns to update date for goals, assists, etc.
+        for column in cols:
+            last_time_df.loc[game_df[game_df[column] > 0].index, column] = game_date[0]
+
+        #Set last game date to current game's date
+        last_time_df.loc[game_df.index, 'Last Game Date'] = game_date[0]
+
+    #Also add in last times the player was + or -
+    pmCols = ['+', '-']
+
+    #Iterate through columns to edit +/- columns
+    for column in pmCols:
+        if column == '+':
+            last_time_df.loc[game_df[game_df['+/-'] > 0].index, column] = game_date[0]
+        elif column == '-':
+            last_time_df.loc[game_df[game_df['+/-'] < 0].index, column] = game_date[0]
+
+    #Save only the date, not the time
+    for column in last_time_df.columns:
+        last_time_df[column] = last_time_df[column].dt.date
+
+    #Save last_time_df
+    save_last_time_df(last_time_df)
+
+    return last_time_df
+
+def incorporateNewStats(my_df):
+
+    """[updates my_df]
+    Returns:
+        [none] -- [just updates my_df]
+    """
+
+    my_games_clean = pd.read_pickle('my_games_clean.pickle')
+
+    print('Adding {} games to my_df'.format(len(my_games_clean)))
 
     # Create master df, initialized with first df in my_games dictionary &
     # Iterate through games' dfs, merging them into the main df, then adding their values to the main df (Ex: Adding Goal totals)
     columns_to_add = ['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Shifts', 'TOI']
-    if starting_df is None:
-        my_df = my_games_clean[0].copy(deep=True)
-        for game in range(1, len(my_games_clean)):
-            my_game = my_games_clean[game]
-            my_df = my_df[columns_to_add].add(my_game[columns_to_add], fill_value=0)
-            # Update the 'Date' column of the main df with the game's date, for each player who scored
-            my_df.loc[my_game[my_game['G'] > 0].index, 'Date'] = my_game.loc[my_game['G'] > 0, 'Date']
-    else:
-        my_df = starting_df.copy(deep=True)
-        for game in range(len(my_games_clean)):
-            my_game = my_games_clean[game]
-            my_df = my_df[columns_to_add].add(my_game[columns_to_add], fill_value=0) #This leaves NaN in the 'Date' column
-            # Update the 'Date' column of the main df with the game's date, for each player who scored
-            my_df.loc[my_game[my_game['G'] > 0].index, 'Date'] = my_game.loc[my_game['G'] > 0, 'Date']
 
-    #Convert NaN in the 'Date' column to October 4, 2000
-    my_df['Date'] = my_df['Date'].fillna('2000/10/4')
+    #Keep only these columns -- removes 'Date' column, which is in last_time_df
+    my_df = my_df[columns_to_add]
+
+    #Create main df for all day's games
+    new_df = pd.concat([game for game in my_games_clean.values()])
+
+    #Combine stats for each player, between games
+    new_df = new_df.groupby(new_df.index).sum()
+
+    #Save new_df
+    with open('new_df.pickle', 'wb') as f:
+        pickle.dump(new_df, f, pickle.HIGHEST_PROTOCOL)
+
+    #Add this day's games df to my_df
+    my_df = my_df.add(new_df[columns_to_add], fill_value=0) 
 
     # Convert columns to int
     columns_to_int = ['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'EV', 'PP', 'SH', 'S', 'Shifts']
@@ -204,45 +282,105 @@ def getStats(starting_df=None, start_date='2000/10/4', end_date='2000/10/12'):
         if column in my_df.columns:
             my_df[column] = my_df[column].astype(int)
 
-    # Create a column 'Days Since Last Goal'
-    today = pd.to_datetime('today')
-    my_df['DateTime'] = pd.to_datetime(my_df['Date'], format='%Y/%m/%d')
-    my_df['Days Since Last Goal'] = today - my_df['DateTime']
-    my_df['Days Since Last Goal'] = my_df['Days Since Last Goal'].dt.days
-    
+    save_my_df(my_df)
+
     return my_df
 
+def updateDF(df, startDate='2000/10/4', endDate='2000/10/10'):
+    """ Run all prescribed functions on my_df, pulling html links, game data, then incorporating it to the file 'my_df.pickle' """
+    scrapeHTMLRange(startDate, endDate)
+    scrapeAvailableGames()
+    cleanUncleanGames()
+    updateLastTime()
+    incorporateNewStats(df)
 
-my_df = getStats(start_date='2000/10/4', end_date='2000/10/12')
 
-# Save my_df
-with open('my_df.pickle', 'wb') as f:
-    # Pickle the 'my_games' dictionary using the highest protocol available.
-    pickle.dump(my_df, f, pickle.HIGHEST_PROTOCOL)
+
+# Create a new, empty my_df
+def new_my_df():
+    """ Create a new, empty my_df """
+    return pd.DataFrame(columns=['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Shifts', 'TOI', 'Team', 'Date'])
+
+#Save my_df as a pickle file
+def save_my_df(my_df):
+    """ Save my_df as a pickle file """
+    with open('my_df.pickle', 'wb') as f:
+        pickle.dump(my_df, f, pickle.HIGHEST_PROTOCOL)
 
 # open my_df
-my_df = pd.read_pickle('my_df.pickle')
+def open_my_df():
+    """ Open the pickle file 'my_stats_df.pickle' """
+    return pd.read_pickle('my_df.pickle')
+
+def create_new_last_time_df():
+    """ Create a new last_time_df file """
+    return pd.DataFrame(columns=['G', 'A', 'PTS', '+', '-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Last Game Date'])
+
+# Save last_time_df as pickle file
+def save_last_time_df(last_time_df):
+    """ Save last_time_df as a pickle file """
+    with open('last_time_df.pickle', 'wb') as f:
+        pickle.dump(last_time_df, f, pickle.HIGHEST_PROTOCOL)
+
+# Open last_time_df pickle file
+def open_last_time_df():
+    """ Open the pickle file 'last_time_df.pickle' """
+    return pd.read_pickle('last_time_df.pickle')
 
 # Open my_games_unclean
-# my_games_unclean = pd.read_pickle('my_games_unclean.pickle')
+def open_my_games_unclean():
+    """ Open the pickle file 'my_games_unclean.pickle' """
+    return pd.read_pickle('my_games_unclean.pickle')
 
 # Open my_games_clean
-# my_games_clean = pd.read_pickle('my_games_clean.pickle')
+def open_my_games_clean():
+    """ Open the pickle file 'my_games_clean.pickle' """
+    return pd.read_pickle('my_games_clean.pickle')
 
 # Open all_html_links
-# all_html_links = pd.read_pickle('all_html_links.pickle')
+def open_all_html_links():
+    """ Open the pickle file 'all_html_links.pickle' """
+    return pd.read_pickle('all_html_links.pickle')
 
 # Open teams_and_dates.pickle
-# teams_and_dates = pd.read_pickle('teams_and_dates.pickle')
-
-# Potential next steps:
-    # 1 - Further modularize the functions. I don't need to be questioning the database everytime, now that I have the date under control. 
-    # 2 - Look into how the 'Days Since Last Goal' method can be applied to all the other categories!!
+def open_teams_and_dates():
+    """ Open the pickle file 'teams_and_dates.pickle' """
+    return pd.read_pickle('teams_and_dates.pickle')
 
 # Print QC information
-print('')
-print('Len my_df:', len(my_df))
-print('Max goals:', my_df['G'].max())
-print('Max TOI:  ', my_df['TOI'].max())
-print('Max TOI Player:', my_df[my_df['TOI'] == my_df['TOI'].max()].index[0])
-print('Chris Chelios present:', 'Chris Chelios' in my_df.index)
+def my_df_QC():
+    """ Run random QC tests on my_df """
+    print('Len my_df:', len(my_df))
+    print('Max goals:', my_df['G'].max())
+    print('Max goalscorer:', my_df[my_df['G'] == my_df['G'].max()].index[0])
+    print('Max TOI:  ', my_df['TOI'].max())
+    print('Max TOI Player:', my_df[my_df['TOI'] == my_df['TOI'].max()].index[0])
+    print('Chris Chelios present:', 'Chris Chelios' in my_df.index)
+
+def randomFunction():
+
+    a = open_my_df()
+    a.iloc[:, 0] = 0
+    save_my_df(a)
+
+
+# if __name__ == '__main__':
+#     my_df = open_my_df()
+#     updateDF(my_df, startDate='2000/10/10', endDate='2000/10/15')
+
+
+# last_time_df = create_new_last_time_df()
+
+
+
+my_df = open_my_df()
+
+# all_html_links = open_all_html_links()
+# my_games_unclean = open_my_games_unclean()
+my_games_clean = open_my_games_clean()
+# teams_and_dates = open_teams_and_dates()
+last_time_df = open_last_time_df()
+
+# last_time_df = updateLastTime()
+
+
