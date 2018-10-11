@@ -10,6 +10,8 @@ import time
 
 #Find way to not allow duplicate stats to be added to main df
 
+'-----------------------------------------------------------------'
+
 def getHTMLLinks(month, day, year):
 
     """[Function to use the given date to create the html links to www.hockey-reference.com for that day's games. 
@@ -58,45 +60,6 @@ def getHTMLLinks(month, day, year):
     # Return 1 - boxscore links, 2 - home team names, 3 - away team names, 4 - game dates
     return (boxscore_links, my_home_teams, my_away_teams, my_game_dates)
 
-def scrapeHTMLRange(start_date, end_date):
-
-    """[scrapes all html links for each each between the given dates, exclusive of the end date, storing them in the file all_html_links.pickle'.
-    """
-
-    start_date = pd.to_datetime(start_date, format='%Y/%m/%d')
-    end_date = pd.to_datetime(end_date, format='%Y/%m/%d')
-    all_html_links = {}
-
-    total_home_teams = []
-    total_away_teams = []
-    all_game_dates = []
-
-    print('Scraping game links between dates {} and {}'.format(start_date, end_date))
-
-    # Get the html links for the tables
-    while start_date != end_date:
-        my_html_results = getHTMLLinks(start_date.month, start_date.day, start_date.year)
-        all_html_links[str(start_date)] = my_html_results[0]
-        total_home_teams.extend(my_html_results[1])
-        total_away_teams.extend(my_html_results[2])
-        all_game_dates.extend(my_html_results[3])
-        start_date += datetime.timedelta(days=1)
-        time.sleep(1/2)
-
-        # Pickle the 'all_html_links' dict using the highest protocol available.
-    with open('all_html_links.pickle', 'wb') as f:
-        pickle.dump(all_html_links, f, pickle.HIGHEST_PROTOCOL)
-
-    # Flatten list of game htmls
-    flat_list_game_links = [item for sublist in list(all_html_links.values()) for item in sublist]
-
-    #Save home teams, away teams, and game dates in df
-    teams_and_dates = pd.DataFrame([total_home_teams, total_away_teams, all_game_dates, flat_list_game_links])
-    with open('teams_and_dates.pickle', 'wb') as f:
-        pickle.dump(teams_and_dates, f, pickle.HIGHEST_PROTOCOL)
-
-    print('Total game links scraped = {}'.format(len(teams_and_dates.columns)))
-
 def scrapeGame(my_url, game_date, home_team_name, away_team_name):
 
     """[Function to pull stats from a single game, given the url (attained through getHTMLLinks), the date (also from getHTMLLinks), home and away teams]
@@ -125,32 +88,6 @@ def scrapeGame(my_url, game_date, home_team_name, away_team_name):
 
     return df
 
-def scrapeAvailableGames():
-
-    """[scrapes game data in file 'teams_and_dates.pickle' incorporating the resulting dfs into the file 'my_games_unclean.pickle']
-    """
-
-    teams_and_dates = pd.read_pickle('teams_and_dates.pickle')
-
-    print('Number of games to scrape = {}'.format(len(teams_and_dates.columns)))
-
-    my_games_unclean = {}
-
-    # Use  html links to create games' dataframes
-    for game in range(len(teams_and_dates.columns)):
-        my_games_unclean[game] = scrapeGame(
-            my_url=teams_and_dates.iloc[3, game], 
-            game_date=teams_and_dates.iloc[2, game],
-            home_team_name=teams_and_dates.iloc[0, game],
-            away_team_name=teams_and_dates.iloc[1, game])
-        time.sleep(1/2)
-
-    # Pickle the 'my_games' dictionary using the highest protocol available.
-    with open('my_games_unclean.pickle', 'wb') as f:
-        pickle.dump(my_games_unclean, f, pickle.HIGHEST_PROTOCOL)
-
-    print('Number of games scraped = {}'.format(len(my_games_unclean)))
-
 def cleanGame(game_df):
 
     """ Cleans individual game data """
@@ -174,6 +111,73 @@ def cleanGame(game_df):
     df['TOI'] = df['TOI'].round(2)
     
     return df
+
+'-----------------------------------------------------------------'
+
+def scrapeHTMLRange(start_date, end_date):
+
+    """[scrapes all html links for each each between the given dates, exclusive of the end date, storing them in the file all_html_links.pickle'.
+    """
+
+    start_date = pd.to_datetime(start_date, format='%Y/%m/%d')
+    end_date = pd.to_datetime(end_date, format='%Y/%m/%d')
+    all_html_links = {}
+
+    total_home_teams = []
+    total_away_teams = []
+    all_game_dates = []
+
+    print('Scraping game links between dates {} and {}'.format(start_date, end_date))
+
+    # Get the html links for the tables
+    while start_date != end_date:
+        my_html_results = getHTMLLinks(start_date.month, start_date.day, start_date.year)
+        all_html_links[str(start_date)] = my_html_results[0]
+        total_home_teams.extend(my_html_results[1])
+        total_away_teams.extend(my_html_results[2])
+        all_game_dates.extend(my_html_results[3])
+        start_date += datetime.timedelta(days=1)
+        time.sleep(1)
+
+        # Pickle the 'all_html_links' dict using the highest protocol available.
+    with open('all_html_links.pickle', 'wb') as f:
+        pickle.dump(all_html_links, f, pickle.HIGHEST_PROTOCOL)
+
+    # Flatten list of game htmls
+    flat_list_game_links = [item for sublist in list(all_html_links.values()) for item in sublist]
+
+    #Save home teams, away teams, and game dates in df
+    teams_and_dates = pd.DataFrame([total_home_teams, total_away_teams, all_game_dates, flat_list_game_links])
+    with open('teams_and_dates.pickle', 'wb') as f:
+        pickle.dump(teams_and_dates, f, pickle.HIGHEST_PROTOCOL)
+
+    print('Total game links scraped = {}'.format(len(teams_and_dates.columns)))
+
+def scrapeAvailableGames():
+
+    """[scrapes game data in file 'teams_and_dates.pickle' incorporating the resulting dfs into the file 'my_games_unclean.pickle']
+    """
+
+    teams_and_dates = pd.read_pickle('teams_and_dates.pickle')
+
+    print('Number of games to scrape = {}'.format(len(teams_and_dates.columns)))
+
+    my_games_unclean = {}
+
+    # Use  html links to create games' dataframes
+    for game in range(len(teams_and_dates.columns)):
+        my_games_unclean[game] = scrapeGame(
+            my_url=teams_and_dates.iloc[3, game], 
+            game_date=teams_and_dates.iloc[2, game],
+            home_team_name=teams_and_dates.iloc[0, game],
+            away_team_name=teams_and_dates.iloc[1, game])
+        time.sleep(1)
+
+    # Pickle the 'my_games' dictionary using the highest protocol available.
+    with open('my_games_unclean.pickle', 'wb') as f:
+        pickle.dump(my_games_unclean, f, pickle.HIGHEST_PROTOCOL)
+
+    print('Number of games scraped = {}'.format(len(my_games_unclean)))
 
 def cleanUncleanGames():
 
@@ -301,6 +305,8 @@ def incorporateNewStats(my_df):
     print('New len my_games_clean:', len(my_games_clean))
     print('Games added to all_time_clean_games:', len(all_time_clean_games[my_key]))
 
+'-----------------------------------------------------------------'
+
 def updateDF(df, startDate='2000/10/15', endDate='2000/11/1'):
     """ Run all prescribed functions on my_df, pulling html links, game data, then incorporating it to the file 'my_df.pickle' """
     scrapeHTMLRange(startDate, endDate)
@@ -309,9 +315,7 @@ def updateDF(df, startDate='2000/10/15', endDate='2000/11/1'):
     updateLastTime()
     incorporateNewStats(df)
 
-
 '-----------------------------------------------------------------'
-
 
 # Create a new, empty my_df
 def new_my_df():
@@ -355,6 +359,7 @@ def open_my_games_clean():
     """ Open the pickle file 'my_games_clean.pickle' """
     return pd.read_pickle('my_games_clean.pickle')
 
+# Save my_games_clean
 def save_my_games_clean(my_games_clean):
     with open('my_games_clean.pickle', 'wb') as f:
         pickle.dump(my_games_clean, f, pickle.HIGHEST_PROTOCOL)
@@ -389,16 +394,15 @@ def my_df_QC():
     print('Max TOI Player:', my_df[my_df['TOI'] == my_df['TOI'].max()].index[0])
     print('Chris Chelios present:', 'Chris Chelios' in my_df.index)
 
-
-
+'-----------------------------------------------------------------'
 
 if __name__ == '__main__':
     my_df = open_my_df()
-    updateDF(my_df, startDate='2000/11/1', endDate='2000/12/1')
+    updateDF(my_df, startDate='2000/12/1', endDate='2001/2/1')
 
+'-----------------------------------------------------------------'
 
-
-my_df = open_my_df()
+# my_df = open_my_df()
 # all_html_links = open_all_html_links()
 # my_games_unclean = open_my_games_unclean()
 # my_games_clean = open_my_games_clean()
@@ -406,8 +410,6 @@ my_df = open_my_df()
 # last_time_df = open_last_time_df()
 
 # last_time_df = updateLastTime()
-
-
 
 # my_df = new_my_df()
 # save_my_df(my_df)
