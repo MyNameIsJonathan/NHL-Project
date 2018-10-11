@@ -4,6 +4,7 @@ import pandas as pd
 import pickle
 import requests
 from bs4 import BeautifulSoup
+from My_Classes import LengthException
 import datetime
 import time
 
@@ -70,6 +71,8 @@ def scrapeHTMLRange(start_date, end_date):
     total_away_teams = []
     all_game_dates = []
 
+    print('Scraping game links between dates {} and {}'.format(start_date, end_date))
+
     # Get the html links for the tables
     while start_date != end_date:
         my_html_results = getHTMLLinks(start_date.month, start_date.day, start_date.year)
@@ -78,7 +81,7 @@ def scrapeHTMLRange(start_date, end_date):
         total_away_teams.extend(my_html_results[2])
         all_game_dates.extend(my_html_results[3])
         start_date += datetime.timedelta(days=1)
-        time.sleep(1/5)
+        time.sleep(1/2)
 
         # Pickle the 'all_html_links' dict using the highest protocol available.
     with open('all_html_links.pickle', 'wb') as f:
@@ -93,8 +96,6 @@ def scrapeHTMLRange(start_date, end_date):
         pickle.dump(teams_and_dates, f, pickle.HIGHEST_PROTOCOL)
 
     print('Total game links scraped = {}'.format(len(teams_and_dates.columns)))
-
-    return teams_and_dates
 
 def scrapeGame(my_url, game_date, home_team_name, away_team_name):
 
@@ -142,7 +143,7 @@ def scrapeAvailableGames():
             game_date=teams_and_dates.iloc[2, game],
             home_team_name=teams_and_dates.iloc[0, game],
             away_team_name=teams_and_dates.iloc[1, game])
-        time.sleep(1/5)
+        time.sleep(1/2)
 
     # Pickle the 'my_games' dictionary using the highest protocol available.
     with open('my_games_unclean.pickle', 'wb') as f:
@@ -166,9 +167,6 @@ def cleanGame(game_df):
 
     #Fill NaN values to convert to int
     df = df.fillna(0)
-
-    #Convert Date to datetime, if it's not already
-    my_df['Date'] = pd.to_datetime(my_df['Date'], format='%Y/%m/%d')
 
     #Get int of minutes on ice from string "mm:ss"
     df['TOI'] = df['TOI'].str.split(':')
@@ -238,12 +236,13 @@ def updateLastTime():
 
     #Save only the date, not the time
     for column in last_time_df.columns:
-        last_time_df[column] = last_time_df[column].dt.date
+        try:
+            last_time_df[column] = last_time_df[column].dt.date
+        except AttributeError:
+            pass
 
     #Save last_time_df
     save_last_time_df(last_time_df)
-
-    return last_time_df
 
 def incorporateNewStats(my_df):
 
@@ -284,9 +283,25 @@ def incorporateNewStats(my_df):
 
     save_my_df(my_df)
 
-    return my_df
+    # Use unclean games to get min and max dates 
+    my_games_unclean = open_my_games_unclean()
+    unclean_df = pd.concat([game for game in my_games_unclean.values()])
+    my_key = 'Dates: {} to {}'.format(unclean_df['Date'].dt.date.min(), unclean_df['Date'].dt.date.max())
 
-def updateDF(df, startDate='2000/10/4', endDate='2000/10/10'):
+    # Move games from my_games_clean dict to all_time_clean_games
+    all_time_clean_games = open_all_time_clean_games()
+    all_time_clean_games[my_key] = list(my_games_clean.values())
+    if len(all_time_clean_games[my_key]) == len(my_games_clean):
+        my_games_clean = {}
+        save_my_games_clean(my_games_clean)
+        save_all_time_clean_games(all_time_clean_games)
+    else:
+        raise LengthException('Number of clean games does not equal length of preserved games val')
+
+    print('New len my_games_clean:', len(my_games_clean))
+    print('Games added to all_time_clean_games:', len(all_time_clean_games[my_key]))
+
+def updateDF(df, startDate='2000/10/15', endDate='2000/11/1'):
     """ Run all prescribed functions on my_df, pulling html links, game data, then incorporating it to the file 'my_df.pickle' """
     scrapeHTMLRange(startDate, endDate)
     scrapeAvailableGames()
@@ -294,6 +309,8 @@ def updateDF(df, startDate='2000/10/4', endDate='2000/10/10'):
     updateLastTime()
     incorporateNewStats(df)
 
+
+'-----------------------------------------------------------------'
 
 
 # Create a new, empty my_df
@@ -312,6 +329,7 @@ def open_my_df():
     """ Open the pickle file 'my_stats_df.pickle' """
     return pd.read_pickle('my_df.pickle')
 
+# Create new last_time_df
 def create_new_last_time_df():
     """ Create a new last_time_df file """
     return pd.DataFrame(columns=['G', 'A', 'PTS', '+', '-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Last Game Date'])
@@ -337,6 +355,20 @@ def open_my_games_clean():
     """ Open the pickle file 'my_games_clean.pickle' """
     return pd.read_pickle('my_games_clean.pickle')
 
+def save_my_games_clean(my_games_clean):
+    with open('my_games_clean.pickle', 'wb') as f:
+        pickle.dump(my_games_clean, f, pickle.HIGHEST_PROTOCOL)
+
+# Save all_time_clean_games dictionary
+def save_all_time_clean_games(all_time_clean_games):
+    with open('all_time_clean_games.pickle', 'wb') as f:
+        pickle.dump(all_time_clean_games, f, pickle.HIGHEST_PROTOCOL)
+
+# Open all_time_clean_games dictionary
+def open_all_time_clean_games():
+    """ Open the pickle file 'all_time_clean_games.pickle' """
+    return pd.read_pickle('all_time_clean_games.pickle')
+
 # Open all_html_links
 def open_all_html_links():
     """ Open the pickle file 'all_html_links.pickle' """
@@ -357,30 +389,35 @@ def my_df_QC():
     print('Max TOI Player:', my_df[my_df['TOI'] == my_df['TOI'].max()].index[0])
     print('Chris Chelios present:', 'Chris Chelios' in my_df.index)
 
-def randomFunction():
-
-    a = open_my_df()
-    a.iloc[:, 0] = 0
-    save_my_df(a)
 
 
-# if __name__ == '__main__':
-#     my_df = open_my_df()
-#     updateDF(my_df, startDate='2000/10/10', endDate='2000/10/15')
 
-
-# last_time_df = create_new_last_time_df()
+if __name__ == '__main__':
+    my_df = open_my_df()
+    updateDF(my_df, startDate='2000/11/1', endDate='2000/12/1')
 
 
 
 my_df = open_my_df()
-
 # all_html_links = open_all_html_links()
 # my_games_unclean = open_my_games_unclean()
-my_games_clean = open_my_games_clean()
+# my_games_clean = open_my_games_clean()
 # teams_and_dates = open_teams_and_dates()
-last_time_df = open_last_time_df()
+# last_time_df = open_last_time_df()
 
 # last_time_df = updateLastTime()
 
 
+
+# my_df = new_my_df()
+# save_my_df(my_df)
+# cleanUncleanGames()
+# incorporateNewStats(my_df)
+# my_games_clean = open_my_games_clean()
+# all_time_clean_games = open_all_time_clean_games()
+
+# print('len(my_games_clean:', len(my_games_clean))
+
+# print('len(all_time_clean_games:', len(all_time_clean_games))
+# print('all_time_clean_games.keys()', all_time_clean_games.keys())
+# print("len(all_time_clean_games['Dates: 2000-10-10 to 2000-10-10'])", len(all_time_clean_games['Dates: 2000-10-10 to 2000-10-10']))

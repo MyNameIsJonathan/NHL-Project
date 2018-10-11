@@ -39,4 +39,11 @@ class hockey_player(person):
         # Update the below stats_dataframe to host stats for each player. Should I do this or keep the stats solely within the dataframe, my_data?
         self.stats_dataframe = None
 
-a = hockey_player('Jonathan Olson')
+class LengthException(Exception):
+    """ Exception used when moving game dfs from my_games_clean to the permament storage dict, all_time_clean_games"""
+    pass
+
+
+
+if __name__ == '__main__':
+    a = hockey_player('Jonathan Olson')
