@@ -394,11 +394,15 @@ def my_df_QC():
     print('Max TOI Player:', my_df[my_df['TOI'] == my_df['TOI'].max()].index[0])
     print('Chris Chelios present:', 'Chris Chelios' in my_df.index)
 
+def open_2000_2001_game_results():
+    """ Open the pickle file '2000-2001-game-results.pickle' """
+    return pd.read_pickle('2000-2001-game-results.pickle')
+
 '-----------------------------------------------------------------'
 
 if __name__ == '__main__':
     my_df = open_my_df()
-    updateDF(my_df, startDate='2000/12/1', endDate='2001/2/1')
+    updateDF(my_df, startDate='2001/4/1', endDate='2001/4/9')
 
 '-----------------------------------------------------------------'
 
