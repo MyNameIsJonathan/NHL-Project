@@ -8,9 +8,8 @@ from My_Classes import LengthException
 import datetime
 import time
 
-#Find way to not allow duplicate stats to be added to main df
 
-'-----------------------------------------------------------------'
+'--------------- Single-Game-Specific Functions ---------------'
 
 def getHTMLLinks(month, day, year):
 
@@ -113,7 +112,7 @@ def cleanGame(game_df):
     
     return df
 
-'-----------------------------------------------------------------'
+'--------------- Multi-Game Functions ---------------'
 
 def scrapeHTMLRange(start_date, end_date):
 
@@ -165,6 +164,9 @@ def scrapeAvailableGames():
 
     my_games_unclean = {}
 
+    #Instantiate counter for reporting scrape progress
+    my_count = 0
+
     # Use  html links to create games' dataframes
     for game in range(len(teams_and_dates.columns)):
         my_games_unclean[game] = scrapeGame(
@@ -173,6 +175,14 @@ def scrapeAvailableGames():
             home_team_name=teams_and_dates.iloc[0, game],
             away_team_name=teams_and_dates.iloc[1, game])
         time.sleep(1)
+        my_count += 1
+        my_progress = round(len(teams_and_dates.columns)/my_count, 2)
+        if my_progress == 0.25:
+            print("Scraped 25% of total games")
+        elif my_progress == 0.5:
+            print("Scraped 50% of total games")
+        elif my_progress == 0.75:
+            print("Scraped 75% of total games")
 
     # Pickle the 'my_games' dictionary using the highest protocol available.
     with open('my_games_unclean.pickle', 'wb') as f:
@@ -294,20 +304,21 @@ def incorporateNewStats(my_df):
     my_key = 'Dates: {} to {}'.format(unclean_df['Date'].min(), unclean_df['Date'].max())
 
     # Move games from my_games_clean dict to all_time_clean_games
-    all_time_clean_games = open_all_time_clean_games()
-    all_time_clean_games[my_key] = list(my_games_clean.values())
-    if len(all_time_clean_games[my_key]) == len(my_games_clean):
-        my_games_clean = {}
-        save_my_games_clean(my_games_clean)
-        save_all_time_clean_games(all_time_clean_games)
-    else:
-        raise LengthException('Number of clean games does not equal length of preserved games val')
+    # all_time_clean_games = open_all_time_clean_games()
+    # all_time_clean_games[my_key] = list(my_games_clean.values())
+    # if len(all_time_clean_games[my_key]) == len(my_games_clean):
+    #     my_games_clean = {}
+    #     save_my_games_clean(my_games_clean)
+    #     save_all_time_clean_games(all_time_clean_games)
+    # else:
+    #     raise LengthException('Number of clean games does not equal length of preserved games val')
 
     print('My_games_clean now empty:', len(my_games_clean) == 0)
     print('Games added to all_time_clean_games:', len(all_time_clean_games[my_key]))
 
-'-----------------------------------------------------------------'
+'--------------- Aggregate Scraping, Updating Functions ---------------'
 
+#Scrape data only between these days, start-inclusive and end-exclusive
 def updateDF(df, startDate='2000/10/4', endDate='2001/4/9'):
     """ Run all prescribed functions on my_df, pulling html links, game data, then incorporating it to the file 'my_df.pickle' """
     scrapeHTMLRange(startDate, endDate)
@@ -316,7 +327,40 @@ def updateDF(df, startDate='2000/10/4', endDate='2001/4/9'):
     updateLastTime()
     incorporateNewStats(df)
 
-'-----------------------------------------------------------------'
+# function to run above functions to scrape, clean, and incorporate data
+def scrapeYear(start_year, end_year):
+
+    #Reset all dfs
+    restartAll()
+
+    #Instantiate my_df
+    my_df = open_my_df()
+
+    #Get start and end dates of the regular season from hockey-reference.com
+    my_file = 'https://www.hockey-reference.com/leagues/NHL_{}_games.html'.format(end_year)
+    my_years_df = pd.read_html(my_file)[0]
+    start_date = my_years_df.iloc[0, 0]
+    end_date = str(pd.to_datetime(my_years_df.iloc[-1, 0]).date() + datetime.timedelta(days=1))
+    del my_years_df
+
+    #Update my_df between these dates
+    updateDF(my_df, startDate=start_date, endDate=end_date)
+    
+    #Save changes to my_df, specifying the year
+    save_yearly_total_my_df(my_df, years='{}_{}'.format(start_year, end_year))
+
+    #Report major stats from my_df for this year
+    my_df = open_my_df()
+    top_goal_scorer = my_df[my_df['G'] == my_df['G'].max()].index[0]
+    top_assist_scorer = my_df[my_df['A'] == my_df['A'].max()].index[0]
+    top_PTS = my_df[my_df['PTS'] == my_df['PTS'].max()].index[0]
+    top_pm = my_df[my_df['+/-'] == my_df['+/-'].max()].index[0]
+    print("  Top Goals: {}, {}".format(top_goal_scorer, my_df.loc[top_goal_scorer, 'G']))
+    print("Top Assists: {}, {}".format(top_assist_scorer, my_df.loc[top_assist_scorer, 'A']))
+    print("    Top PTS: {}, {}".format(top_PTS, my_df.loc[top_PTS, 'PTS']))
+    print("    Top +/-: {}, {}".format(top_pm, my_df.loc[top_pm, '+/-']))
+
+'--------------- Helper Functions ---------------'
 
 # Create a new, empty my_df
 def new_my_df():
@@ -434,24 +478,26 @@ def restartAll():
     else:
         pass
 
+'--------------- Call To Provided Functions ---------------'
 
-#     my_df = open_my_df()
-#     updateDF(my_df, startDate='2000/12/31', endDate='2001/4/9')
+if __name__ == '__main__':
+    scrapeYear(2003, 2004)
 
-'-----------------------------------------------------------------'
+'----------------------------------------------------------'
 
-my_df = open_my_df()
+# my_df = open_yearly_my_df(years='2002_2003')
+# my_df = open_my_df()
 # all_html_links = open_all_html_links()
 # my_games_unclean = open_my_games_unclean()
 # my_games_clean = open_my_games_clean()
 # teams_and_dates = open_teams_and_dates()
-last_time_df = open_last_time_df()
+# last_time_df = open_last_time_df()
 # all_time_clean_games = open_all_time_clean_games()
 
 # print(type(last_time_df.iloc[0, 0]))
 # print(type(last_time_df.iloc[3, 0]))
 
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
-plt.scatter(my_df['G'], my_df['PTS'])
-plt.show()
+# plt.scatter(my_df['G'], my_df['PTS'])
+# plt.show()
