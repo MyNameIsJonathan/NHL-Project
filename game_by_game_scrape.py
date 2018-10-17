@@ -8,6 +8,7 @@ from My_Classes import LengthException
 import datetime
 import time
 
+#Resume on 2003-2004 scrape (call scrape for 2003-2004)
 
 '--------------- Single-Game-Specific Functions ---------------'
 
@@ -304,14 +305,14 @@ def incorporateNewStats(my_df):
     my_key = 'Dates: {} to {}'.format(unclean_df['Date'].min(), unclean_df['Date'].max())
 
     # Move games from my_games_clean dict to all_time_clean_games
-    # all_time_clean_games = open_all_time_clean_games()
-    # all_time_clean_games[my_key] = list(my_games_clean.values())
-    # if len(all_time_clean_games[my_key]) == len(my_games_clean):
-    #     my_games_clean = {}
-    #     save_my_games_clean(my_games_clean)
-    #     save_all_time_clean_games(all_time_clean_games)
-    # else:
-    #     raise LengthException('Number of clean games does not equal length of preserved games val')
+    all_time_clean_games = open_all_time_clean_games()
+    all_time_clean_games[my_key] = list(my_games_clean.values())
+    if len(all_time_clean_games[my_key]) == len(my_games_clean):
+        my_games_clean = {}
+        save_my_games_clean(my_games_clean)
+        save_all_time_clean_games(all_time_clean_games)
+    else:
+        raise LengthException('Number of clean games does not equal length of preserved games val')
 
     print('My_games_clean now empty:', len(my_games_clean) == 0)
     print('Games added to all_time_clean_games:', len(all_time_clean_games[my_key]))
@@ -501,3 +502,4 @@ if __name__ == '__main__':
 
 # plt.scatter(my_df['G'], my_df['PTS'])
 # plt.show()
+
