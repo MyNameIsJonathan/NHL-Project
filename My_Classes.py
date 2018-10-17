@@ -11,7 +11,7 @@ class NHL_Team(object):
         self.coach = coach
 
 class person(object):
-    def __init__(self, name=None, title=None):
+    def __init__(self, name, title=None):
         """
         Class defining each person. This could be a coach, player, anything.
         Arguments:
@@ -29,7 +29,7 @@ class hockey_player(person):
     # Initiate a player number that will be unique to each player and will be ascribed to them at creation
     player_number = 1
 
-    def __init__(self, name=None, title=None, position=None, team=None):
+    def __init__(self, name, title=None, position=None, team=None):
         person.__init__(self, name)
         self.position = position
         self.team = team
