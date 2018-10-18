@@ -545,22 +545,51 @@ def yearlyRestart():
 '--------------- Call To Provided Functions ---------------'
 
 if __name__ == '__main__':
-    scrapeYear(2009)
+    for year in range(2014, 2019):
+        scrapeYear(year)
 
 '----------------------------------------------------------'
 
 # my_df = open_yearly_my_df(years='2002_2003')
 # my_df = open_my_df()
-# all_html_links = open_all_html_links()
-my_games_unclean = open_my_games_unclean()
-my_games_clean = open_my_games_clean()
-# teams_and_dates = open_teams_and_dates()
-last_time_df = open_last_time_df()
+all_html_links = open_all_html_links()
+# my_games_unclean = open_my_games_unclean()
+# my_games_clean = open_my_games_clean()
+teams_and_dates = open_teams_and_dates()
+# last_time_df = open_last_time_df()
 # all_time_clean_games = open_all_time_clean_games()
 
 
+teams_and_dates = open_teams_and_dates()
+a = teams_and_dates.transpose()
+a[3] = gameLinks['url']
 
+def scrapeYearsURLS(end_year):
+    
+    """Scrape all html links for games across an entire NHL season. 
+    This uses the table available at 
+    'https://www.hockey-reference.com/leagues/NHL_YYYY_games.html', 
+    where YYYY is the year"""
 
+    #General url
+    url = 'https://www.hockey-reference.com/leagues/NHL_{}_games.html'.format(end_year)
 
+    #Process the html
+    r = requests.get(url)
+    soup = BeautifulSoup(r.content,'lxml')
+    table = soup.find('table', id='games') 
+    rows = table.findAll('tr')
 
+    #Select the first resulting table, namely that of the Regular Season stats. Table 2 is the playoffs stats.
+    seasonSummary = pd.read_html(url)[0]
+    seasonSummary = seasonSummary[['Date', 'Home', 'Visitor']]
+    my_urls = pd.Series([[th.a['href'] if th.find('a') else ''.join(th.stripped_strings) for th in row.find_all('th')] for row in table.find_all('tr')][1:])
+    my_urls = [item for sublist in my_urls for item in sublist]
+    seasonSummary.loc[:, 'url'] = my_urls
+    seasonSummary['url'] = 'https://www.hockey-reference.com' + seasonSummary['url']
 
+    #Save resulting file
+
+def savePickle(variable, desired_name):
+    with open(desired_name, 'wb') as f:
+        pickle.dump(variable, f, pickle.HIGHEST_PROTOCOL)
