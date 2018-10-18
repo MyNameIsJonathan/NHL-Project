@@ -187,12 +187,11 @@ def scrapeAvailableGames():
             away_team_name=teams_and_dates.iloc[1, game])
         time.sleep(1)
         my_count += 1
-        my_progress = len(teams_and_dates.columns)/my_count
-        if my_progress == threshold_25:
+        if my_count == threshold_25:
             print("Scraped 25% of total games")
-        elif my_progress == threshold_50:
+        elif my_count == threshold_50:
             print("Scraped 50% of total games")
-        elif my_progress == threshold_75:
+        elif my_count == threshold_75:
             print("Scraped 75% of total games")
 
     # Pickle the 'my_games' dictionary using the highest protocol available.
@@ -222,6 +221,8 @@ def cleanUncleanGames():
 def updateLastTime():
 
     """Update df containing the dates of the last time each player scored, hit, etc"""
+
+    print("Updating Last Time to reflect new stats' dates")
 
     #Load in last_time_df
     last_time_df = open_last_time_df()
@@ -544,7 +545,7 @@ def yearlyRestart():
 '--------------- Call To Provided Functions ---------------'
 
 if __name__ == '__main__':
-    scrapeYear(2007)
+    scrapeYear(2009)
 
 '----------------------------------------------------------'
 
