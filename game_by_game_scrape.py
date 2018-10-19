@@ -11,7 +11,7 @@ import time
 
 '--------------- Single-Game-Specific Functions ---------------'
 
-def getHTMLLinks(month, day, year):
+def getURLS(month, day, year):
 
     """[Function to use the given date to create the html links to www.hockey-reference.com for that day's games. 
         Scrapes that website and creates the link for each of the games on that day]
@@ -61,7 +61,7 @@ def getHTMLLinks(month, day, year):
 
 def scrapeGame(my_url, game_date, home_team_name, away_team_name):
 
-    """[Function to pull stats from a single game, given the url (attained through getHTMLLinks), the date (also from getHTMLLinks), home and away teams]
+    """[Function to pull stats from a single game, given the url (attained through getURLS), the date (also from getURLS), home and away teams]
     Returns:
         [Pandas DataFrame] -- [a clean df that has the game's stats]
     """
@@ -102,11 +102,11 @@ def cleanGame(game_df):
     df = game_df.copy(deep=True)
 
     # Delete columns that are only present in the datasets starting in 2014-2015 season
-    cols_to_drop = ['S%', 'EV.2', 'PP.2', 'SH.2', 'Unnamed: 15', 'Unnamed: 16', 'Unnamed: 17']
+    cols_to_drop = ['EV.1', 'PP.1', 'SH.1', 'S%', 'EV.2', 'PP.2', 'SH.2', 'Unnamed: 15', 'Unnamed: 16', 'Unnamed: 17']
     df = df.drop([column for column in cols_to_drop if column in df.columns], axis=1)
 
     # Rename columns for better readability
-    df = df.rename(columns = {'EV.1':'EV', 'PP.1':'PP', 'SH.1':'SH', 'SHFT':'Shifts'})
+    df = df.rename(columns = {'SHFT':'Shifts'})
 
     #Fill NaN values to convert to int
     df = df.fillna(0)
@@ -120,7 +120,7 @@ def cleanGame(game_df):
 
 '--------------- Multi-Game Functions ---------------'
 
-def scrapeHTMLRange(start_date, end_date):
+def scrapeURLRange(start_date, end_date):
 
     """[scrapes all html links for each each between the given dates, exclusive of the end date, storing them in the file all_html_links.pickle'.
     """
@@ -137,7 +137,7 @@ def scrapeHTMLRange(start_date, end_date):
 
     # Get the html links for the tables
     while start_date != end_date:
-        my_html_results = getHTMLLinks(start_date.month, start_date.day, start_date.year)
+        my_html_results = getURLS(start_date.month, start_date.day, start_date.year)
         all_html_links[str(start_date)] = my_html_results[0]
         total_home_teams.extend(my_html_results[1])
         total_away_teams.extend(my_html_results[2])
@@ -146,66 +146,131 @@ def scrapeHTMLRange(start_date, end_date):
         time.sleep(1)
 
     # Pickle the 'all_html_links' dict using the highest protocol available.
-    with open('all_html_links.pickle', 'wb') as f:
-        pickle.dump(all_html_links, f, pickle.HIGHEST_PROTOCOL)
+    savePickle(all_html_links, 'all_html_links.pickle')
 
     # Flatten list of game htmls
     flat_list_game_links = [item for sublist in list(all_html_links.values()) for item in sublist]
 
     #Save home teams, away teams, and game dates in df
     teams_and_dates = pd.DataFrame([total_home_teams, total_away_teams, all_game_dates, flat_list_game_links])
-    with open('teams_and_dates.pickle', 'wb') as f:
-        pickle.dump(teams_and_dates, f, pickle.HIGHEST_PROTOCOL)
+    savePickle(teams_and_dates, 'teams_and_dates.pickle')
 
     print('Total game links scraped = {}'.format(len(teams_and_dates.columns)))
 
-def scrapeAvailableGames():
+def scrapeYearsURLs(end_year):
+    
+    """Scrape all html links for games across an entire NHL season. 
+    This uses the table available at 
+    'https://www.hockey-reference.com/leagues/NHL_YYYY_games.html', 
+    where YYYY is the year"""
+
+    print('Scraping all urls for games in season {}-{}'.format(end_year-1, end_year))
+
+    #General url
+    url = 'https://www.hockey-reference.com/leagues/NHL_{}_games.html'.format(end_year)
+
+    #Process the html
+    r = requests.get(url)
+    soup = BeautifulSoup(r.content,'lxml')
+    table = soup.find('table', id='games') 
+
+    #Select the first resulting table, namely that of the Regular Season stats. Table 2 is the playoffs stats.
+    seasonSummary = pd.read_html(url)[0]
+    seasonSummary = seasonSummary[['Date', 'Home', 'Visitor']]
+    my_urls = pd.Series([[th.a['href'] if th.find('a') else ''.join(th.stripped_strings) for th in row.find_all('th')] for row in table.find_all('tr')][1:])
+    my_urls = [item for sublist in my_urls for item in sublist]
+    seasonSummary.loc[:, 'url'] = my_urls
+    seasonSummary = seasonSummary[seasonSummary['url'].str.contains('boxscore')]
+    seasonSummary['url'] = 'https://www.hockey-reference.com' + seasonSummary['url']
+
+    #Save resulting file
+    savePickle(seasonSummary, 'seasonSummary', end_year-1, end_year)
+
+    print('Finished scraping game urls')
+
+def scrapeAvailableGames(end_year=None):
 
     """[scrapes game data in file 'teams_and_dates.pickle' incorporating the resulting dfs into the file 'my_games_unclean.pickle']
+    If end_year is False, scraping in range and will return a df with columns representing each game
+    If end_year is True, it will scrape a full year
     """
-
-    #Load in required data
-    teams_and_dates = pd.read_pickle('teams_and_dates.pickle')
-    number_of_games = len(teams_and_dates.columns)
-    print('Number of games to scrape = {}'.format(number_of_games))
 
     #Create my_games_unclean dict to store scraped games
     my_games_unclean = {}
 
-    #Instantiate counter for reporting scrape progress and create % thresholds
-    my_count = 0
-    threshold_25 = int(number_of_games*0.25)
-    threshold_50 = int(number_of_games*0.5)
-    threshold_75 = int(number_of_games*0.75)
+    if end_year is None:
 
-    # Use  html links to create games' dataframes
-    for game in range(len(teams_and_dates.columns)):
-        my_games_unclean[game] = scrapeGame(
-            my_url=teams_and_dates.iloc[3, game], 
-            game_date=teams_and_dates.iloc[2, game],
-            home_team_name=teams_and_dates.iloc[0, game],
-            away_team_name=teams_and_dates.iloc[1, game])
-        time.sleep(1)
-        my_count += 1
-        if my_count == threshold_25:
-            print("Scraped 25% of total games")
-        elif my_count == threshold_50:
-            print("Scraped 50% of total games")
-        elif my_count == threshold_75:
-            print("Scraped 75% of total games")
+        #Load in required data
+        teams_and_dates = pd.read_pickle('teams_and_dates.pickle')
+        number_of_games = len(teams_and_dates.columns)
+        print('Number of games to scrape = {}'.format(number_of_games))
 
-    # Pickle the 'my_games' dictionary using the highest protocol available.
-    with open('my_games_unclean.pickle', 'wb') as f:
-        pickle.dump(my_games_unclean, f, pickle.HIGHEST_PROTOCOL)
+        #Instantiate counter for reporting scrape progress and create % thresholds
+        my_count = 0
+        threshold_25 = int(number_of_games*0.25)
+        threshold_50 = int(number_of_games*0.5)
+        threshold_75 = int(number_of_games*0.75)
+
+        # Use  html links to create games' dataframes
+        for game in range(len(teams_and_dates.columns)):
+            my_games_unclean[game] = scrapeGame(
+                my_url=teams_and_dates.iloc[3, game], 
+                game_date=teams_and_dates.iloc[2, game],
+                home_team_name=teams_and_dates.iloc[0, game],
+                away_team_name=teams_and_dates.iloc[1, game])
+            time.sleep(1)
+            my_count += 1
+            if my_count == threshold_25:
+                print("Scraped 25% of total games")
+            elif my_count == threshold_50:
+                print("Scraped 50% of total games")
+            elif my_count == threshold_75:
+                print("Scraped 75% of total games")
+
+        # Pickle the 'my_games' dictionary using the highest protocol available.
+        savePickle(my_games_unclean, 'my_games_unclean')
+
+    else:
+        seasonSummary = pd.read_pickle('seasonSummary_{}_{}.pickle'.format(end_year-1, end_year))
+        number_of_games = len(seasonSummary)
+        print('Number of games to scrape = {}'.format(number_of_games))
+
+        #Instantiate counter for reporting scrape progress and create % thresholds
+        my_count = 0
+        threshold_25 = int(number_of_games*0.25)
+        threshold_50 = int(number_of_games*0.5)
+        threshold_75 = int(number_of_games*0.75)
+
+        # Use  html links to create games' dataframes
+        for game in range(len(seasonSummary)):
+            my_games_unclean[game] = scrapeGame(
+                my_url=seasonSummary.iloc[game, 3], 
+                game_date=seasonSummary.iloc[game, 0],
+                home_team_name=seasonSummary.iloc[game, 1],
+                away_team_name=seasonSummary.iloc[game, 2])
+            time.sleep(1)
+            my_count += 1
+            if my_count == threshold_25:
+                print("Scraped 25% of total games")
+            elif my_count == threshold_50:
+                print("Scraped 50% of total games")
+            elif my_count == threshold_75:
+                print("Scraped 75% of total games")
+        
+        # Pickle the 'my_games' dictionary using the highest protocol available.
+        savePickle(my_games_unclean, 'my_games_unclean', end_year-1, end_year)
 
     print('Number of games scraped = {}'.format(len(my_games_unclean)))
 
-def cleanUncleanGames():
+def cleanUncleanGames(end_year):
 
     """[Cleans the data present in each game of my_games_unclean dictionary]
     """
 
-    my_games_unclean = pd.read_pickle('my_games_unclean.pickle')
+    #Create variable start_year
+    start_year = end_year - 1
+
+    my_games_unclean = pd.read_pickle('my_games_unclean_{}_{}.pickle'.format(start_year, end_year))
     my_games_clean = {}
 
     print('Number of games to clean = {}'.format(len(my_games_unclean)))
@@ -213,22 +278,24 @@ def cleanUncleanGames():
     for index, game in my_games_unclean.items():
         my_games_clean[index] = cleanGame(game)
 
-    with open('my_games_clean.pickle', 'wb') as f:
-        pickle.dump(my_games_clean, f, pickle.HIGHEST_PROTOCOL)
+    savePickle(my_games_clean, 'my_games_clean', start_year, end_year)
 
     print('Number of games cleaned  = {}'.format(len(my_games_clean)))
 
-def updateLastTime():
+def updateLastTime(end_year):
 
     """Update df containing the dates of the last time each player scored, hit, etc"""
 
     print("Updating Last Time to reflect new stats' dates")
 
-    #Load in last_time_df
-    last_time_df = open_last_time_df()
+    #Create variable start_year
+    start_year = end_year - 1
+
+    #Load in last_time_df from the PREVIOUS season, which will be copied and updated
+    last_time_df = pd.read_pickle('last_time_df_{}_{}.pickle'.format(start_year-1, end_year-1)).copy()
 
     #Load my_games_clean dictionary
-    my_games_clean = open_my_games_clean()
+    my_games_clean = pd.read_pickle('my_games_clean_{}_{}.pickle'.format(start_year, end_year))
 
     #Set columns to iterate through
     cols = ['G', 'A', 'PTS', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S']
@@ -268,38 +335,28 @@ def updateLastTime():
             pass
 
     #Save last_time_df
-    save_last_time_df(last_time_df)
+    savePickle(last_time_df, 'last_time_df', start_year, end_year)
 
-def incorporateNewStats(my_df):
+def incorporateNewStats(end_year):
 
     """[updates my_df]
     Returns:
         [none] -- [just updates my_df]
     """
 
-    my_games_clean = pd.read_pickle('my_games_clean.pickle')
+    #Create variable start_year
+    start_year = end_year - 1
+
+    #Instantiate my_games_clean
+    my_games_clean = pd.read_pickle('my_games_clean_{}_{}.pickle'.format(start_year, end_year))
 
     print('Adding {} games to my_df'.format(len(my_games_clean)))
 
-    # Create master df, initialized with first df in my_games dictionary &
-    # Iterate through games' dfs, merging them into the main df, then adding their values to the main df (Ex: Adding Goal totals)
-    columns_to_add = ['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Shifts', 'TOI']
-
-    #Keep only these columns -- removes 'Date' column, which is in last_time_df
-    my_df = my_df[columns_to_add]
-
     #Create main df for all day's games
-    new_df = pd.concat([game for game in my_games_clean.values()])
+    my_df = pd.concat([game for game in my_games_clean.values()])
 
     #Combine stats for each player, between games
-    new_df = new_df.groupby(new_df.index).sum()
-
-    #Save new_df
-    with open('new_df.pickle', 'wb') as f:
-        pickle.dump(new_df, f, pickle.HIGHEST_PROTOCOL)
-
-    #Add this day's games df to my_df
-    my_df = my_df.add(new_df[columns_to_add], fill_value=0) 
+    my_df = my_df.groupby(my_df.index).sum()
 
     # Convert columns to int
     columns_to_int = ['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'EV', 'PP', 'SH', 'S', 'Shifts']
@@ -307,32 +364,14 @@ def incorporateNewStats(my_df):
         if column in my_df.columns:
             my_df[column] = my_df[column].astype(int)
 
-    save_my_df(my_df)
-
-    # Use unclean games to get min and max dates 
-    my_games_unclean = open_my_games_unclean()
-    unclean_df = pd.concat([game for game in my_games_unclean.values()])
-    my_key = 'Dates: {} to {}'.format(unclean_df['Date'].min(), unclean_df['Date'].max())
-
-    # Move games from my_games_clean dict to all_time_clean_games
-    all_time_clean_games = open_all_time_clean_games()
-    all_time_clean_games[my_key] = list(my_games_clean.values())
-    if len(all_time_clean_games[my_key]) == len(my_games_clean):
-        my_games_clean = {}
-        save_my_games_clean(my_games_clean)
-        save_all_time_clean_games(all_time_clean_games)
-    else:
-        raise LengthException('Number of clean games does not equal length of preserved games val')
-
-    print('My_games_clean now empty:', len(my_games_clean) == 0)
-    print('Games added to all_time_clean_games:', len(all_time_clean_games[my_key]))
+    savePickle(my_df, 'my_df', start_year, end_year)
 
 '--------------- Aggregate Scraping, Updating Functions ---------------'
 
 #Scrape data only between these days, start-inclusive and end-exclusive
 def updateDF(df, startDate='2000/10/4', endDate='2001/4/9'):
     """ Run all prescribed functions on my_df, pulling html links, game data, then incorporating it to the file 'my_df.pickle' """
-    scrapeHTMLRange(startDate, endDate)
+    scrapeURLRange(startDate, endDate)
     scrapeAvailableGames()
     cleanUncleanGames()
     updateLastTime()
@@ -344,172 +383,42 @@ def scrapeYear(end_year):
     NHL season. The year provided is the end_year of the season, such as 
     2006 for the 2005-2006 season"""
 
-    #Get start_year
-    start_year = end_year - 1
-
-    #Reset my_df
-    yearlyRestart()
-
-    #Instantiate my_df
-    my_df = open_my_df()
-
-    #Get start and end dates of the regular season from hockey-reference.com
-    my_file = 'https://www.hockey-reference.com/leagues/NHL_{}_games.html'.format(end_year)
-    my_years_df = pd.read_html(my_file)[0]
-    start_date = my_years_df.iloc[0, 0]
-    end_date = str(pd.to_datetime(my_years_df.iloc[-1, 0]).date() + datetime.timedelta(days=1))
-    del my_years_df
-
-    #Update my_df between these dates
-    scrapeHTMLRange(start_date, end_date)
-    all_html_links = open_all_html_links() #open all_html_links for saving
-    save_yearly_all_html_links(all_html_links, start_year, end_year) #Save all_hml_links with years in the resulting filename
-    scrapeAvailableGames()
-    my_games_unclean = open_my_games_unclean() #Open my_games_unclean for saving
-    save_yearly_my_games_unclean(my_games_unclean, start_year, end_year) #Save my_games_unclean with years in the resulting filename
-    cleanUncleanGames()
-    my_games_clean = open_my_games_clean() #Load my_games_clean, for saving
-    save_yearly_my_games_clean(my_games_clean, start_year, end_year) #Save this year's my_games_clean with years in the resulting filename
-    updateLastTime()
-    #Checkpoint-save last_time_df for each year, in case it is needed later
-    last_time_df = open_last_time_df()
-    save_yearly_last_time_df(last_time_df, start_year, end_year)
-    incorporateNewStats(my_df)
-
-    #Save changes to my_df, specifying the year
-    save_yearly_total_my_df(my_df, years='{}_{}'.format(start_year, end_year))
+    #Update stats between these dates
+    scrapeYearsURLs(end_year)
+    scrapeAvailableGames(end_year)
+    cleanUncleanGames(end_year)
+    updateLastTime(end_year)
+    incorporateNewStats(end_year)
 
     #Report major stats from my_df for this year
-    my_df = open_my_df()
-    top_goal_scorer = my_df[my_df['G'] == my_df['G'].max()].index[0]
-    top_assist_scorer = my_df[my_df['A'] == my_df['A'].max()].index[0]
-    top_PTS = my_df[my_df['PTS'] == my_df['PTS'].max()].index[0]
-    top_pm = my_df[my_df['+/-'] == my_df['+/-'].max()].index[0]
-    print("  Top Goals: {}, {}".format(top_goal_scorer, my_df.loc[top_goal_scorer, 'G']))
-    print("Top Assists: {}, {}".format(top_assist_scorer, my_df.loc[top_assist_scorer, 'A']))
-    print("    Top PTS: {}, {}".format(top_PTS, my_df.loc[top_PTS, 'PTS']))
-    print("    Top +/-: {}, {}".format(top_pm, my_df.loc[top_pm, '+/-']))
+    my_df = pd.read_pickle('my_df_{}_{}.pickle'.format(end_year-1, end_year))
+    my_df_QC(my_df)
 
 '--------------- Helper Functions ---------------'
 
-# Create a new, empty my_df
-def new_my_df():
-    """ Create a new, empty my_df """
-    return pd.DataFrame(columns=['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Shifts', 'TOI', 'Team', 'Date'])
-
-#Save my_df as a pickle file
-def save_my_df(my_df):
-    """ Save my_df as a pickle file """
-    with open('my_df.pickle', 'wb') as f:
-        pickle.dump(my_df, f, pickle.HIGHEST_PROTOCOL)
-
-# open my_df
-def open_my_df():
-    """ Open the pickle file 'my_stats_df.pickle' """
-    return pd.read_pickle('my_df.pickle')
-
-#Save a year's my_df
-def save_yearly_total_my_df(my_df, years='1999_2000'):
-    """ Save my_df that contains a full year's stats as a pickle file """
-    my_filename = "my_df_{}.pickle".format(years)
-    with open(my_filename, 'wb') as f:
-        pickle.dump(my_df, f, pickle.HIGHEST_PROTOCOL)
-
-#Open my_df from a specific year
-def open_yearly_my_df(years='1999_2000'):
-    """ Open the pickle file for a year's stats """
-    my_filename = "my_df_{}.pickle".format(years)
-    return pd.read_pickle(my_filename)
+#Generic save pickle file helper functions
+def savePickle(variable, variable_name, start_year=None, end_year=None):
+    """Save the given variable as a pickle file, with the filename ending with '.pickle'"""
+    if start_year and end_year:
+        filename = variable_name + '_{}_{}'.format(start_year, end_year) + '.pickle'
+    else:
+        filename = variable_name + '.pickle'
+    with open(filename, 'wb') as f:
+        pickle.dump(variable, f, pickle.HIGHEST_PROTOCOL)
 
 # Create new last_time_df
-def create_new_last_time_df():
+def new_last_time_df():
     """ Create a new last_time_df file """
     return pd.DataFrame(columns=['G', 'A', 'PTS', '+', '-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Last Game Date'])
 
-# Save last_time_df as pickle file
-def save_last_time_df(last_time_df):
-    """ Save last_time_df as a pickle file """
-    with open('last_time_df.pickle', 'wb') as f:
-        pickle.dump(last_time_df, f, pickle.HIGHEST_PROTOCOL)
-
-# Open last_time_df pickle file
-def open_last_time_df():
-    """ Open the pickle file 'last_time_df.pickle' """
-    return pd.read_pickle('last_time_df.pickle')
-
-#Save checkpoint of last_time_df for each year, in case it is needed for troubleshooting
-def save_yearly_last_time_df(last_time_df, start_year, end_year):
-    my_filename = 'last_time_df_{}_{}.pickle'.format(start_year, end_year)
-    with open(my_filename, 'wb') as f:
-        pickle.dump(last_time_df, f, pickle.HIGHEST_PROTOCOL)
-
-# Open my_games_unclean
-def open_my_games_unclean():
-    """ Open the pickle file 'my_games_unclean.pickle' """
-    return pd.read_pickle('my_games_unclean.pickle')
-
-#Save my_games_unclean for each year
-def save_yearly_my_games_unclean(my_games_unclean, start_year, end_year):
-    my_filename = 'my_games_unclean_{}_{}.pickle'.format(start_year, end_year)
-    with open(my_filename, 'wb') as f:
-        pickle.dump(my_games_unclean, f, pickle.HIGHEST_PROTOCOL)
-
-# Open my_games_clean
-def open_my_games_clean():
-    """ Open the pickle file 'my_games_clean.pickle' """
-    return pd.read_pickle('my_games_clean.pickle')
-
-# Save my_games_clean
-def save_my_games_clean(my_games_clean):
-    with open('my_games_clean.pickle', 'wb') as f:
-        pickle.dump(my_games_clean, f, pickle.HIGHEST_PROTOCOL)
-
-#Save clean games from each year, in case that year's games are needed later 
-def save_yearly_my_games_clean(my_games_clean, start_year, end_year):
-    my_filename = 'my_games_clean_{}_{}.pickle'.format(start_year, end_year)
-    with open(my_filename, 'wb') as f:
-        pickle.dump(my_games_clean, f, pickle.HIGHEST_PROTOCOL)
-
-# Save all_time_clean_games dictionary
-def save_all_time_clean_games(all_time_clean_games):
-    with open('all_time_clean_games.pickle', 'wb') as f:
-        pickle.dump(all_time_clean_games, f, pickle.HIGHEST_PROTOCOL)
-
-# Open all_time_clean_games dictionary
-def open_all_time_clean_games():
-    """ Open the pickle file 'all_time_clean_games.pickle' """
-    return pd.read_pickle('all_time_clean_games.pickle')
-
-#Save yearly all_html_links
-def save_yearly_all_html_links(all_html_links, start_year, end_year):
-    my_filename = 'all_html_links_{}_{}.pickle'.format(start_year, end_year)
-    with open(my_filename, 'wb') as f:
-        pickle.dump(all_html_links, f, pickle.HIGHEST_PROTOCOL)
-
-# Open all_html_links
-def open_all_html_links():
-    """ Open the pickle file 'all_html_links.pickle' """
-    return pd.read_pickle('all_html_links.pickle')
-
-# Open teams_and_dates.pickle
-def open_teams_and_dates():
-    """ Open the pickle file 'teams_and_dates.pickle' """
-    return pd.read_pickle('teams_and_dates.pickle')
-
 # Print QC information
-def my_df_QC():
+def my_df_QC(my_df):
     """ Run random QC tests on my_df """
     print('Len my_df:', len(my_df))
     print('Max goals:', my_df['G'].max())
     print('Max goalscorer:', my_df[my_df['G'] == my_df['G'].max()].index[0])
     print('Max TOI:  ', my_df['TOI'].max())
     print('Max TOI Player:', my_df[my_df['TOI'] == my_df['TOI'].max()].index[0])
-    print('Chris Chelios present:', 'Chris Chelios' in my_df.index)
-
-#Open results from the 2000-2001 season, game-by-game df
-def open_2000_2001_game_results():
-    """ Open the pickle file '2000-2001-game-results.pickle' """
-    return pd.read_pickle('2000-2001-game-results.pickle')
 
 #Create new, blank variables
 def restartAll():
@@ -518,78 +427,21 @@ def restartAll():
     if user_input.lower() == 'y':
 
         #Create new, empty variables (dfs, etc)
-        my_df = new_my_df()
-        last_time_df = create_new_last_time_df()
+        last_time_df = new_last_time_df()
         my_games_clean = {}
         all_time_clean_games = {}
 
         #Save all new variables
-        save_my_df(my_df)
-        save_last_time_df(last_time_df)
-        save_my_games_clean(my_games_clean)
-        save_all_time_clean_games(all_time_clean_games)
+        savePickle(last_time_df, 'last_time_df')
+        savePickle(my_games_clean, 'my_games_clean')
+        savePickle(all_time_clean_games, 'all_time_clean_games')
 
     else:
         pass
 
-#Reset variables for each year's scrape
-def yearlyRestart():
-    """A function to create a mostly-new statistical workspace"""
-
-    #Create new my_df
-    my_df = new_my_df()
-
-    #Save all new variables
-    save_my_df(my_df)
-
 '--------------- Call To Provided Functions ---------------'
 
-if __name__ == '__main__':
-    for year in range(2014, 2019):
-        scrapeYear(year)
+# if __name__ == '__main__':
+#     scrapeYear(2015)
 
 '----------------------------------------------------------'
-
-# my_df = open_yearly_my_df(years='2002_2003')
-# my_df = open_my_df()
-all_html_links = open_all_html_links()
-# my_games_unclean = open_my_games_unclean()
-# my_games_clean = open_my_games_clean()
-teams_and_dates = open_teams_and_dates()
-# last_time_df = open_last_time_df()
-# all_time_clean_games = open_all_time_clean_games()
-
-
-teams_and_dates = open_teams_and_dates()
-a = teams_and_dates.transpose()
-a[3] = gameLinks['url']
-
-def scrapeYearsURLS(end_year):
-    
-    """Scrape all html links for games across an entire NHL season. 
-    This uses the table available at 
-    'https://www.hockey-reference.com/leagues/NHL_YYYY_games.html', 
-    where YYYY is the year"""
-
-    #General url
-    url = 'https://www.hockey-reference.com/leagues/NHL_{}_games.html'.format(end_year)
-
-    #Process the html
-    r = requests.get(url)
-    soup = BeautifulSoup(r.content,'lxml')
-    table = soup.find('table', id='games') 
-    rows = table.findAll('tr')
-
-    #Select the first resulting table, namely that of the Regular Season stats. Table 2 is the playoffs stats.
-    seasonSummary = pd.read_html(url)[0]
-    seasonSummary = seasonSummary[['Date', 'Home', 'Visitor']]
-    my_urls = pd.Series([[th.a['href'] if th.find('a') else ''.join(th.stripped_strings) for th in row.find_all('th')] for row in table.find_all('tr')][1:])
-    my_urls = [item for sublist in my_urls for item in sublist]
-    seasonSummary.loc[:, 'url'] = my_urls
-    seasonSummary['url'] = 'https://www.hockey-reference.com' + seasonSummary['url']
-
-    #Save resulting file
-
-def savePickle(variable, desired_name):
-    with open(desired_name, 'wb') as f:
-        pickle.dump(variable, f, pickle.HIGHEST_PROTOCOL)
