@@ -441,7 +441,9 @@ def restartAll():
 
 '--------------- Call To Provided Functions ---------------'
 
-# if __name__ == '__main__':
-#     scrapeYear(2015)
+if __name__ == '__main__':
+        scrapeYear(2018)
 
 '----------------------------------------------------------'
+
+lastTime = pd.read_pickle('last_time_df_2017_2018.pickle')

@@ -136,4 +136,3 @@ def new_my_df():
     """ Create a new, empty my_df """
     return pd.DataFrame(columns=['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Shifts', 'TOI', 'Team', 'Date'])
 
-
