@@ -41,9 +41,9 @@ FLA, MTL, EDM]
 
 
 #Initialize dict of team names (string - keys) and players (hockey_player instances in a list - values)
-current_NHL_players = {}
+NHL_teams_and_players = {}
 
-#Loop through teams, creating a hockey_player instance for each player on that team, adding it to the current_NHL_players dictionary
+#Loop through teams, creating a hockey_player instance for each player on that team, adding it to the NHL_teams_and_players dictionary
 for team in my_teams:
     print('Team Name:', team.Name)
     #Create the team's URL
@@ -63,7 +63,7 @@ for team in my_teams:
     my_df['Handedness'] = my_df['Handedness'].str.replace('[^a-zA-Z]', '')
  
     #Create a new key-value pair, for the current team
-    current_NHL_players[team.Name] = []
+    NHL_teams_and_players[team.Name] = []
 
     #Create and add players to this new key-value pair
     for i in range(len(my_df)):
@@ -86,7 +86,16 @@ for team in my_teams:
             )
 
         #Add player to key-value pair
-        current_NHL_players[team.Name].append(my_player)
+        NHL_teams_and_players[team.Name].append(my_player)
 
-current_NHL_players[list(current_NHL_players.keys())[21]]
+# NHL_teams_and_players[list(NHL_teams_and_players.keys())[21]]
 
+#Save each team as a pickle file
+for team in my_teams:
+    savePickle(team, team.Name)
+
+#Save my list of team names
+savePickle(my_teams, 'my_teams')
+
+#Save NHL_teams_and_players dataframe as pickle
+savePickle(NHL_teams_and_players, 'NHL_teams_and_players')

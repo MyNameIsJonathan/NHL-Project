@@ -499,18 +499,26 @@ def restartAll():
 
 
 def findTodaysGames():
+    """Get today's date and create url, date string, and scrape data"""
     today = pd.to_datetime('today')
     url = 'https://www.hockey-reference.com/leagues/NHL_2019_games.html' #Change this url for '19-'20 season
     today_str = '{}-{}-{}'.format(str(today.year), str(today.month), str(today.day))
     my_games_df = pd.read_html(url)[0]
     my_games_df = my_games_df[['Date', 'Home', 'Visitor']]
     my_games_df = my_games_df[my_games_df['Date'] == today_str]
+    #Save todaysGames df with the date
+    savePickle(my_games_df, 'todaysGames_{}'.format(today_str))
 
-    return my_games_df
+def todaysPlayersStats():
+    """Get stats for players who play today"""
+    today = pd.to_datetime('today')
+    today_str = '{}-{}-{}'.format(str(today.year), str(today.month), str(today.day))
+    todaysGames = pd.read_pickle('todaysGames_{}.pickle'.format(today_str))
+    #Get the list of teams playing today
+    teams_playing_today = list(todaysGames['Home'].unique()) + list(todaysGames['Visitor'].unique())
 
+    #Instantiate a list of player names who play today
+    players_playing_today = []
 
-
-# a = pd.read_pickle('last_time_df_2017_2018.pickle')
-# GamesSince = pd.DataFrame(columns=a.columns)
-# GamesSince = GamesSince.rename(index=str, columns={"Last Game Date": "Total Recorded Games"})
-# savePickle(GamesSince, 'GamesSince', start_year=2004, end_year=2005)
+    #Fill players_playing_today by iterating through the team-player dictionary from the file team_creation.py
+    
