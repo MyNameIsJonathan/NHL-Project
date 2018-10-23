@@ -496,6 +496,7 @@ def restartAll():
 
 '----------------------------------------------------------'
 
+#Keep working on implementing these, then work on implementing daily update versions of the yearly updates
 
 
 def findTodaysGames():
@@ -509,6 +510,7 @@ def findTodaysGames():
     #Save todaysGames df with the date
     savePickle(my_games_df, 'todaysGames_{}'.format(today_str))
 
+
 def todaysPlayersStats():
     """Get stats for players who play today"""
     today = pd.to_datetime('today')
@@ -517,8 +519,21 @@ def todaysPlayersStats():
     #Get the list of teams playing today
     teams_playing_today = list(todaysGames['Home'].unique()) + list(todaysGames['Visitor'].unique())
 
-    #Instantiate a list of player names who play today
-    players_playing_today = []
-
     #Fill players_playing_today by iterating through the team-player dictionary from the file team_creation.py
-    
+    NHL_teams_and_players = pd.read_pickle('NHL_teams_and_players.pickle')
+
+    #Instantiate a list of player names who play today and fill it 
+    players_playing_today = []
+    for team in teams_playing_today:
+        players_playing_today.extend([player.Name for player in NHL_teams_and_players[team]])
+
+    last_time_df = pd.read_pickle('last_time_df_2017_2018.pickle')
+    todays_last_time = last_time_df.reindex(players_playing_today, fill_value=datetime.date(2000,10,3))
+
+    GamesSince = pd.read_pickle('GamesSince_2017_2018.pickle')
+    todays_GamesSince = GamesSince.reindex(players_playing_today, fill_value=0)
+
+    for column in todays_GamesSince.columns:
+        todays_GamesSince = todays_GamesSince.sort_values(column, ascending=False)
+        print(todays_GamesSince.head())
+        print('')

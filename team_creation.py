@@ -11,7 +11,7 @@ BUF = NHL_Team(Name='Buffalo Sabres', Coach='Phil Housley', Abbreviation='BUF')
 CAR = NHL_Team(Name='Carolina Hurricanes', Coach="Rod Brind'Amour", Abbreviation='CAR')
 COL = NHL_Team(Name='Colorado Avalanche', Coach='Jared Bednar', Abbreviation='COL')
 DAL = NHL_Team(Name='Dallas Stars', Coach='Jim Montgomery', Abbreviation='DAL')
-DET = NHL_Team(Name='Detroit Redwings', Coach='Jeff Blashill', Abbreviation='DET')
+DET = NHL_Team(Name='Detroit Red Wings', Coach='Jeff Blashill', Abbreviation='DET')
 NYR = NHL_Team(Name='New York Rangers', Coach='David Quinn', Abbreviation='NYR')
 OTT = NHL_Team(Name='Ottawa Senators', Coach='Guy Boucher', Abbreviation='OTT')
 PIT = NHL_Team(Name='Pittsburgh Penguins', Coach='Mike Sullivan', Abbreviation='PIT')
@@ -88,7 +88,22 @@ for team in my_teams:
         #Add player to key-value pair
         NHL_teams_and_players[team.Name].append(my_player)
 
-# NHL_teams_and_players[list(NHL_teams_and_players.keys())[21]]
+        if my_player in NHL_teams_and_players[team.Name]:
+            print(my_player.Name, end='  ')
+        else:
+            print(my_player.Name, 'not added to dictionary NHL_teams_and_players')
+
+    print('')
+    print('')
+
+#Loop through resulting dictionary, filling in the players into the team.Members list for each team
+for team_str, players_list in NHL_teams_and_players.items():
+    team = None
+    for team_instance in my_teams:
+        if team_instance.Name == team_str:
+            team = team_instance
+    team.Members = []
+    team.Members.extend(players_list)
 
 #Save each team as a pickle file
 for team in my_teams:
@@ -99,3 +114,4 @@ savePickle(my_teams, 'my_teams')
 
 #Save NHL_teams_and_players dataframe as pickle
 savePickle(NHL_teams_and_players, 'NHL_teams_and_players')
+
