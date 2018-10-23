@@ -441,9 +441,19 @@ def restartAll():
 
 '--------------- Call To Provided Functions ---------------'
 
-if __name__ == '__main__':
-        scrapeYear(2018)
+# if __name__ == '__main__':
+        # scrapeYear(2018)
 
 '----------------------------------------------------------'
 
-lastTime = pd.read_pickle('last_time_df_2017_2018.pickle')
+
+
+def findTodaysGames():
+
+
+today = pd.to_datetime('today')
+url = 'https://www.hockey-reference.com/leagues/NHL_2019_games.html' #Change this url for 19-20 season
+today_str = '{}-{}-{}'.format(str(today.year), str(today.month), str(today.day))
+my_games_df = pd.read_html(url)[0]
+my_games_df = my_games_df[['Date', 'Home', 'Visitor']]
+my_games_df = my_games_df[my_games_df['Date'] == today_str]
