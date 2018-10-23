@@ -337,6 +337,56 @@ def updateLastTime(end_year):
     #Save last_time_df
     savePickle(last_time_df, 'last_time_df', start_year, end_year)
 
+def updateGamesSince(end_year):
+    """A function to update the DataFrame that notes the number of games since a player has scored, gotten an assist, etc."""
+
+    #Create variable start_year
+    start_year = end_year - 1
+
+    print("Updating GamesSince to reflect new stats' timelines for the season spanning {} to {}".format(start_year, end_year))
+
+    #Load in GamesSince from the PREVIOUS season, which will be copied and updated
+    GamesSince = pd.read_pickle('GamesSince_{}_{}.pickle'.format(start_year-1, end_year-1)).copy()
+
+    #Load my_games_clean dictionary
+    my_games_clean = pd.read_pickle('my_games_clean_{}_{}.pickle'.format(start_year, end_year))
+
+    #Set columns to iterate through
+    cols = ['G', 'A', 'PTS', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S']
+
+    #Also add in last times the player was + or -
+    pmCols = ['+', '-']
+
+    #Iterate through all games in my_games_clean dictionary
+    for index, game_df in my_games_clean.items():
+
+        #Create the new index, which is a union of the main one and the one from the specific game
+        new_index = GamesSince.index.union(game_df.index)
+        #Implement the new index, filling in empty values with the value 0
+        GamesSince = GamesSince.reindex(new_index, fill_value=0)
+
+        #Iterate through columns to 1 - reset counter to 0 for any stat change and 2 - increment counters for unchanged stats by 1
+        for column in cols:
+            GamesSince.loc[game_df[game_df[column] > 0].index, column] = 0
+            GamesSince.loc[game_df[game_df[column] == 0].index, column] += 1
+
+        #Increment all players' Total Recorded Games by 1
+        GamesSince.loc[game_df.index, 'Total Recorded Games'] += 1
+
+        #Iterate through columns to edit +/- columns
+        for column in pmCols:
+            if column == '+':
+                GamesSince.loc[game_df[game_df['+/-'] > 0].index, column] = 0
+                GamesSince.loc[game_df[game_df['+/-'] <= 0].index, column] += 1
+            elif column == '-':
+                GamesSince.loc[game_df[game_df['+/-'] < 0].index, column] = 0
+                GamesSince.loc[game_df[game_df['+/-'] >= 0].index, column] += 1
+
+    #Save GamesSince
+    savePickle(GamesSince, 'GamesSince', start_year, end_year)
+
+    print('Finished updating GamesSince for the year {} through {}'.format(start_year, end_year))
+
 def incorporateNewStats(end_year):
 
     """[updates my_df]
@@ -449,11 +499,18 @@ def restartAll():
 
 
 def findTodaysGames():
+    today = pd.to_datetime('today')
+    url = 'https://www.hockey-reference.com/leagues/NHL_2019_games.html' #Change this url for '19-'20 season
+    today_str = '{}-{}-{}'.format(str(today.year), str(today.month), str(today.day))
+    my_games_df = pd.read_html(url)[0]
+    my_games_df = my_games_df[['Date', 'Home', 'Visitor']]
+    my_games_df = my_games_df[my_games_df['Date'] == today_str]
+
+    return my_games_df
 
 
-today = pd.to_datetime('today')
-url = 'https://www.hockey-reference.com/leagues/NHL_2019_games.html' #Change this url for 19-20 season
-today_str = '{}-{}-{}'.format(str(today.year), str(today.month), str(today.day))
-my_games_df = pd.read_html(url)[0]
-my_games_df = my_games_df[['Date', 'Home', 'Visitor']]
-my_games_df = my_games_df[my_games_df['Date'] == today_str]
+
+# a = pd.read_pickle('last_time_df_2017_2018.pickle')
+# GamesSince = pd.DataFrame(columns=a.columns)
+# GamesSince = GamesSince.rename(index=str, columns={"Last Game Date": "Total Recorded Games"})
+# savePickle(GamesSince, 'GamesSince', start_year=2004, end_year=2005)
