@@ -118,6 +118,100 @@ def cleanGame(game_df):
     
     return df
 
+'--------------- Todays Games Functions ---------------'
+
+def findTodaysGames():
+    """Get today's date and create url, date string, and scrape data"""
+    today = pd.to_datetime('today')
+    url = 'https://www.hockey-reference.com/leagues/NHL_2019_games.html' #Change this url for '19-'20 season
+    today_str = '{}-{}-{}'.format(str(today.year), str(today.month), str(today.day))
+    my_games_df = pd.read_html(url)[0]
+    my_games_df = my_games_df[['Date', 'Home', 'Visitor']]
+    my_games_df = my_games_df[my_games_df['Date'] == today_str]
+    #Save todaysGames df with the date
+    savePickle(my_games_df, 'todaysGames_{}'.format(today_str))
+
+def todaysPlayersStats():
+    """Get stats for players who play today"""
+    today = pd.to_datetime('today')
+    today_str = '{}-{}-{}'.format(str(today.year), str(today.month), str(today.day))
+    todaysGames = pd.read_pickle('todaysGames_{}.pickle'.format(today_str))
+    #Get the list of teams playing today
+    teams_playing_today = list(todaysGames['Home'].unique()) + list(todaysGames['Visitor'].unique())
+
+    #Fill players_playing_today by iterating through the team-player dictionary from the file team_creation.py
+    NHL_teams_and_players = pd.read_pickle('NHL_teams_and_players.pickle')
+
+    #Instantiate a list of player names who play today and fill it 
+    players_playing_today = []
+    for team in teams_playing_today:
+        players_playing_today.extend([player.Name for player in NHL_teams_and_players[team]])
+
+    #Open the last_time_df file to see the last time each player scored in each category
+    last_time_df = pd.read_pickle('last_time_df_2017_2018.pickle')
+    todays_last_time = last_time_df.reindex(players_playing_today, fill_value=datetime.date(2000,10,3))
+
+    #Also open the GamesSince df for the same reason
+    GamesSince = pd.read_pickle('GamesSince_2017_2018.pickle')
+    todays_GamesSince = GamesSince.reindex(players_playing_today, fill_value=0)
+
+    #Print the top 5 players for each category of GamesSince, such as the 5 players who haven't scored in the most games
+    for column in todays_GamesSince.columns:
+        todays_GamesSince = todays_GamesSince.sort_values(column, ascending=False)
+        print(todays_GamesSince.head())
+        print('')
+
+'--------------- Single-Day Scrape Functions ---------------'
+
+def scrapeYesterdaysURLS():
+
+    """[scrapes all html links for the given date storing them in a piclkle file labeled by day'.
+    """
+    yesterdaysDate = (pd.to_datetime('today') - datetime.timedelta(days=1)).date()
+
+    all_html_links = {}
+
+    total_home_teams = []
+    total_away_teams = []
+    all_game_dates = []
+
+    print('Scraping game links for games on {}'.format(yesterdaysDate))
+
+    # Get the html links for the tables
+    my_html_results = getURLS(start_date.month, start_date.day, start_date.year)
+    all_html_links[str(start_date)] = my_html_results[0]
+    total_home_teams.extend(my_html_results[1])
+    total_away_teams.extend(my_html_results[2])
+    all_game_dates.extend(my_html_results[3])
+    start_date += datetime.timedelta(days=1)
+
+    # Pickle the 'all_html_links' dict using the highest protocol available.
+    savePickle(all_html_links, 'all_html_links.pickle')
+
+    # Flatten list of game htmls
+    flat_list_game_links = [item for sublist in list(all_html_links.values()) for item in sublist]
+
+    #Save home teams, away teams, and game dates in df
+    teams_and_dates = pd.DataFrame([total_home_teams, total_away_teams, all_game_dates, flat_list_game_links])
+    savePickle(teams_and_dates, 'teams_and_dates.pickle')
+
+    print('Total game links scraped = {}'.format(len(teams_and_dates.columns)))
+
+def scrapeYesterdaysGames():
+    pass
+
+def cleanYesterdaysGames():
+    pass
+
+def updateYesterdaysLastTime():
+    pass
+
+def updateYesterdaysGamesSince():
+    pass
+
+def incorporateYesterdaysStats():
+    pass
+
 '--------------- Multi-Game Functions ---------------'
 
 def scrapeURLRange(start_date, end_date):
@@ -444,6 +538,9 @@ def scrapeYear(end_year):
     my_df = pd.read_pickle('my_df_{}_{}.pickle'.format(end_year-1, end_year))
     my_df_QC(my_df)
 
+def scrapeTodaysGames():
+    pass
+
 '--------------- Helper Functions ---------------'
 
 #Generic save pickle file helper functions
@@ -495,45 +592,3 @@ def restartAll():
         # scrapeYear(2018)
 
 '----------------------------------------------------------'
-
-#Keep working on implementing these, then work on implementing daily update versions of the yearly updates
-
-
-def findTodaysGames():
-    """Get today's date and create url, date string, and scrape data"""
-    today = pd.to_datetime('today')
-    url = 'https://www.hockey-reference.com/leagues/NHL_2019_games.html' #Change this url for '19-'20 season
-    today_str = '{}-{}-{}'.format(str(today.year), str(today.month), str(today.day))
-    my_games_df = pd.read_html(url)[0]
-    my_games_df = my_games_df[['Date', 'Home', 'Visitor']]
-    my_games_df = my_games_df[my_games_df['Date'] == today_str]
-    #Save todaysGames df with the date
-    savePickle(my_games_df, 'todaysGames_{}'.format(today_str))
-
-
-def todaysPlayersStats():
-    """Get stats for players who play today"""
-    today = pd.to_datetime('today')
-    today_str = '{}-{}-{}'.format(str(today.year), str(today.month), str(today.day))
-    todaysGames = pd.read_pickle('todaysGames_{}.pickle'.format(today_str))
-    #Get the list of teams playing today
-    teams_playing_today = list(todaysGames['Home'].unique()) + list(todaysGames['Visitor'].unique())
-
-    #Fill players_playing_today by iterating through the team-player dictionary from the file team_creation.py
-    NHL_teams_and_players = pd.read_pickle('NHL_teams_and_players.pickle')
-
-    #Instantiate a list of player names who play today and fill it 
-    players_playing_today = []
-    for team in teams_playing_today:
-        players_playing_today.extend([player.Name for player in NHL_teams_and_players[team]])
-
-    last_time_df = pd.read_pickle('last_time_df_2017_2018.pickle')
-    todays_last_time = last_time_df.reindex(players_playing_today, fill_value=datetime.date(2000,10,3))
-
-    GamesSince = pd.read_pickle('GamesSince_2017_2018.pickle')
-    todays_GamesSince = GamesSince.reindex(players_playing_today, fill_value=0)
-
-    for column in todays_GamesSince.columns:
-        todays_GamesSince = todays_GamesSince.sort_values(column, ascending=False)
-        print(todays_GamesSince.head())
-        print('')
