@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 from My_Classes import LengthException
 import datetime
 import time
+import os.path
 
 
 '--------------- Single-Game-Specific Functions ---------------'
@@ -149,7 +150,6 @@ def todaysPlayersStats():
 
     #Open the last_time_df file to see the last time each player scored in each category
     last_time_df = pd.read_pickle('last_time_df_2017_2018.pickle')
-    todays_last_time = last_time_df.reindex(players_playing_today, fill_value=datetime.date(2000,10,3))
 
     #Also open the GamesSince df for the same reason
     GamesSince = pd.read_pickle('GamesSince_2017_2018.pickle')
@@ -930,15 +930,6 @@ def scrapeSpecificDay(day):
         my_df = pd.read_pickle('dailyMyDF/dailyMyDF_{}.pickle'.format(myDate - datetime.timedelta(days=1)))
         savePickle(my_df, 'dailyMyDF/dailyMyDF_{}'.format(myDate))
 
-#Scrape data only between these days, start-inclusive and end-exclusive
-def updateDF(df, startDate='2000/10/4', endDate='2001/4/9'):
-    """ Run all prescribed functions on my_df, pulling html links, game data, then incorporating it to the file 'my_df.pickle' """
-    scrapeURLRange(startDate, endDate)
-    scrapeAvailableGames()
-    cleanUncleanGames()
-    updateLastTime()
-    incorporateNewStats(df)
-
 # function to run above functions to scrape, clean, and incorporate data
 def scrapeYear(end_year):
     """Function to scrape, clean, save, and incorporate data from the given 
@@ -1016,16 +1007,9 @@ def restartAll():
     else:
         pass
 
-'--------------- Call To Provided Functions ---------------'
-
-# if __name__ == '__main__':
-        # scrapeYear(2018)
-
-'----------------------------------------------------------'
-
-
+#Report summary of LastTime for current high-achieving players
 def showRecentPerformers():
-
+    """A function to return summarizing statistics focusing on LastTime for current players"""
     #Select yesterday -- even if no games were played then, the update functions will accomodate and create it accurate dataframes
     myDate = pd.to_datetime('today').date() - datetime.timedelta(days=1)
 
@@ -1072,3 +1056,23 @@ def showRecentPerformers():
     currentPlayersLastTime = currentPlayersLastTime.sort_values('Average')
 
     print(currentPlayersLastTime.head(25))
+
+'--------------- Call To Provided Functions ---------------'
+
+if __name__ == '__main__':
+
+    #Check if yesterdays data was already scraped, by checking for one of the indicative files
+    yesterdaysDate = pd.to_datetime('today').date() - datetime.timedelta(days=1)
+    filename = 'dailyGamesClean/dailyGamesClean_{}.pickle'.format(yesterdaysDate)
+    if os.path.isfile(filename):
+        print('\nYesterday was already scraped -- skipping scrape\n')
+    else:
+        print('Scraping yesterdays data')
+        scrapeYesterday()
+    
+    #Show recent performers!!
+    showRecentPerformers()
+
+'----------------------------------------------------------'
+
+# /Users/jonathanolson/Documents/GitHub/NHL-Project/dailyGamesClean/dailyGamesClean_2018-10-19.pickle
