@@ -902,12 +902,24 @@ def incorporateNewStats(end_year):
 
 #Scrape, clean, incorporate yesterday's stats
 def scrapeYesterday():
-    scrapeYesterdaysURLS()
-    scrapeYesterdaysGames()
-    cleanYesterdaysGames()
-    updateYesterdaysLastTime()
-    updateYesterdaysGamesSince()
-    incorporateYesterdaysStats()
+
+    #Check if yesterdays data was already scraped, by checking for one of the indicative files
+    yesterdaysDate = pd.to_datetime('today').date() - datetime.timedelta(days=1)
+    filename = 'dailyGamesClean/dailyGamesClean_{}.pickle'.format(yesterdaysDate)
+    
+    if os.path.isfile(filename):
+        print('\nYesterday was already scraped -- skipping scrape\n')
+    else:
+        print('Scraping yesterdays data')
+        scrapeYesterdaysURLS()
+        scrapeYesterdaysGames()
+        cleanYesterdaysGames()
+        updateYesterdaysLastTime()
+        updateYesterdaysGamesSince()
+        incorporateYesterdaysStats()
+
+    #Show recent performers!!
+    showRecentPerformers()
 
 #Scrape, clean, incorporate specific day's stats
 def scrapeSpecificDay(day):
@@ -946,11 +958,6 @@ def scrapeYear(end_year):
     #Report major stats from my_df for this year
     my_df = pd.read_pickle('my_df_{}_{}.pickle'.format(end_year-1, end_year))
     my_df_QC(my_df)
-
-#Call functions to update all dataframes with yesterday's stats
-def dailyUpdate():
-    """Daily update function to download yesterday's data, update all dataframes, scrape todays games, and report on todays games"""
-    pass
 
 #Scrape individual days from the start date to yesterday
 def scrapeToNow(start_date='2000/12/31'):
@@ -1017,10 +1024,11 @@ def showRecentPerformers():
     lastTime = pd.read_pickle('dailyLastTime/dailyLastTime_{}.pickle'.format(myDate))
     gamesSince = pd.read_pickle('dailyGamesSince/dailyGamesSince_{}.pickle'.format(myDate))
 
-    #Select only platers who've played this year
+    #Select only players who've played this year
     currentPlayers = lastTime[lastTime['Last Game Date'] > pd.to_datetime('2018-10-1', format='%Y-%m-%d').date()]
+    # print(min(currentPlayers['Last Game Date']))
     currentPlayersIndex = currentPlayers.index
-    currentPlayersLastTime = gamesSince.reindex(currentPlayersIndex)
+    currentPlayersGamesSince = gamesSince.reindex(currentPlayersIndex)
 
     #Create a dataframe that represents the weighted stats for each category!
     # myWeights = {
@@ -1036,43 +1044,38 @@ def showRecentPerformers():
     #     'GW': 0.2,
     #     'S': 0.05
     #     }
-    # weightTable = currentPlayersLastTime.copy()
+    # weightTable = currentPlayersGamesSince.copy()
     # weightTable.drop('Total Recorded Games', axis=1)
     # for column, weight in myWeights.items():
     #     weightTable[column] = weightTable[column] * weight
 
-    # #Use weightTables values to create a new column in currentPlayersLastTime: 'Weighted Average'
-    # currentPlayersLastTime['Weighted Average'] = weightTable.mean(axis=1).round(0).astype(int)
+    # #Use weightTables values to create a new column in currentPlayersGamesSince: 'Weighted Average'
+    # currentPlayersGamesSince['Weighted Average'] = weightTable.mean(axis=1).round(0).astype(int)
 
     #Create a column 'Average', that averages all stats
     myCols = ['G', 'A', '+', 'EV', 'PP', 'SH', 'GW', 'S']
-    currentPlayersLastTime['Average'] = currentPlayersLastTime[myCols].mean(axis=1).round(2)
+    currentPlayersGamesSince['Average'] = currentPlayersGamesSince[myCols].mean(axis=1).round(2)
 
     #Select only players who've played enough career games to validate low averages being good
     #(An average of 2 days since scoring, assisting, etc. is good, but only if the player has played more than 2 games!)
-    currentPlayersLastTime = currentPlayersLastTime[currentPlayersLastTime['Total Recorded Games'] >= 25]
+    currentPlayersGamesSince = currentPlayersGamesSince[currentPlayersGamesSince['Total Recorded Games'] >= 25]
 
-    #Sort by 'Average'
-    currentPlayersLastTime = currentPlayersLastTime.sort_values('Average')
+    #Sort by different category to show underperformers
+    for column in currentPlayersGamesSince.columns:
+        for player in currentPlayersGamesSince.sort_values(column, ascending=False).head(3).index:
+            print('{}\t{}\t{}'.format(column, player, currentPlayersGamesSince.loc[player, column]))
 
-    print(currentPlayersLastTime.head(25))
+
+    currentPlayersGamesSince = currentPlayersGamesSince.sort_values('G', ascending=False)
+
+    print('\nLongest droughts\n')
+    print(currentPlayersGamesSince.head())
 
 '--------------- Call To Provided Functions ---------------'
 
 if __name__ == '__main__':
-
-    #Check if yesterdays data was already scraped, by checking for one of the indicative files
-    yesterdaysDate = pd.to_datetime('today').date() - datetime.timedelta(days=1)
-    filename = 'dailyGamesClean/dailyGamesClean_{}.pickle'.format(yesterdaysDate)
-    if os.path.isfile(filename):
-        print('\nYesterday was already scraped -- skipping scrape\n')
-    else:
-        print('Scraping yesterdays data')
-        scrapeYesterday()
-    
-    #Show recent performers!!
-    showRecentPerformers()
+    scrapeYesterday()
 
 '----------------------------------------------------------'
 
-# /Users/jonathanolson/Documents/GitHub/NHL-Project/dailyGamesClean/dailyGamesClean_2018-10-19.pickle
+

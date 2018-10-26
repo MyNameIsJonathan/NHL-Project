@@ -115,3 +115,6 @@ savePickle(my_teams, 'my_teams')
 #Save NHL_teams_and_players dataframe as pickle
 savePickle(NHL_teams_and_players, 'NHL_teams_and_players')
 
+#Loop to remove weird space characters
+for player in range(len(players)):
+    players[player] = players[player].replace(u'\xa0', u' ')
