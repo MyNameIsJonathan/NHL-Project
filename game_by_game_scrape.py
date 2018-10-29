@@ -313,7 +313,7 @@ def updateSpecificDaysSince(date='2000-1-1'):
 
     myDate = pd.to_datetime(date, format='%Y-%m-%d').date()
 
-    print("Updating GamesSince to reflect new stats' timelines for yerterday, {}".format(myDate))
+    print("Updating GamesSince to reflect new stats from {}".format(myDate))
 
     #Load in GamesSince from the previous day, which will be copied and updated
     GamesSince = pd.read_pickle('dailyGamesSince/dailyGamesSince_{}.pickle'.format(myDate - datetime.timedelta(days=1))).copy()
@@ -922,7 +922,8 @@ def scrapeYesterday():
     showRecentPerformers()
 
 #Scrape, clean, incorporate specific day's stats
-def scrapeSpecificDay(day):
+def scrapeSpecificDay(day='2018-11-26'):
+    day = pd.to_datetime(day, format='%Y-%m-%d')
     myGames = scrapeSpecificDaysURLS(day)
     if myGames == 'Games Found':
         scrapeSpecificDaysGames(day)
@@ -968,6 +969,40 @@ def scrapeToNow(start_date='2000/12/31'):
     while myDate != todaysDate:
         scrapeSpecificDay(str(myDate))
         myDate += datetime.timedelta(days=1)
+
+'--------------- Data-Reporting Functions ---------------'
+
+#Open latest versions of the following DataFrames
+
+def openLatestMyDF():
+    myDate = pd.to_datetime('today').date()
+    while True:
+        try:
+            myDF = pd.read_pickle('dailyMyDF/dailyMyDF_{}.pickle'.format(myDate))
+            break
+        except:
+            myDate -= datetime.timedelta(days=1)
+    return myDF
+
+def openLatestLastTime():
+    myDate = pd.to_datetime('today').date()
+    while True:
+        try:
+            lastTime = pd.read_pickle('dailyLastTime/dailyLastTime_{}.pickle'.format(myDate))
+            break
+        except:
+            myDate -= datetime.timedelta(days=1)
+    return lastTime
+
+def openLatestGamesSince():
+    myDate = pd.to_datetime('today').date()
+    while True:
+        try:
+            gamesSince = pd.read_pickle('dailyGamesSince/dailyGamesSince_{}.pickle'.format(myDate))
+            break
+        except:
+            myDate -= datetime.timedelta(days=1)
+    return gamesSince
 
 '--------------- Helper Functions ---------------'
 
@@ -1073,9 +1108,12 @@ def showRecentPerformers():
 
 '--------------- Call To Provided Functions ---------------'
 
-if __name__ == '__main__':
-    scrapeYesterday()
+# if __name__ == '__main__':
+#     scrapeYesterday()
 
 '----------------------------------------------------------'
 
+a = openLatestMyDF()
+b = openLatestLastTime()
+c = openLatestGamesSince()
 
