@@ -123,36 +123,31 @@ def cleanGame(game_df):
 
 def findTodaysGames():
     """Get today's date and create url, date string, and scrape data"""
-    today = pd.to_datetime('today')
+    today = pd.to_datetime('today').date()
     url = 'https://www.hockey-reference.com/leagues/NHL_2019_games.html' #Change this url for '19-'20 season
-    today_str = '{}-{}-{}'.format(str(today.year), str(today.month), str(today.day))
     my_games_df = pd.read_html(url)[0]
     my_games_df = my_games_df[['Date', 'Home', 'Visitor']]
-    my_games_df = my_games_df[my_games_df['Date'] == today_str]
+    my_games_df = my_games_df[my_games_df['Date'] == str(today)]
     #Save todaysGames df with the date
-    savePickle(my_games_df, 'todaysGames_{}'.format(today_str))
+    savePickle(my_games_df, 'todaysGames_{}'.format(str(today)))
 
 def todaysPlayersStats():
     """Get stats for players who play today"""
-    today = pd.to_datetime('today')
-    today_str = '{}-{}-{}'.format(str(today.year), str(today.month), str(today.day))
-    todaysGames = pd.read_pickle('todaysGames_{}.pickle'.format(today_str))
+    today = pd.to_datetime('today').date()
+    todaysGames = pd.read_pickle('todaysGames_{}.pickle'.format(str(today)))
     #Get the list of teams playing today
     teams_playing_today = list(todaysGames['Home'].unique()) + list(todaysGames['Visitor'].unique())
 
     #Fill players_playing_today by iterating through the team-player dictionary from the file team_creation.py
-    NHL_teams_and_players = pd.read_pickle('NHL_teams_and_players.pickle')
+    NHL_teams_and_players = pd.read_pickle('Teams/NHL_teams_and_players.pickle')
 
     #Instantiate a list of player names who play today and fill it 
     players_playing_today = []
     for team in teams_playing_today:
         players_playing_today.extend([player.Name for player in NHL_teams_and_players[team]])
 
-    #Open the last_time_df file to see the last time each player scored in each category
-    last_time_df = pd.read_pickle('last_time_df_2017_2018.pickle')
-
-    #Also open the GamesSince df for the same reason
-    GamesSince = pd.read_pickle('GamesSince_2017_2018.pickle')
+    #Open the GamesSince df to see the games since each of today's players scored, etc.
+    GamesSince = pd.read_pickle('dailyGamesSince/dailyGamesSince_{}.pickle'.format(today - datetime.timedelta(days=1)))
     todays_GamesSince = GamesSince.reindex(players_playing_today, fill_value=0)
 
     #Print the top 5 players for each category of GamesSince, such as the 5 players who haven't scored in the most games
@@ -901,9 +896,8 @@ def incorporateNewStats(end_year):
 
 '--------------- Aggregate Scraping, Updating Functions ---------------'
 
-#Scrape, clean, incorporate yesterday's stats
 def scrapeYesterday():
-
+    """ Scrape, clean, incorporate yesterday's stats """
     #Check if yesterdays data was already scraped, by checking for one of the indicative files (dailyGamesClean)
     yesterdaysDate = pd.to_datetime('today').date() - datetime.timedelta(days=1)
     filename = 'dailyGamesClean/dailyGamesClean_{}.pickle'.format(yesterdaysDate)
@@ -922,8 +916,10 @@ def scrapeYesterday():
     #Show recent performers!!
     showRecentPerformers()
 
-#Scrape, clean, incorporate specific day's stats
 def scrapeSpecificDay(day='2018-11-26'):
+
+    """ Scrape, clean, incorporate specific day's stats """
+
     day = pd.to_datetime(day, format='%Y-%m-%d')
     myGames = scrapeSpecificDaysURLS(day)
     if myGames == 'Games Found':
@@ -944,7 +940,6 @@ def scrapeSpecificDay(day='2018-11-26'):
         my_df = pd.read_pickle('dailyMyDF/dailyMyDF_{}.pickle'.format(myDate - datetime.timedelta(days=1)))
         savePickle(my_df, 'dailyMyDF/dailyMyDF_{}'.format(myDate))
 
-# function to run above functions to scrape, clean, and incorporate data
 def scrapeYear(end_year):
     """Function to scrape, clean, save, and incorporate data from the given 
     NHL season. The year provided is the end_year of the season, such as 
@@ -961,7 +956,6 @@ def scrapeYear(end_year):
     my_df = pd.read_pickle('my_df_{}_{}.pickle'.format(end_year-1, end_year))
     my_df_QC(my_df)
 
-#Scrape individual days from the start date to yesterday
 def scrapeToNow(start_date='2000/12/31'):
     """Scrape individual days from the start date to yesterday"""
     myDate = pd.to_datetime(start_date, format='%Y-%m-%d').date()
@@ -972,8 +966,6 @@ def scrapeToNow(start_date='2000/12/31'):
         myDate += datetime.timedelta(days=1)
 
 '--------------- Data-Reporting Functions ---------------'
-
-#Open latest versions of the following DataFrames
 
 def openLatestMyDF():
     myDate = pd.to_datetime('today').date()
@@ -1007,7 +999,6 @@ def openLatestGamesSince():
 
 '--------------- Helper Functions ---------------'
 
-#Generic save pickle file helper functions
 def savePickle(variable, variable_name, start_year=None, end_year=None):
     """Save the given variable as a pickle file, with the filename ending with '.pickle'"""
     if start_year and end_year:
@@ -1017,12 +1008,10 @@ def savePickle(variable, variable_name, start_year=None, end_year=None):
     with open(filename, 'wb') as f:
         pickle.dump(variable, f, pickle.HIGHEST_PROTOCOL)
 
-# Create new last_time_df
 def new_last_time_df():
     """ Create a new last_time_df file """
     return pd.DataFrame(columns=['G', 'A', 'PTS', '+', '-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Last Game Date'])
 
-# Print QC information
 def my_df_QC(my_df):
     """ Run random QC tests on my_df """
     print('Len my_df:', len(my_df))
@@ -1031,7 +1020,6 @@ def my_df_QC(my_df):
     print('Max TOI:  ', my_df['TOI'].max())
     print('Max TOI Player:', my_df[my_df['TOI'] == my_df['TOI'].max()].index[0])
 
-#Create new, blank variables
 def restartAll():
     """A function to create a brand new statistical workspace"""
     user_input = input('Are you sure you want to clear all previous data? (y/n)    ')
@@ -1050,9 +1038,8 @@ def restartAll():
     else:
         pass
 
-#Report summary of LastTime for current high-achieving players
 def showRecentPerformers():
-    """A function to return summarizing statistics focusing on LastTime for current players"""
+    """A function to return summarizing statistics focusing on GamesSince for current players"""
     #Select yesterday -- even if no games were played then, the update functions will accomodate and create it accurate dataframes
     myDate = pd.to_datetime('today').date() - datetime.timedelta(days=1)
 
@@ -1066,28 +1053,6 @@ def showRecentPerformers():
     currentPlayersIndex = currentPlayers.index
     currentPlayersGamesSince = gamesSince.reindex(currentPlayersIndex)
 
-    #Create a dataframe that represents the weighted stats for each category!
-    # myWeights = {
-    #     'G': 1,
-    #     'A': 1,
-    #     'PTS': 0.9,
-    #     '+': 0.75,
-    #     '-': -0.25, #A negative value will yield a benefit for a high value here
-    #     'PIM': 0.1,
-    #     'EV': 0.1,
-    #     'PP': 0.1,
-    #     'SH': 0.2,
-    #     'GW': 0.2,
-    #     'S': 0.05
-    #     }
-    # weightTable = currentPlayersGamesSince.copy()
-    # weightTable.drop('Total Recorded Games', axis=1)
-    # for column, weight in myWeights.items():
-    #     weightTable[column] = weightTable[column] * weight
-
-    # #Use weightTables values to create a new column in currentPlayersGamesSince: 'Weighted Average'
-    # currentPlayersGamesSince['Weighted Average'] = weightTable.mean(axis=1).round(0).astype(int)
-
     #Create a column 'Average', that averages all stats
     myCols = ['G', 'A', '+', 'EV', 'PP', 'SH', 'GW', 'S']
     currentPlayersGamesSince['Average'] = currentPlayersGamesSince[myCols].mean(axis=1).round(2)
@@ -1096,16 +1061,12 @@ def showRecentPerformers():
     #(An average of 2 days since scoring, assisting, etc. is good, but only if the player has played more than 2 games!)
     currentPlayersGamesSince = currentPlayersGamesSince[currentPlayersGamesSince['Total Recorded Games'] >= 25]
 
+    print('\nLongest droughts\n')
+
     #Sort by different category to show underperformers
     for column in currentPlayersGamesSince.columns:
         for player in currentPlayersGamesSince.sort_values(column, ascending=False).head(3).index:
             print('{}\t{}\t{}'.format(column, player, currentPlayersGamesSince.loc[player, column]))
-
-
-    currentPlayersGamesSince = currentPlayersGamesSince.sort_values('G', ascending=False)
-
-    print('\nLongest droughts\n')
-    print(currentPlayersGamesSince.head())
 
 '--------------- Call To Provided Functions ---------------'
 
@@ -1114,56 +1075,6 @@ if __name__ == '__main__':
 
 '----------------------------------------------------------'
 
-a = openLatestMyDF()
+# a = openLatestMyDF()
 # b = openLatestLastTime()
 # c = openLatestGamesSince()
-
-# incorporateSpecificDaysStats('2018-10-03')
-# b = pd.read_pickle('dailyMyDF/dailyMyDF_2018-10-03.pickle')
-
-myDate = pd.to_datetime('2018-10-03', format='%Y-%m-%d').date()
-today = pd.to_datetime('today').date()
-
-while myDate != today:
-    # print('Date', myDate)
-    myGamesClean = pd.read_pickle('dailyGamesClean/dailyGamesClean_{}.pickle'.format(myDate))
-    if len(myGamesClean) > 0:
-        incorporateSpecificDaysStats(str(myDate))
-    else:
-        mydf = pd.read_pickle('dailyMyDF/dailyMyDF_{}.pickle'.format(myDate - datetime.timedelta(days=1)))
-        savePickle(mydf, 'dailyMyDF/dailyMyDF_{}'.format(myDate))
-
-    myDate += datetime.timedelta(days=1)
-
-a = pd.read_pickle('dailyMyDF/dailyMyDF_2018-10-12.pickle')
-
-'--------------------------------------------------------------------------------------------'
-
-date = '2018-10-13'
-
-myDate = pd.to_datetime(date, format='%Y-%m-%d').date()
-
-my_games_clean = pd.read_pickle('dailyGamesClean/dailyGamesClean_{}.pickle'.format(myDate))
-
-#Instantiate my_games_clean
-my_games_clean = pd.read_pickle('dailyGamesClean/dailyGamesClean_{}.pickle'.format(myDate))
-
-print('Adding {} games to my_df'.format(len(my_games_clean)))
-
-#Load in the day befores my_df
-my_df = pd.read_pickle('dailyMyDF/dailyMyDF_{}.pickle'.format(myDate - datetime.timedelta(days=1)))
-
-#Create main df for all day's games
-new_df = pd.concat([game for game in my_games_clean.values()], sort=True)
-new_df = new_df.groupby(new_df.index).sum()
-
-#Combine my_df and new_df
-my_df = my_df.add(new_df, fill_value=0)
-
-# Convert columns to int
-columns_to_int = ['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'EV', 'PP', 'SH', 'S', 'Shifts']
-for column in columns_to_int:
-    if column in my_df.columns:
-        my_df[column] = my_df[column].astype(int)
-
-savePickle(my_df, 'dailyMyDF/dailyMyDF_{}'.format(myDate))
