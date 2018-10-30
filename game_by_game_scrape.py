@@ -359,6 +359,7 @@ def updateSpecificDaysSince(date='2000-1-1'):
 
 def incorporateSpecificDaysStats(date='2000-1-1'):
 
+    #Convert date to datetime
     myDate = pd.to_datetime(date, format='%Y-%m-%d').date()
 
     #Instantiate my_games_clean
@@ -366,12 +367,12 @@ def incorporateSpecificDaysStats(date='2000-1-1'):
 
     print('Adding {} games to my_df'.format(len(my_games_clean)))
 
-    #Load in the day before's my_df
+    #Load in the day befores my_df
     my_df = pd.read_pickle('dailyMyDF/dailyMyDF_{}.pickle'.format(myDate - datetime.timedelta(days=1)))
 
     #Create main df for all day's games
-    new_df = pd.concat([game for game in my_games_clean.values()])
-    new_df = my_df.groupby(my_df.index).sum()
+    new_df = pd.concat([game for game in my_games_clean.values()], sort=True)
+    new_df = new_df.groupby(new_df.index).sum()
 
     #Combine my_df and new_df
     my_df = my_df.add(new_df, fill_value=0)
@@ -586,8 +587,8 @@ def incorporateYesterdaysStats():
     my_df = pd.read_pickle('dailyMyDF/dailyMyDF_{}.pickle'.format(yesterdaysDate - datetime.timedelta(days=1)))
 
     #Create main df for all day's games
-    new_df = pd.concat([game for game in my_games_clean.values()])
-    new_df = my_df.groupby(my_df.index).sum()
+    new_df = pd.concat([game for game in my_games_clean.values()], sort=True)
+    new_df = new_df.groupby(new_df.index).sum()
 
     #Combine my_df and new_df
     my_df = my_df.add(new_df, fill_value=0)
@@ -903,7 +904,7 @@ def incorporateNewStats(end_year):
 #Scrape, clean, incorporate yesterday's stats
 def scrapeYesterday():
 
-    #Check if yesterdays data was already scraped, by checking for one of the indicative files
+    #Check if yesterdays data was already scraped, by checking for one of the indicative files (dailyGamesClean)
     yesterdaysDate = pd.to_datetime('today').date() - datetime.timedelta(days=1)
     filename = 'dailyGamesClean/dailyGamesClean_{}.pickle'.format(yesterdaysDate)
     
@@ -1108,12 +1109,61 @@ def showRecentPerformers():
 
 '--------------- Call To Provided Functions ---------------'
 
-# if __name__ == '__main__':
-#     scrapeYesterday()
+if __name__ == '__main__':
+    scrapeYesterday()
 
 '----------------------------------------------------------'
 
 a = openLatestMyDF()
-b = openLatestLastTime()
-c = openLatestGamesSince()
+# b = openLatestLastTime()
+# c = openLatestGamesSince()
 
+# incorporateSpecificDaysStats('2018-10-03')
+# b = pd.read_pickle('dailyMyDF/dailyMyDF_2018-10-03.pickle')
+
+myDate = pd.to_datetime('2018-10-03', format='%Y-%m-%d').date()
+today = pd.to_datetime('today').date()
+
+while myDate != today:
+    # print('Date', myDate)
+    myGamesClean = pd.read_pickle('dailyGamesClean/dailyGamesClean_{}.pickle'.format(myDate))
+    if len(myGamesClean) > 0:
+        incorporateSpecificDaysStats(str(myDate))
+    else:
+        mydf = pd.read_pickle('dailyMyDF/dailyMyDF_{}.pickle'.format(myDate - datetime.timedelta(days=1)))
+        savePickle(mydf, 'dailyMyDF/dailyMyDF_{}'.format(myDate))
+
+    myDate += datetime.timedelta(days=1)
+
+a = pd.read_pickle('dailyMyDF/dailyMyDF_2018-10-12.pickle')
+
+'--------------------------------------------------------------------------------------------'
+
+date = '2018-10-13'
+
+myDate = pd.to_datetime(date, format='%Y-%m-%d').date()
+
+my_games_clean = pd.read_pickle('dailyGamesClean/dailyGamesClean_{}.pickle'.format(myDate))
+
+#Instantiate my_games_clean
+my_games_clean = pd.read_pickle('dailyGamesClean/dailyGamesClean_{}.pickle'.format(myDate))
+
+print('Adding {} games to my_df'.format(len(my_games_clean)))
+
+#Load in the day befores my_df
+my_df = pd.read_pickle('dailyMyDF/dailyMyDF_{}.pickle'.format(myDate - datetime.timedelta(days=1)))
+
+#Create main df for all day's games
+new_df = pd.concat([game for game in my_games_clean.values()], sort=True)
+new_df = new_df.groupby(new_df.index).sum()
+
+#Combine my_df and new_df
+my_df = my_df.add(new_df, fill_value=0)
+
+# Convert columns to int
+columns_to_int = ['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'EV', 'PP', 'SH', 'S', 'Shifts']
+for column in columns_to_int:
+    if column in my_df.columns:
+        my_df[column] = my_df[column].astype(int)
+
+savePickle(my_df, 'dailyMyDF/dailyMyDF_{}'.format(myDate))
