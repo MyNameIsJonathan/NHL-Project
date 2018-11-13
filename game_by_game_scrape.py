@@ -940,6 +940,28 @@ def scrapeSpecificDay(day='2018-11-26'):
         my_df = pd.read_pickle('dailyMyDF/dailyMyDF_{}.pickle'.format(myDate - datetime.timedelta(days=1)))
         savePickle(my_df, 'dailyMyDF/dailyMyDF_{}'.format(myDate))
 
+def scrapeToToday():
+    """Scrape games day-by-day, up to current day
+    Accomodates previously-scraped days. Automatically finds last-scraped day"""
+
+    #Find last scraped day; indicated by presence of that day's myDF
+    myDate = pd.to_datetime('today').date()
+    today = pd.to_datetime('today').date()
+    while True:
+        try:
+            myDF = pd.read_pickle('dailyMyDF/dailyMyDF_{}.pickle'.format(myDate))
+            break
+        except:
+            myDate -= datetime.timedelta(days=1)
+
+    #Increase date to first unscraped day (next day)
+    myDate += datetime.timedelta(days=1)
+
+    #Iteratively scrape each day
+    while myDate != today:
+        scrapeSpecificDay(day=str(myDate))
+        myDate += datetime.timedelta(days=1)
+
 def scrapeYear(end_year):
     """Function to scrape, clean, save, and incorporate data from the given 
     NHL season. The year provided is the end_year of the season, such as 
@@ -1071,7 +1093,7 @@ def showRecentPerformers():
 '--------------- Call To Provided Functions ---------------'
 
 if __name__ == '__main__':
-    scrapeYesterday()
+    scrapeToToday()
 
 '----------------------------------------------------------'
 
