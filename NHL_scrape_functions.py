@@ -962,6 +962,9 @@ def scrapeToToday():
         scrapeSpecificDay(day=str(myDate))
         myDate += datetime.timedelta(days=1)
 
+    #Report on recent performers
+    showRecentPerformers()
+
 def scrapeYear(end_year):
     """Function to scrape, clean, save, and incorporate data from the given 
     NHL season. The year provided is the end_year of the season, such as 
