@@ -1095,11 +1095,9 @@ def showRecentPerformers():
 
 '--------------- Call To Provided Functions ---------------'
 
-if __name__ == '__main__':
-    scrapeToToday()
+# if __name__ == '__main__':
+#     scrapeToToday()
 
 '----------------------------------------------------------'
 
-# a = openLatestMyDF()
-# b = openLatestLastTime()
-# c = openLatestGamesSince()
+
