@@ -1,14 +1,5 @@
 {% extends "layout.html" %}
 {% block content %}
-  <h1>NHL Top Scorer To date: {{ my_results['Top Scorer'] }}</h1>
-  <H2>Second Through Fifth Top Scorers:
-    <ul>
-      <li>{{ my_results['Second Top Scorer'] }}</li>
-      <li>{{ my_results['Third Top Scorer'] }}</li>
-      <li>{{ my_results['Fourth Top Scorer'] }}</li>
-      <li>{{ my_results['Fifth Top Scorer'] }}</li>
-    </ul>
-  </H2>
     {% for post in posts.items %}
         <article class="media content-section">
           <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + post.author.image_file) }}">

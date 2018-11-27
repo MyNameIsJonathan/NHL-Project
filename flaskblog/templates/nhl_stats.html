@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h1>NHL Stats</h1>
+    <h2>NHL Top Scorer To date: {{ my_results['Top Scorer'] }}</h2>
+    <h3>Second Through Fifth Top Scorers:
+      <ul>
+        <li>{{ my_results['Second Top Scorer'] }}</li>
+        <li>{{ my_results['Third Top Scorer'] }}</li>
+        <li>{{ my_results['Fourth Top Scorer'] }}</li>
+        <li>{{ my_results['Fifth Top Scorer'] }}</li>
+      </ul>
+    </h3>
+{% endblock content %}
