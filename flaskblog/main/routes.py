@@ -32,7 +32,10 @@ def nhl_stats():
     importantStats['Fourth Top Scorer'] = myDF.sort_values(['G', 'PTS'], ascending=False).iloc[3].name
     importantStats['Fifth Top Scorer'] = myDF.sort_values(['G', 'PTS'], ascending=False).iloc[4].name
 
-    return render_template('nhl_stats.html', title = 'NHL Stats', importantStats=importantStats)
+    #Create an HTML myDF
+    htmlMyDF = myDF.head(10).to_html(classes=None, border=None, justify=None)
+
+    return render_template('nhl_stats.html', title = 'NHL Stats', htmlMyDF=htmlMyDF, importantStats=importantStats)
 
 @main.route("/announcements")
 def announcements():
