@@ -1,23 +1,35 @@
+/* 
+#F8E9A1 -- Yellow
+#F76C6C -- Pink
+#A8D0E6 -- Light Blue
+#374785 -- Blue
+#24305E -- Dark Blue
+*/
+
 body {
-  background: #fafafa;
-  color: #333333;
-  margin-top: 5rem;
+  background: #A8D0E6;
+  color: #24305E;
+  padding-top: 6.5rem;
+  font-weight: 600;
 }
 
-h1 {
-  color: #428bca;
-} 
-
-h2, h3, h4, h5, h6 {
-  color: #444444;
+#main-nav-bar {
+  color: #24305E;
+  font-weight: 600;
+  font-size: 2.3rem;
+  background: #F76C6C;
+  padding: 10px 10px;
+  border-radius: 10px;
+  text-align: center;
 }
 
-.bg-steel {
-  background-color: #000000;
+h1, h2, h3, h4, h5, h6 {
+  color: #374785;
 }
 
 .site-header .navbar-nav .nav-link {
-  color: #cbd5db;
+  color: #428bca;
+  font-size: 1.2rem;
 }
 
 .site-header .navbar-nav .nav-link:hover {
@@ -26,6 +38,31 @@ h2, h3, h4, h5, h6 {
 
 .site-header .navbar-nav .nav-link.active {
   font-weight: 500;
+}
+
+#logout-button {
+  color: #F76C6C;
+  background-color: #374785;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+#register-button {
+  color: #F76C6C;
+  background-color: #374785;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+#header-container {
+  font-size: 7rem;
+  margin: .20rem;
+  background: #A8D0E6;
+}
+
+.navbar {
+  padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+  background: #A8D0E6;
 }
 
 .content-section {
@@ -82,3 +119,5 @@ a.article-title:hover {
 .account-heading {
   font-size: 2.5rem;
 }
+
+

@@ -1,7 +1,7 @@
 from flask import render_template, request, Blueprint
 from flaskblog.models import Post
 import pandas as pd
-
+import NHL_scrape_functions
 
 main = Blueprint('main', __name__)
 
@@ -18,15 +18,21 @@ def home():
 
 @main.route("/nhl_stats")
 def nhl_stats():
-    a = pd.read_pickle('/Users/jonathanolson/Documents/GitHub/NHL-Project/dailyMyDF/dailyMyDF_2018-11-25.pickle')
-    a = a.sort_values('G', ascending=False)
-    my_results = {}
-    my_results['Top Scorer'] = a.iloc[0].name
-    my_results['Second Top Scorer'] = a.iloc[1].name
-    my_results['Third Top Scorer'] = a.iloc[2].name
-    my_results['Fourth Top Scorer'] = a.iloc[3].name
-    my_results['Fifth Top Scorer'] = a.iloc[4].name
-    return render_template('nhl_stats.html', title = 'NHL Stats', my_results=my_results)
+    myDF = NHL_scrape_functions.openLatestMyDF().sort_values('G', ascending=False)
+    lastTimeDF = NHL_scrape_functions.openLatestLastTime()
+    gamesSinceDF = NHL_scrape_functions.openLatestGamesSince()
+
+    #Create a dictionary to store important pieces of info, to be displayed on NHL_stats page
+    importantStats = {}
+
+    #Get top goal scorers -- if tied, get top point scorer.
+    importantStats['Top Scorer'] = myDF.sort_values(['G', 'PTS'], ascending=False).iloc[0].name
+    importantStats['Second Top Scorer'] = myDF.sort_values(['G', 'PTS'], ascending=False).iloc[1].name
+    importantStats['Third Top Scorer'] = myDF.sort_values(['G', 'PTS'], ascending=False).iloc[2].name
+    importantStats['Fourth Top Scorer'] = myDF.sort_values(['G', 'PTS'], ascending=False).iloc[3].name
+    importantStats['Fifth Top Scorer'] = myDF.sort_values(['G', 'PTS'], ascending=False).iloc[4].name
+
+    return render_template('nhl_stats.html', title = 'NHL Stats', importantStats=importantStats)
 
 @main.route("/announcements")
 def announcements():
