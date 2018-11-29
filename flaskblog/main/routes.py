@@ -32,10 +32,33 @@ def nhl_stats():
     importantStats['Fourth Top Scorer'] = myDF.sort_values(['G', 'PTS'], ascending=False).iloc[3].name
     importantStats['Fifth Top Scorer'] = myDF.sort_values(['G', 'PTS'], ascending=False).iloc[4].name
 
-    #Create an HTML myDF
-    htmlMyDF = myDF.head(10).to_html(classes=None, border=None, justify=None)
+    # Set pandas options
+    pd.set_option('colheader_justify', 'center') 
 
-    return render_template('nhl_stats.html', title = 'NHL Stats', htmlMyDF=htmlMyDF, importantStats=importantStats)
+    my_html_df = myDF.head(10).to_html()
+
+    # Initialize an html string to fill in the table/df
+    html_string = f'''
+        <html>
+        <head><title>Current NHL Leaders</title></head>
+        <link rel="stylesheet" type="text/css" href="df_style.css"/>
+        <body>
+            {my_html_df}
+        </body>
+        </html>.
+        '''
+
+    # Write an html file with the html version of this dataframe
+    with open('MyDF_html.html', 'w') as f:
+        f.write(html_string)
+        f.close()
+
+    print('htmlstring:', html_string)
+
+    return render_template('nhl_stats.html', 
+    title = 'NHL Stats', 
+    importantStats=importantStats, 
+    myDF=myDF.head(10).to_html(classes=['table-striped', 'table-hover', 'table-sm', 'table-responsive', 'table-borderless', 'stat-table'], index_names=False))
 
 @main.route("/announcements")
 def announcements():

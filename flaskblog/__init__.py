@@ -1,5 +1,5 @@
 #To Start virtual environment for this project:
-# source /Users/jonathanolson/Projects/Environments/coreyflask/bin/activate
+# source /Users/jonathanolson/Projects/Environments/nhl_flask/bin/activate
 
 import os
 from flask import Flask
