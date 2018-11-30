@@ -10,6 +10,9 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='NHLmain.css') }}">
 
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans">
+
     <!-- Page Title -->
     <title>NHL Stats</title>
 
@@ -30,7 +33,7 @@
               <a class="nav-item nav-link" href="{{ url_for('main.nhl_stats') }}">NHL Stats</a>
             </div>
             <!-- Navbar Right Side -->
-            <div class="navbar-nav">
+            <div class="navbar-nav" id="right-nav-bar">
               {% if current_user.is_authenticated %}
                 <a class="nav-item nav-link" href="{{ url_for('posts.new_post') }}">New Post</a>
                 <a class="nav-item nav-link" href="{{ url_for('users.account') }}">Account</a>
