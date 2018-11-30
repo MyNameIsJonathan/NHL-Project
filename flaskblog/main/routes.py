@@ -27,7 +27,7 @@ def nhl_stats():
     myDF = myDF.reindex(['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Shifts', 'TOI'], axis=1)
 
     lastTimeDF = NHL_scrape_functions.openLatestLastTime()
-    lastTimeDF = lastTimeDF[lastTimeDF['Last Game Date'] >= pd.to_datetime('today').date() - datetime.timedelta(days=30)] # Select for player who've played in last 30 days only
+    lastTimeDF = lastTimeDF[lastTimeDF['Last Game Date'] >= pd.to_datetime('2018-7-1', format="%Y-%m-%d").date()] # Select for player who've played in last 30 days only
     lastTimeDF = lastTimeDF[lastTimeDF['G'] > pd.to_datetime('2000-10-03', format="%Y-%m-%d").date()] # Players who've never scored have last goal set as 2000/10/3. Remove these palyers
     lastTimeDF = lastTimeDF.sort_values(['G', 'A'])
     lastTimeDF = lastTimeDF.reindex(['Last Game Date', 'G', 'A', 'PTS', '+', '-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S'], axis=1)
@@ -39,10 +39,15 @@ def nhl_stats():
     gamesSinceDF = gamesSinceDF.loc[currentPlayers, :]
     gamesSinceDF = gamesSinceDF.sort_values(['G', 'A'], ascending=False)
 
+    # Replace date '2000-10-3' with 'Never'
+    myDF = myDF.replace(to_replace=pd.to_datetime('2000-10-3', format="%Y-%m-%d").date(), value='Never')
+    lastTimeDF = lastTimeDF.replace(to_replace=pd.to_datetime('2000-10-3', format="%Y-%m-%d").date(), value='Never')
+    gamesSinceDF = gamesSinceDF.replace(to_replace=pd.to_datetime('2000-10-3', format="%Y-%m-%d").date(), value='Never')
+
     # Convert DFs to html
-    myDF=myDF.head(10).to_html(classes=['table', 'table-striped', 'table-hover', 'stat-table'], index_names=False, justify='center')
-    lastTimeDF=lastTimeDF.head(10).to_html(classes=['table', 'table-striped', 'table-hover', 'stat-table'], index_names=False, table_id="lasttime-table", justify='center')
-    gamesSinceDF=gamesSinceDF.head(10).to_html(classes=['table', 'table-striped', 'table-hover', 'stat-table'], index_names=False, justify='center')
+    myDF=myDF.head(10).to_html(classes=['table', 'stat-table'], index_names=False, justify='center')
+    lastTimeDF=lastTimeDF.head(10).to_html(classes=['table', 'stat-table'], index_names=False, table_id="lasttime-table", justify='center')
+    gamesSinceDF=gamesSinceDF.head(10).to_html(classes=['table', 'stat-table'], index_names=False, justify='center')
 
     # Set pandas options
     pd.set_option('colheader_justify', 'center') 
