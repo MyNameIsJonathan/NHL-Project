@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container">
+    <div class="bg-text">
+        <h1>Today's Players</h1>
+    </div>
+    <div>
+        <p> Of <strong>{{ numberOfPlayersToday }}</strong> players playing today:</p>
+        <ul>
+            <li>
+                    <strong>{{ todaysDroughts['G'].index[0] }}</strong> hasn't scored in the most games, <strong>{{ todaysDroughts['G']['G'][0] }}</strong>, since his last game on <strong>{{ 'NOT ENTERED' }}</strong>.
+            </li>
+            <li>
+                    <strong>{{ todaysDroughts['A'].index[0] }}</strong> hasn't recorded an assist in the most games, <strong>{{ todaysDroughts['A']['A'][0] }}</strong>, since his last game on <strong>{{ 'NOT ENTERED' }}</strong>.
+            </li>
+            <li>
+                    <strong>{{ todaysDroughts['+'].index[0] }}</strong> hasn't had a positive rating in the most games, <strong>{{ todaysDroughts['+']['+'][0] }}</strong>, since his last game on <strong>{{ 'NOT ENTERED' }}</strong>.
+            </li>
+            <li>
+                    <strong>{{ todaysDroughts['-'].index[0] }}</strong> hasn't had a negative rating in the most games, <strong>{{ todaysDroughts['-']['-'][0] }}</strong>, since his last game on <strong>{{ 'NOT ENTERED' }}</strong>.
+            </li>
+            <li>
+                    <strong>{{ todaysDroughts['PIM'].index[0] }}</strong> hasn't had a penalty in the most games, <strong>{{ todaysDroughts['PIM']['PIM'][0] }}</strong>, since his last game on <strong>{{ 'NOT ENTERED' }}</strong>.
+            </li>
+            <li>
+                    <strong>{{ todaysDroughts['EV'].index[0] }}</strong> hasn't scored an even-strength goal in the most games, <strong>{{ todaysDroughts['EV']['EV'][0] }}</strong>, since his last game on <strong>{{ 'NOT ENTERED' }}</strong>.
+            </li>
+            <li>
+                    <strong>{{ todaysDroughts['PP'].index[0] }}</strong> hasn't scored a power play goal in the most games, <strong>{{ todaysDroughts['PP']['PP'][0] }}</strong>, since his last game on <strong>{{ 'NOT ENTERED' }}</strong>.
+            </li>
+            <li>
+                    <strong>{{ todaysDroughts['SH'].index[0] }}</strong> hasn't scored a shorthanded goal in the most games, <strong>{{ todaysDroughts['SH']['SH'][0] }}</strong>, since his last game on <strong>{{ 'NOT ENTERED' }}</strong>.
+            </li>
+            <li>
+                    <strong>{{ todaysDroughts['GW'].index[0] }}</strong> hasn't scored a game-winning goal in the most games, <strong>{{ todaysDroughts['GW']['GW'][0] }}</strong>, since his last game on <strong>{{ 'NOT ENTERED' }}</strong>.
+            </li>
+            <li>
+                    <strong>{{ todaysDroughts['S'].index[0] }}</strong> hasn't had a shot in the most games, <strong>{{ todaysDroughts['S']['S'][0] }}</strong>, since his last game on <strong>{{ 'NOT ENTERED' }}</strong>.
+            </li>
+        </ul>
+    </div>
+</div>
+    
+
+{% endblock content %}

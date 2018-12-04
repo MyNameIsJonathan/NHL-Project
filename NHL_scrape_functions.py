@@ -129,12 +129,22 @@ def findTodaysGames():
     my_games_df = my_games_df[['Date', 'Home', 'Visitor']]
     my_games_df = my_games_df[my_games_df['Date'] == str(today)]
     #Save todaysGames df with the date
-    savePickle(my_games_df, 'todaysGames_{}'.format(str(today)))
+    savePickle(my_games_df, 'todaysGames/todaysGames_{}'.format(str(today)))
+
+def openTodaysGames():
+    myDate = pd.to_datetime('today').date()
+    while True:
+        try:
+            todaysGames = pd.read_pickle('todaysGames/todaysGames_{}.pickle'.format(myDate))
+            break
+        except:
+            myDate -= datetime.timedelta(days=1)
+    return todaysGames
 
 def todaysPlayersStats():
     """Get stats for players who play today"""
     today = pd.to_datetime('today').date()
-    todaysGames = pd.read_pickle('todaysGames_{}.pickle'.format(str(today)))
+    todaysGames = pd.read_pickle('todaysGames/todaysGames_{}.pickle'.format(str(today)))
     #Get the list of teams playing today
     teams_playing_today = list(todaysGames['Home'].unique()) + list(todaysGames['Visitor'].unique())
 
@@ -146,15 +156,97 @@ def todaysPlayersStats():
     for team in teams_playing_today:
         players_playing_today.extend([player.Name for player in NHL_teams_and_players[team]])
 
+    #Save how many players are playing today
+    numberOfPlayersToday = len(players_playing_today)
+    savePickle(numberOfPlayersToday, 'numberOfPlayersToday/numberOfPlayersToday_{}'.format(str(today)))
+
     #Open the GamesSince df to see the games since each of today's players scored, etc.
     GamesSince = pd.read_pickle('dailyGamesSince/dailyGamesSince_{}.pickle'.format(today - datetime.timedelta(days=1)))
     todays_GamesSince = GamesSince.reindex(players_playing_today, fill_value=0)
 
-    #Print the top 5 players for each category of GamesSince, such as the 5 players who haven't scored in the most games
+    #Save the top 5 players for each category of GamesSince, such as the 5 players who haven't scored in the most games
+    todaysDroughts = {}
     for column in todays_GamesSince.columns:
         todays_GamesSince = todays_GamesSince.sort_values(column, ascending=False)
-        print(todays_GamesSince.head(1))
-        print('')
+        my_player = todays_GamesSince.head(1).index[0]
+        todaysDroughts[column] = todays_GamesSince.head(1)
+
+    #Save the dictionary, todaysDroughts, for uploading on website
+    savePickle(todaysDroughts, 'todaysDroughts/todaysDroughts_{}'.format(str(today)))
+
+def openTodaysDroughts():
+    myDate = pd.to_datetime('today').date()
+    while True:
+        try:
+            todaysDroughts = pd.read_pickle('todaysDroughts/todaysDroughts_{}.pickle'.format(myDate))
+            break
+        except:
+            myDate -= datetime.timedelta(days=1)
+    return todaysDroughts
+
+def openNumberOfPlayers():
+    myDate = pd.to_datetime('today').date()
+    while True:
+        try:
+            numberOfPlayersToday = pd.read_pickle('numberOfPlayersToday/numberOfPlayersToday_{}.pickle'.format(myDate))
+            break
+        except:
+            myDate -= datetime.timedelta(days=1)
+    return numberOfPlayersToday
+
+def makeTodaysHTML():
+
+    today = pd.to_datetime('today').date()
+
+    # Load in the three main dataframes and select for current players, if necessary
+    myDF = openLatestMyDF().sort_values('G', ascending=False)
+    myDF['TOI'] = myDF['TOI'].astype(int)
+    myDF = myDF.sort_values(['G', 'PTS'], ascending=False)
+    myDF = myDF.reindex(['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Shifts', 'TOI'], axis=1)
+
+    lastTimeDF = openLatestLastTime()
+    lastTimeDF = lastTimeDF[lastTimeDF['Last Game Date'] >= pd.to_datetime('2018-7-1', format="%Y-%m-%d").date()] # Select for player who've played in last 30 days only
+    lastTimeDF = lastTimeDF[lastTimeDF['G'] > pd.to_datetime('2000-10-03', format="%Y-%m-%d").date()] # Players who've never scored have last goal set as 2000/10/3. Remove these palyers
+    lastTimeDF = lastTimeDF.sort_values(['G', 'A'])
+    lastTimeDF = lastTimeDF.reindex(['Last Game Date', 'G', 'A', 'PTS', '+', '-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S'], axis=1)
+
+    # Grab the players in this df, for slicing retired players from the gamesSince DF
+    currentPlayers = lastTimeDF.index
+
+    gamesSinceDF = openLatestGamesSince()
+    gamesSinceDF = gamesSinceDF.loc[currentPlayers, :]
+    gamesSinceDF = gamesSinceDF.sort_values(['G', 'A'], ascending=False)
+
+    # Replace date '2000-10-3' with 'Never'
+    myDF = myDF.replace(to_replace=pd.to_datetime('2000-10-3', format="%Y-%m-%d").date(), value='Never')
+    lastTimeDF = lastTimeDF.replace(to_replace=pd.to_datetime('2000-10-3', format="%Y-%m-%d").date(), value='Never')
+    gamesSinceDF = gamesSinceDF.replace(to_replace=pd.to_datetime('2000-10-3', format="%Y-%m-%d").date(), value='Never')
+
+    # Set pandas options
+    pd.set_option('colheader_justify', 'center') 
+
+    # Convert DFs to html
+    myDF=myDF.head(10).to_html(classes=['table', 'stat-table'], index_names=False, justify='center')
+    lastTimeDF=lastTimeDF.head(10).to_html(classes=['table', 'stat-table'], index_names=False, justify='center')
+    gamesSinceDF=gamesSinceDF.head(10).to_html(classes=['table', 'stat-table'], index_names=False, justify='center')
+
+    # Save the HTML strings in a dictionary, to be loaded on routes.py file for display. This prevents it from being calculated everytime the user is routed to "Today's Players"
+    myHTML = {}
+    myHTML['myDF'] = myDF
+    myHTML['lastTimeDF'] = lastTimeDF
+    myHTML['gamesSinceDF'] = gamesSinceDF
+
+    savePickle(myHTML, 'todaysHTML/todaysHTML_{}'.format(str(today)))
+
+def opentodaysHTML():
+    myDate = pd.to_datetime('today').date()
+    while True:
+        try:
+            todaysHTML = pd.read_pickle('todaysHTML/todaysHTML_{}.pickle'.format(myDate))
+            break
+        except:
+            myDate -= datetime.timedelta(days=1)
+    return todaysHTML
 
 '--------------- Single-Day Scrape Functions ---------------'
 

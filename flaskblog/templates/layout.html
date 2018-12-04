@@ -11,7 +11,7 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='NHLmain.css') }}">
 
     <!-- Google Fonts -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 
     <!-- Page Title -->
     <title>NHL Stats</title>
@@ -21,55 +21,36 @@
 
 <body>
   <header class="site-header">
-      <nav class="navbar navbar-expand-md navbar-fixed-top">
-        <div class="container" id="header-container">
-          <a class="navbar-brand" href="/" id="main-nav-bar">Jonathan's NHL Stats</a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarToggle">
-            <div class="navbar-nav mr-auto">
-              <a class="nav-item nav-link" href="{{ url_for('main.home') }}">Home</a>
-              <a class="nav-item nav-link" href="{{ url_for('main.nhl_stats') }}">NHL Stats</a>
-            </div>
-            <!-- Navbar Right Side -->
-            <div class="navbar-nav" id="right-nav-bar">
-              {% if current_user.is_authenticated %}
-                <a class="nav-item nav-link" href="{{ url_for('posts.new_post') }}">New Post</a>
-                <a class="nav-item nav-link" href="{{ url_for('users.account') }}">Account</a>
-                <a class="nav-item nav-link" id="logout-button" href="{{ url_for('users.logout') }}">Logout</a>
-              {% else %}
-                <a class="nav-item nav-link" href="{{ url_for('users.login') }}">Login</a>
-                <a class="nav-item nav-link" id="register-button" href="{{ url_for('users.register') }}">Register</a>
-              {% endif %}
-            </div>
+    <nav class="navbar navbar-expand-md navbar-fixed-top">
+      <div class="container" id="header-container">
+        <a class="navbar-brand" href="/" id="main-nav-bar">Jonathan's NHL Stats</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarToggle">
+          <div class="navbar-nav mr-auto">
+            <a class="nav-item nav-link" href="{{ url_for('main.home') }}">Home</a>
+            <a class="nav-item nav-link" href="{{ url_for('main.nhl_stats') }}">NHL Stats</a>
+            <a class="nav-item nav-link" href="{{ url_for('main.todays_players') }}">Today's Players</a>
+          </div>
+          <!-- Navbar Right Side -->
+          <div class="navbar-nav" id="right-nav-bar">
+            {% if current_user.is_authenticated %}
+              <a class="nav-item nav-link" href="{{ url_for('posts.new_post') }}">New Post</a>
+              <a class="nav-item nav-link" href="{{ url_for('users.account') }}">Account</a>
+              <a class="nav-item nav-link" id="register-logout-button" href="{{ url_for('users.logout') }}">Logout</a>
+            {% else %}
+              <a class="nav-item nav-link" href="{{ url_for('users.login') }}">Login</a>
+              <a class="nav-item nav-link" id="register-logout-button" href="{{ url_for('users.register') }}">Register</a>
+            {% endif %}
           </div>
         </div>
-      </nav>
-    </header>
-    <main role="main" class="container">
-      <div class="row">
-        <div class="col-md-8">
-          {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-              {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">
-                  {{ message }}
-                </div>
-              {% endfor %}
-            {% endif %}
-          {% endwith %}
-          {% block content %}{% endblock %}
-        </div>
       </div>
-    </main>
+    </nav>
+  </header>
+  <main role="main" class="container">
+    {% block content %}{% endblock %}
+  </main>
+</body>
 
-
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS 
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    a-->
-  </body>
 </html>

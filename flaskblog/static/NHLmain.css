@@ -1,14 +1,46 @@
 
 
+body:before {
+  content: '';
+  position: fixed;
+  width: 100%;
+  height: 100vh;
+  background-image: url('../static/images/uqebOQJ.jpg');
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-position: 100% 100%;
+  background-size: cover;
+  filter: blur(2px) brightness(0.45);
+  z-index: -9;
+  transform: scale(1.1);
+  font-family: 'Roboto', sans-serif;
+}
+
 body {
-  background: #f5f5f5;
-  color: #000000;
+  color: #CCCCCC;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/*
+body {
+	background: url('../static/images/uqebOQJ.jpg') no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  background-color:#333;
+  color: #cccccc;
   font-weight: 200;
   font-family: 'Open Sans';
 }
+*/
 
 h1, h2, h3, h4, h5, h6 {
-  color: #333333;
+  color: #FFFFFF;
+  font-weight: 100;
 }
 
 h1 {
@@ -35,65 +67,86 @@ th {
   vertical-align: middle;
   word-wrap: none;
   white-space: nowrap;
+  border-right: #CCCCCC;
+}
+
+th:hover {
+  text-transform: uppercase;
+}
+
+.stat-table th {
+  background-color: transparent;
+  color: #CCCCCC;
+  font-weight: 300;
+  border: none;
+  text-align: center;
 }
 
 /* Make empty header cells (i.e., above the players' names) the same background as the body */
 .stat-table th:empty {
-  background-color: #f5f5f5;
+  background: transparent;
+  width: 200px;
+  min-width: 200px;
+  border: none;
 }
 
 tr {
   line-height: 10px;
 }
 
-tr:nth-child(even) {
-  background-color: rgba(3, 169, 244, 0.1);
+tr:hover {
+  background-color: #d3a014a2;
 }
 
-tr:hover {
-  background-color: rgba(3, 169, 244, 0.3);
+hr {
+  width: 80%;
+  background-color: #CCCCCC;
 }
 
 #main-nav-bar {
   color: #FFFFFF;
-  background-color: #2196f3;
   font-weight: 100;
   font-size: 2.3rem;
-  padding: 7px 12px;
-  border-radius: 3px;
+  padding: 7px 14px;
   text-align: center;
-  margin: 5px 5px 5px 5px;
+  border-style: solid;
+  border-radius: 2px;
+  border-color: #cccccc;
+  border-width: 2px;
+
 }
 
-#logout-button {
+#register-logout-button {
   color: #FFFFFF;
-  background-color: #2196f3;
-  border-radius: 3px;
+  border-radius: 2px;
+  border-style: solid;
+  border-color: #cccccc;
+  border-width: 1px;
+  margin-right: 0px;
 }
 
-#register-button {
-  color: #FFFFFF;
-  background-color: #2196f3;
-  border-radius: 3px;
+#register-logout-button:hover {
+  color: #d3a014a2;
+  border-color: #d3a014a2;
 }
 
 #header-container {
   font-size: 7rem;
-  margin: .20rem;
+  margin: .8rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 #navbarToggle {
-  padding: 10px;
+  padding-right: 0px;
+  font-weight: 100;
 }
 
 .container {
-  margin: 0px 0px;
-  padding: 0px 0px;
+  text-align: center;
+  box-sizing: border-box;
   max-width: 100%;
-}
-
-.data-page {
-  margin: 1em 1em 1em 1em;
 }
 
 .site-header .navbar-nav .nav-link {
@@ -103,7 +156,7 @@ tr:hover {
 }
 
 .site-header .navbar-nav .nav-link:hover {
-  color: #2196f3;
+  color: #d3a014a2;
   transform: scale(1.15);
   -webkit-transform: scale(1.15);
 }
@@ -114,38 +167,73 @@ tr:hover {
 
 .navbar {
   padding: 0rem 0rem 0rem 0rem;
-  background: #333333;
+  background: transparent;
+  position: relative;
+  top: 0%;
+  width: 100%;
+  z-index: 2;
 }
 
 .nav-item .nav-link {
   padding: 10px 10px;
 }
 
-.col-md-8 {
-  max-width: 100%;
-  min-width: 100%;
-}
-
-.stat-table th {
-  background-color: #2196f3;
-  color: #FFFFFF;
-  font-weight: 300;
-  border: none;
-  text-align: center;
-}
-
 .stat-table {
   border: none;
   justify-items: center;
+  color: #CCCCCC;
 }
 
 .stamkos-image {
   height: auto;
   width: 70%;
+  opacity: 0.7;
+  box-shadow: 0 0 8px 8px black inset;
 }
 
 .stamkos-div {  
   text-align: center;
-  margin: 0px 0px 0px 0px;
+  margin: 0px 0px 20px 0px;
 }
 
+.bg-text {
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0, 0.4); /* Black w/opacity/see-through */
+  color: #CCCCCC;
+  padding: 1em 3em 1em 1em;
+  text-align: center;
+  margin: 1em;
+  display: block;
+  border-radius: 2px;
+}
+
+.bg-text-data {
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0, 0.4); /* Black w/opacity/see-through */
+  color: #CCCCCC;
+  padding: 1em 3em 1em 1em;
+  text-align: center;
+  margin: 1em;
+  display: block;
+  border-radius: 2px;
+}
+
+strong {
+  font-size: 140%;
+}
+
+
+::-webkit-scrollbar-track {
+	border: 1px solid black;
+	background-color: #333333;
+}
+
+::-webkit-scrollbar {
+  height: 7px;
+  width: 10px;
+	background-color: #d3a014a2;
+}
+
+::-webkit-scrollbar-thumb {
+	background-color: #d3a014a2;	
+}
