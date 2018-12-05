@@ -10,7 +10,7 @@ body:before {
   background-repeat: no-repeat;
   background-position: 100% 100%;
   background-size: cover;
-  filter: blur(2px) brightness(0.45);
+  filter: blur(2px) brightness(0.5);
   z-index: -9;
   transform: scale(1.1);
   font-family: 'Roboto', sans-serif;
@@ -74,6 +74,12 @@ th:hover {
   text-transform: uppercase;
 }
 
+span {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: normal;
+}
+
 .stat-table th {
   background-color: transparent;
   color: #CCCCCC;
@@ -95,12 +101,18 @@ tr {
 }
 
 tr:hover {
-  background-color: #d3a014a2;
+  background-color: rgba(248, 218, 86, 0.712);
 }
 
 hr {
   width: 80%;
   background-color: #CCCCCC;
+}
+
+
+strong {
+  font-size: 140%;
+  color: rgba(248, 218, 86, 0.712);
 }
 
 #main-nav-bar {
@@ -117,7 +129,7 @@ hr {
 }
 
 #register-logout-button {
-  color: #FFFFFF;
+  color: #cccccc;
   border-radius: 2px;
   border-style: solid;
   border-color: #cccccc;
@@ -126,8 +138,8 @@ hr {
 }
 
 #register-logout-button:hover {
-  color: #d3a014a2;
-  border-color: #d3a014a2;
+  color: rgba(248, 218, 86, 0.712);
+  border-color: rgba(248, 218, 86, 0.712);
 }
 
 #header-container {
@@ -156,7 +168,7 @@ hr {
 }
 
 .site-header .navbar-nav .nav-link:hover {
-  color: #d3a014a2;
+  color: rgba(248, 218, 86, 0.712);
   transform: scale(1.15);
   -webkit-transform: scale(1.15);
 }
@@ -193,35 +205,45 @@ hr {
 
 .stamkos-div {  
   text-align: center;
-  margin: 0px 0px 20px 0px;
+  margin: 0px 0px 40px 0px;
 }
 
 .bg-text {
   background-color: rgb(0,0,0); /* Fallback color */
   background-color: rgba(0,0,0, 0.4); /* Black w/opacity/see-through */
   color: #CCCCCC;
-  padding: 1em 3em 1em 1em;
+  padding: 1em;
   text-align: center;
-  margin: 1em;
   display: block;
   border-radius: 2px;
 }
 
-.bg-text-data {
-  background-color: rgb(0,0,0); /* Fallback color */
-  background-color: rgba(0,0,0, 0.4); /* Black w/opacity/see-through */
-  color: #CCCCCC;
-  padding: 1em 3em 1em 1em;
+.todays-players {
+  width: 49.9%;
+  height: 100%;
+  line-height: 13.5em;
   text-align: center;
-  margin: 1em;
-  display: block;
-  border-radius: 2px;
+  font-size: 2.5em;
+  color: #cccccc;
+  display: table-cell;
+  padding: .1em;
 }
 
-strong {
-  font-size: 140%;
+.vertical-line {
+  width: 0.1%;
+  min-width: 1px;
+  display: table-cell;
+  background-color:#CCCCCC;
+  height: 100%;
 }
 
+.player-wrapper{
+  display: table;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 50px;
+  margin-top: 50px;
+}
 
 ::-webkit-scrollbar-track {
 	border: 1px solid black;
@@ -229,11 +251,11 @@ strong {
 }
 
 ::-webkit-scrollbar {
-  height: 7px;
-  width: 10px;
-	background-color: #d3a014a2;
+  height: 5px;
+  width: 8px;
+	background-color: rgba(248, 218, 86, 0.712);
 }
 
 ::-webkit-scrollbar-thumb {
-	background-color: #d3a014a2;	
+	background-color: rgba(248, 218, 86, 0.712);	
 }

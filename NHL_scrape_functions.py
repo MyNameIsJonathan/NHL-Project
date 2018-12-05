@@ -141,7 +141,7 @@ def openTodaysGames():
             myDate -= datetime.timedelta(days=1)
     return todaysGames
 
-def todaysPlayersStats():
+def todaysPlayerDroughts():
     """Get stats for players who play today"""
     today = pd.to_datetime('today').date()
     todaysGames = pd.read_pickle('todaysGames/todaysGames_{}.pickle'.format(str(today)))
@@ -168,8 +168,7 @@ def todaysPlayersStats():
     todaysDroughts = {}
     for column in todays_GamesSince.columns:
         todays_GamesSince = todays_GamesSince.sort_values(column, ascending=False)
-        my_player = todays_GamesSince.head(1).index[0]
-        todaysDroughts[column] = todays_GamesSince.head(1)
+        todaysDroughts[column] = todays_GamesSince.head()
 
     #Save the dictionary, todaysDroughts, for uploading on website
     savePickle(todaysDroughts, 'todaysDroughts/todaysDroughts_{}'.format(str(today)))
@@ -1052,6 +1051,10 @@ def scrapeToToday():
     #Iteratively scrape each day
     while myDate != today:
         scrapeSpecificDay(day=str(myDate))
+        # Find games for this date
+        findTodaysGames()
+        # Find players playing on this date
+        todaysPlayerDroughts()
         myDate += datetime.timedelta(days=1)
 
     #Report on recent performers
