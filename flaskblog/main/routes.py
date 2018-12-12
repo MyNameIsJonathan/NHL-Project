@@ -1,5 +1,4 @@
 from flask import render_template, request, Blueprint
-from flaskblog.models import Post
 import pandas as pd
 import NHL_scrape_functions
 import datetime

@@ -12,7 +12,7 @@ def UpdatePlayers():
 from My_Classes import hockey_player, NHL_Team
 import pandas as pd
 
-my_data = pd.read_pickle('NHL_2008_to_2018')
+my_data = pd.read_pickle('pickleFiles/RandomPickles/NHL_2008_to_2018')
 my_data.index = [player.replace(u'\xa0', u' ') for player in my_data.index]
 
 my_players_list = []

@@ -19,7 +19,7 @@ class User(db.Model, UserMixin):
     #lazy defines when sqlalchemy loads the datafrom the database. True means it will load data as-needed in one go
         #This allows us to use post attribute to get all of a user's posts
         #Not a column
-    posts = db.relationship('Post', backref='author', lazy=True)
+    # posts = db.relationship('Post', backref='author', lazy=True)
 
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
@@ -38,13 +38,3 @@ class User(db.Model, UserMixin):
     def __repr__(self):
         return f"User('{self.username}', '{self.email}', '{self.image_file}'"
 
-class Post(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), nullable=False)
-    date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow) #Always use UTC timezone when saving dates to a database
-    content = db.Column(db.Text, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-        #We use a lowercase 'u' in 'user.id', because that's the name of the table and that's what we wanna reference
-        #With the User class reference to 'Post', we want to reference the class itself, so we use upper 'Post'
-    def __repr__(self):
-        return f"User('{self.title}', '{self.date_posted}'"

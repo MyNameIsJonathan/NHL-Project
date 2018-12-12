@@ -1,7 +1,7 @@
 from flask import render_template, url_for, flash, redirect, request, Blueprint
 from flask_login import login_user, current_user, logout_user, login_required
 from flaskblog import db, bcrypt
-from flaskblog.models import User, Post
+from flaskblog.models import User
 from flaskblog.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
                                    RequestResetForm, ResetPasswordForm)
 from flaskblog.users.utils import save_picture, send_reset_email
@@ -62,15 +62,6 @@ def account():
         form.email.data = current_user.email
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
     return render_template('account.html', title='Account', image_file=image_file, form=form) 
-
-@users.route("/user/<string:username>")
-def user_posts(username):
-    page = request.args.get('page', default=1, type=int)
-    user = User.query.filter_by(username=username).first_or_404()
-    posts = Post.query.filter_by(author=user)\
-        .order_by(Post.date_posted.desc())\
-        .paginate(page=page, per_page=5)
-    return render_template('user_posts.html', posts=posts, user=user)
 
 
 

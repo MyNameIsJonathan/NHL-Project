@@ -38,11 +38,9 @@ def create_app(config_class=Config):
 
     #Import down here to prevent circular imports
     from flaskblog.users.routes import users #Here, we are importing the "users" Blutprint variable
-    from flaskblog.posts.routes import posts
     from flaskblog.main.routes import main
     from flaskblog.errors.handlers import errors
     app.register_blueprint(users)
-    app.register_blueprint(posts)
     app.register_blueprint(main)
     app.register_blueprint(errors)
 

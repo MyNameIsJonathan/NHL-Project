@@ -19,9 +19,6 @@
           <!-- Navbar Right Side -->
           <ul class="navbar-nav" id="right-nav-bar">
             {% if current_user.is_authenticated %}
-            <li class="nav-item mr-auto">
-              <a class="nav-item nav-link" href="{{ url_for('posts.new_post') }}">New Post</a>
-            </li>
             <li class="nav-item mr-auto">  
               <a class="nav-item nav-link" href="{{ url_for('users.account') }}">Account</a>
             </li>
@@ -47,7 +44,6 @@
                 <a class="dropdown-item" href="{{ url_for('main.todays_players') }}">Today's Players</a>
                 <div class="dropdown-divider"></div>
                     {% if current_user.is_authenticated %}
-                        <a class="dropdown-item" href="{{ url_for('posts.new_post') }}">New Post</a>
                         <a class="dropdown-item" href="{{ url_for('users.account') }}">Account/a>
                         <a class="dropdown-item" href="{{ url_for('users.logout') }}">Logout</a>
                     {% else %}

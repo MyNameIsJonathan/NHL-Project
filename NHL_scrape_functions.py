@@ -134,13 +134,13 @@ def findTodaysGames(my_date=None):
     my_games_df = my_games_df[['Date', 'Home', 'Visitor']]
     my_games_df = my_games_df[my_games_df['Date'] == str(today)]
     #Save todaysGames df with the date
-    savePickle(my_games_df, 'todaysGames/todaysGames_{}'.format(str(today)))
+    savePickle(my_games_df, 'pickleFiles/todaysGames/todaysGames_{}'.format(str(today)))
 
 def openTodaysGames():
     myDate = pd.to_datetime('today').date()
     while True:
         try:
-            todaysGames = pd.read_pickle('todaysGames/todaysGames_{}.pickle'.format(myDate))
+            todaysGames = pd.read_pickle('pickleFiles/todaysGames/todaysGames_{}.pickle'.format(myDate))
             break
         except:
             myDate -= datetime.timedelta(days=1)
@@ -155,12 +155,12 @@ def todaysPlayerDroughts(my_date=None):
         today = my_date
 
 
-    todaysGames = pd.read_pickle('todaysGames/todaysGames_{}.pickle'.format(str(today)))
+    todaysGames = pd.read_pickle('pickleFiles/todaysGames/todaysGames_{}.pickle'.format(str(today)))
     #Get the list of teams playing today
     teams_playing_today = list(todaysGames['Home'].unique()) + list(todaysGames['Visitor'].unique())
 
     #Fill players_playing_today by iterating through the team-player dictionary from the file team_creation.py
-    NHL_teams_and_players = pd.read_pickle('Teams/NHL_teams_and_players.pickle')
+    NHL_teams_and_players = pd.read_pickle('pickleFiles/Teams/NHL_teams_and_players.pickle')
 
     #Instantiate a list of player names who play today and fill it 
     players_playing_today = []
@@ -169,10 +169,10 @@ def todaysPlayerDroughts(my_date=None):
 
     #Save how many players are playing today
     numberOfPlayersToday = len(players_playing_today)
-    savePickle(numberOfPlayersToday, 'numberOfPlayersToday/numberOfPlayersToday_{}'.format(str(today)))
+    savePickle(numberOfPlayersToday, 'pickleFiles/numberOfPlayersToday/numberOfPlayersToday_{}'.format(str(today)))
 
     #Open yesterday's GamesSince df to see the games since each of today's players scored, etc.
-    GamesSince = pd.read_pickle('dailyGamesSince/dailyGamesSince_{}.pickle'.format(today - datetime.timedelta(days=1)))
+    GamesSince = pd.read_pickle('pickleFiles/dailyGamesSince/dailyGamesSince_{}.pickle'.format(today - datetime.timedelta(days=1)))
     todays_GamesSince = GamesSince.reindex(players_playing_today, fill_value=0)
 
     #Save the top 5 players for each category of GamesSince, such as the 5 players who haven't scored in the most games
@@ -182,13 +182,13 @@ def todaysPlayerDroughts(my_date=None):
         todaysDroughts[column] = todays_GamesSince.head()
 
     #Save the dictionary, todaysDroughts, for uploading on website
-    savePickle(todaysDroughts, 'todaysDroughts/todaysDroughts_{}'.format(str(today)))
+    savePickle(todaysDroughts, 'pickleFiles/todaysDroughts/todaysDroughts_{}'.format(str(today)))
 
 def openTodaysDroughts():
     myDate = pd.to_datetime('today').date()
     while True:
         try:
-            todaysDroughts = pd.read_pickle('todaysDroughts/todaysDroughts_{}.pickle'.format(myDate))
+            todaysDroughts = pd.read_pickle('pickleFiles/todaysDroughts/todaysDroughts_{}.pickle'.format(myDate))
             break
         except:
             myDate -= datetime.timedelta(days=1)
@@ -198,7 +198,7 @@ def openNumberOfPlayers():
     myDate = pd.to_datetime('today').date()
     while True:
         try:
-            numberOfPlayersToday = pd.read_pickle('numberOfPlayersToday/numberOfPlayersToday_{}.pickle'.format(myDate))
+            numberOfPlayersToday = pd.read_pickle('pickleFiles/numberOfPlayersToday/numberOfPlayersToday_{}.pickle'.format(myDate))
             break
         except:
             myDate -= datetime.timedelta(days=1)
@@ -214,9 +214,9 @@ def makeTodaysHTML(my_date=None):
     # Load in the three main dataframes and select for current players, if necessary
     while True:
         try:
-            myDF = pd.read_pickle('dailyMyDF/dailyMyDF_{}.pickle'.format(today))
-            lastTimeDF = pd.read_pickle('dailyLastTime/dailyLastTime_{}.pickle'.format(today))
-            gamesSinceDF = pd.read_pickle('dailyGamesSince/dailyGamesSince_{}.pickle'.format(today))
+            myDF = pd.read_pickle('pickleFiles/dailyMyDF/dailyMyDF_{}.pickle'.format(today))
+            lastTimeDF = pd.read_pickle('pickleFiles/dailyLastTime/dailyLastTime_{}.pickle'.format(today))
+            gamesSinceDF = pd.read_pickle('pickleFiles/dailyGamesSince/dailyGamesSince_{}.pickle'.format(today))
             break
         except:
             today -= datetime.timedelta(days=1)
@@ -257,13 +257,13 @@ def makeTodaysHTML(my_date=None):
     myHTML['lastTimeDF'] = lastTimeDF
     myHTML['gamesSinceDF'] = gamesSinceDF
 
-    savePickle(myHTML, 'todaysHTML/todaysHTML_{}'.format(str(today)))
+    savePickle(myHTML, 'pickleFiles/todaysHTML/todaysHTML_{}'.format(str(today)))
 
 def opentodaysHTML():
     myDate = pd.to_datetime('today').date()
     while True:
         try:
-            todaysHTML = pd.read_pickle('todaysHTML/todaysHTML_{}.pickle'.format(myDate))
+            todaysHTML = pd.read_pickle('pickleFiles/todaysHTML/todaysHTML_{}.pickle'.format(myDate))
             break
         except:
             myDate -= datetime.timedelta(days=1)
@@ -294,7 +294,7 @@ def scrapeSpecificDaysURLS(date='2000-12-31'):
     all_game_dates.extend(my_html_results[3])
 
     # Pickle the 'daily_html_links' dict using the highest protocol available.
-    savePickle(daily_html_links, 'dailyHTMLLinks/dailyHTMLLinks_{}'.format(myDate))
+    savePickle(daily_html_links, 'pickleFiles/dailyHTMLLinks/dailyHTMLLinks_{}'.format(myDate))
 
     # Flatten list of game htmls
     flat_list_game_links = [item for sublist in list(daily_html_links.values()) for item in sublist]
@@ -302,7 +302,7 @@ def scrapeSpecificDaysURLS(date='2000-12-31'):
     #Save home teams, away teams, and game dates in df
     teams_and_dates = pd.DataFrame([total_home_teams, total_away_teams, all_game_dates, flat_list_game_links])
     teams_and_dates = teams_and_dates.transpose()
-    savePickle(teams_and_dates, 'dailyTeamsAndDates/dailyTeamsAndDates_{}'.format(myDate))
+    savePickle(teams_and_dates, 'pickleFiles/dailyTeamsAndDates/dailyTeamsAndDates_{}'.format(myDate))
 
     print('Total game links scraped = {}'.format(len(teams_and_dates)))
 
@@ -318,7 +318,7 @@ def scrapeSpecificDaysGames(date='2000-1-1'):
     #Create my_games_unclean dict to store scraped games
     dailyGamesUnclean = {}
 
-    daysGames = pd.read_pickle('dailyTeamsAndDates/dailyTeamsAndDates_{}.pickle'.format(myDate))
+    daysGames = pd.read_pickle('pickleFiles/dailyTeamsAndDates/dailyTeamsAndDates_{}.pickle'.format(myDate))
     number_of_games = len(daysGames)
     print('Number of games to scrape = {}'.format(number_of_games))
 
@@ -345,7 +345,7 @@ def scrapeSpecificDaysGames(date='2000-1-1'):
         time.sleep(1)
     
     # Pickle the 'my_games' dictionary using the highest protocol available.
-    savePickle(dailyGamesUnclean, 'dailyGamesUnclean/dailyGamesUnclean_{}'.format(myDate))
+    savePickle(dailyGamesUnclean, 'pickleFiles/dailyGamesUnclean/dailyGamesUnclean_{}'.format(myDate))
 
     print('Number of games scraped = {}'.format(len(dailyGamesUnclean)))
 
@@ -353,7 +353,7 @@ def cleanSpecificDaysGames(date='2000-1-1'):
 
     myDate = pd.to_datetime(date, format='%Y-%m-%d').date()
 
-    my_games_unclean = pd.read_pickle('dailyGamesUnclean/dailyGamesUnclean_{}.pickle'.format(myDate))
+    my_games_unclean = pd.read_pickle('pickleFiles/dailyGamesUnclean/dailyGamesUnclean_{}.pickle'.format(myDate))
     my_games_clean = {}
 
     print('Number of games to clean = {}'.format(len(my_games_unclean)))
@@ -361,7 +361,7 @@ def cleanSpecificDaysGames(date='2000-1-1'):
     for index, game in my_games_unclean.items():
         my_games_clean[index] = cleanGame(game)
 
-    savePickle(my_games_clean, 'dailyGamesClean/dailyGamesClean_{}'.format(myDate))
+    savePickle(my_games_clean, 'pickleFiles/dailyGamesClean/dailyGamesClean_{}'.format(myDate))
 
     print('Number of games cleaned  = {}'.format(len(my_games_clean)))
 
@@ -372,10 +372,10 @@ def updateSpecificDaysLastTime(date='2000-1-1'):
     myDate = pd.to_datetime(date, format='%Y-%m-%d').date()
 
     #Load in last_time_df from the previous day, which will be copied and updated
-    last_time_df = pd.read_pickle('dailyLastTime/dailyLastTime_{}.pickle'.format(myDate - datetime.timedelta(days=1))).copy()
+    last_time_df = pd.read_pickle('pickleFiles/dailyLastTime/dailyLastTime_{}.pickle'.format(myDate - datetime.timedelta(days=1))).copy()
 
     #Load my_games_clean dictionary
-    my_games_clean = pd.read_pickle('dailyGamesClean/dailyGamesClean_{}.pickle'.format(myDate))
+    my_games_clean = pd.read_pickle('pickleFiles/dailyGamesClean/dailyGamesClean_{}.pickle'.format(myDate))
 
     #Set columns to iterate through
     cols = ['G', 'A', 'PTS', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S']
@@ -415,7 +415,7 @@ def updateSpecificDaysLastTime(date='2000-1-1'):
             pass
 
     #Save last_time_df
-    savePickle(last_time_df, 'dailyLastTime/dailyLastTime_{}'.format(myDate))
+    savePickle(last_time_df, 'pickleFiles/dailyLastTime/dailyLastTime_{}'.format(myDate))
 
 def updateSpecificDaysSince(date='2000-1-1'):
 
@@ -424,10 +424,10 @@ def updateSpecificDaysSince(date='2000-1-1'):
     print("Updating GamesSince to reflect new stats from {}".format(myDate))
 
     #Load in GamesSince from the previous day, which will be copied and updated
-    GamesSince = pd.read_pickle('dailyGamesSince/dailyGamesSince_{}.pickle'.format(myDate - datetime.timedelta(days=1))).copy()
+    GamesSince = pd.read_pickle('pickleFiles/dailyGamesSince/dailyGamesSince_{}.pickle'.format(myDate - datetime.timedelta(days=1))).copy()
 
     #Load my_games_clean dictionary
-    my_games_clean = pd.read_pickle('dailyGamesClean/dailyGamesClean_{}.pickle'.format(myDate))
+    my_games_clean = pd.read_pickle('pickleFiles/dailyGamesClean/dailyGamesClean_{}.pickle'.format(myDate))
 
     #Set columns to iterate through
     cols = ['G', 'A', 'PTS', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S']
@@ -461,7 +461,7 @@ def updateSpecificDaysSince(date='2000-1-1'):
                 GamesSince.loc[game_df[game_df['+/-'] >= 0].index, column] += 1
 
     #Save GamesSince
-    savePickle(GamesSince, 'dailyGamesSince/dailyGamesSince_{}'.format(myDate))
+    savePickle(GamesSince, 'pickleFiles/dailyGamesSince/dailyGamesSince_{}'.format(myDate))
 
     print('Finished updating GamesSince for {}'.format(myDate))
 
@@ -471,12 +471,12 @@ def incorporateSpecificDaysStats(date='2000-1-1'):
     myDate = pd.to_datetime(date, format='%Y-%m-%d').date()
 
     #Instantiate my_games_clean
-    my_games_clean = pd.read_pickle('dailyGamesClean/dailyGamesClean_{}.pickle'.format(myDate))
+    my_games_clean = pd.read_pickle('pickleFiles/dailyGamesClean/dailyGamesClean_{}.pickle'.format(myDate))
 
     print('Adding {} games to my_df'.format(len(my_games_clean)))
 
     #Load in the day befores my_df
-    my_df = pd.read_pickle('dailyMyDF/dailyMyDF_{}.pickle'.format(myDate - datetime.timedelta(days=1)))
+    my_df = pd.read_pickle('pickleFiles/dailyMyDF/dailyMyDF_{}.pickle'.format(myDate - datetime.timedelta(days=1)))
 
     #Create main df for all day's games
     new_df = pd.concat([game for game in my_games_clean.values()], sort=True)
@@ -491,7 +491,7 @@ def incorporateSpecificDaysStats(date='2000-1-1'):
         if column in my_df.columns:
             my_df[column] = my_df[column].astype(int)
 
-    savePickle(my_df, 'dailyMyDF/dailyMyDF_{}'.format(myDate))
+    savePickle(my_df, 'pickleFiles/dailyMyDF/dailyMyDF_{}'.format(myDate))
 
 '--------------- Yesterday Scrape Functions ---------------'
 
@@ -517,7 +517,7 @@ def scrapeYesterdaysURLS():
     all_game_dates.extend(my_html_results[3])
 
     # Pickle the 'daily_html_links' dict using the highest protocol available.
-    savePickle(daily_html_links, 'dailyHTMLLinks/dailyHTMLLinks_{}'.format(yesterdaysDate))
+    savePickle(daily_html_links, 'pickleFiles/dailyHTMLLinks/dailyHTMLLinks_{}'.format(yesterdaysDate))
 
     # Flatten list of game htmls
     flat_list_game_links = [item for sublist in list(daily_html_links.values()) for item in sublist]
@@ -525,7 +525,7 @@ def scrapeYesterdaysURLS():
     #Save home teams, away teams, and game dates in df
     teams_and_dates = pd.DataFrame([total_home_teams, total_away_teams, all_game_dates, flat_list_game_links])
     teams_and_dates = teams_and_dates.transpose()
-    savePickle(teams_and_dates, 'dailyTeamsAndDates/dailyTeamsAndDates_{}'.format(yesterdaysDate))
+    savePickle(teams_and_dates, 'pickleFiles/dailyTeamsAndDates/dailyTeamsAndDates_{}'.format(yesterdaysDate))
 
     print('Total game links scraped = {}'.format(len(teams_and_dates)))
 
@@ -536,7 +536,7 @@ def scrapeYesterdaysGames():
     #Create my_games_unclean dict to store scraped games
     dailyGamesUnclean = {}
 
-    yesterdaysGames = pd.read_pickle('dailyTeamsAndDates/dailyTeamsAndDates_{}.pickle'.format(yesterdaysDate))
+    yesterdaysGames = pd.read_pickle('pickleFiles/dailyTeamsAndDates/dailyTeamsAndDates_{}.pickle'.format(yesterdaysDate))
     number_of_games = len(yesterdaysGames)
     print('Number of games to scrape = {}'.format(number_of_games))
 
@@ -562,7 +562,7 @@ def scrapeYesterdaysGames():
             print("Scraped 75% of total games")
     
     # Pickle the 'my_games' dictionary using the highest protocol available.
-    savePickle(dailyGamesUnclean, 'dailyGamesUnclean/dailyGamesUnclean_{}'.format(yesterdaysDate))
+    savePickle(dailyGamesUnclean, 'pickleFiles/dailyGamesUnclean/dailyGamesUnclean_{}'.format(yesterdaysDate))
 
     print('Number of games scraped = {}'.format(len(dailyGamesUnclean)))
 
@@ -570,7 +570,7 @@ def cleanYesterdaysGames():
 
     yesterdaysDate = (pd.to_datetime('today') - datetime.timedelta(days=1)).date()
 
-    my_games_unclean = pd.read_pickle('dailyGamesUnclean/dailyGamesUnclean_{}.pickle'.format(yesterdaysDate))
+    my_games_unclean = pd.read_pickle('pickleFiles/dailyGamesUnclean/dailyGamesUnclean_{}.pickle'.format(yesterdaysDate))
     my_games_clean = {}
 
     print('Number of games to clean = {}'.format(len(my_games_unclean)))
@@ -578,7 +578,7 @@ def cleanYesterdaysGames():
     for index, game in my_games_unclean.items():
         my_games_clean[index] = cleanGame(game)
 
-    savePickle(my_games_clean, 'dailyGamesClean/dailyGamesClean_{}'.format(yesterdaysDate))
+    savePickle(my_games_clean, 'pickleFiles/dailyGamesClean/dailyGamesClean_{}'.format(yesterdaysDate))
 
     print('Number of games cleaned  = {}'.format(len(my_games_clean)))
 
@@ -589,10 +589,10 @@ def updateYesterdaysLastTime():
     yesterdaysDate = (pd.to_datetime('today') - datetime.timedelta(days=1)).date()
 
     #Load in last_time_df from the previous day, which will be copied and updated
-    last_time_df = pd.read_pickle('dailyLastTime/dailyLastTime_{}.pickle'.format(yesterdaysDate - datetime.timedelta(days=1))).copy()
+    last_time_df = pd.read_pickle('pickleFiles/dailyLastTime/dailyLastTime_{}.pickle'.format(yesterdaysDate - datetime.timedelta(days=1))).copy()
 
     #Load my_games_clean dictionary
-    my_games_clean = pd.read_pickle('dailyGamesClean/dailyGamesClean_{}.pickle'.format(yesterdaysDate))
+    my_games_clean = pd.read_pickle('pickleFiles/dailyGamesClean/dailyGamesClean_{}.pickle'.format(yesterdaysDate))
 
     #Set columns to iterate through
     cols = ['G', 'A', 'PTS', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S']
@@ -632,7 +632,7 @@ def updateYesterdaysLastTime():
             pass
 
     #Save last_time_df
-    savePickle(last_time_df, 'dailyLastTime/dailyLastTime_{}'.format(yesterdaysDate))
+    savePickle(last_time_df, 'pickleFiles/dailyLastTime/dailyLastTime_{}'.format(yesterdaysDate))
 
 def updateYesterdaysGamesSince():
 
@@ -641,10 +641,10 @@ def updateYesterdaysGamesSince():
     print("Updating GamesSince to reflect new stats' timelines for yerterday, {}".format(yesterdaysDate))
 
     #Load in GamesSince from the previous day, which will be copied and updated
-    GamesSince = pd.read_pickle('dailyGamesSince/dailyGamesSince_{}.pickle'.format(yesterdaysDate - datetime.timedelta(days=1))).copy()
+    GamesSince = pd.read_pickle('pickleFiles/dailyGamesSince/dailyGamesSince_{}.pickle'.format(yesterdaysDate - datetime.timedelta(days=1))).copy()
 
     #Load my_games_clean dictionary
-    my_games_clean = pd.read_pickle('dailyGamesClean/dailyGamesClean_{}.pickle'.format(yesterdaysDate))
+    my_games_clean = pd.read_pickle('pickleFiles/dailyGamesClean/dailyGamesClean_{}.pickle'.format(yesterdaysDate))
     
     #Set columns to iterate through
     cols = ['G', 'A', 'PTS', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S']
@@ -678,7 +678,7 @@ def updateYesterdaysGamesSince():
                 GamesSince.loc[game_df[game_df['+/-'] >= 0].index, column] += 1
 
     #Save GamesSince
-    savePickle(GamesSince, 'dailyGamesSince/dailyGamesSince_{}'.format(yesterdaysDate))
+    savePickle(GamesSince, 'pickleFiles/dailyGamesSince/dailyGamesSince_{}'.format(yesterdaysDate))
 
     print('Finished updating GamesSince for yesterday, {}'.format(yesterdaysDate))
 
@@ -687,12 +687,12 @@ def incorporateYesterdaysStats():
     yesterdaysDate = (pd.to_datetime('today') - datetime.timedelta(days=1)).date()
 
     #Instantiate my_games_clean
-    my_games_clean = pd.read_pickle('dailyGamesClean/dailyGamesClean_{}.pickle'.format(yesterdaysDate))
+    my_games_clean = pd.read_pickle('pickleFiles/dailyGamesClean/dailyGamesClean_{}.pickle'.format(yesterdaysDate))
 
     print('Adding {} games to my_df'.format(len(my_games_clean)))
 
     #Load in the day befores my_df
-    my_df = pd.read_pickle('dailyMyDF/dailyMyDF_{}.pickle'.format(yesterdaysDate - datetime.timedelta(days=1)))
+    my_df = pd.read_pickle('pickleFiles/dailyMyDF/dailyMyDF_{}.pickle'.format(yesterdaysDate - datetime.timedelta(days=1)))
 
     #Create main df for all day's games
     new_df = pd.concat([game for game in my_games_clean.values()], sort=True)
@@ -707,7 +707,7 @@ def incorporateYesterdaysStats():
         if column in my_df.columns:
             my_df[column] = my_df[column].astype(int)
 
-    savePickle(my_df, 'dailyMyDF/dailyMyDF_{}'.format(yesterdaysDate))
+    savePickle(my_df, 'pickleFiles/dailyMyDF/dailyMyDF_{}'.format(yesterdaysDate))
 
 '--------------- Multi-Game Functions ---------------'
 
@@ -737,14 +737,14 @@ def scrapeURLRange(start_date, end_date):
         time.sleep(1)
 
     # Pickle the 'all_html_links' dict using the highest protocol available.
-    savePickle(all_html_links, 'all_html_links')
+    savePickle(all_html_links, 'pickleFiles/all_html_links')
 
     # Flatten list of game htmls
     flat_list_game_links = [item for sublist in list(all_html_links.values()) for item in sublist]
 
     #Save home teams, away teams, and game dates in df
     teams_and_dates = pd.DataFrame([total_home_teams, total_away_teams, all_game_dates, flat_list_game_links])
-    savePickle(teams_and_dates, 'teams_and_dates')
+    savePickle(teams_and_dates, 'pickleFiles/teams_and_dates')
 
     print('Total game links scraped = {}'.format(len(teams_and_dates.columns)))
 
@@ -775,7 +775,7 @@ def scrapeYearsURLs(end_year):
     seasonSummary['url'] = 'https://www.hockey-reference.com' + seasonSummary['url']
 
     #Save resulting file
-    savePickle(seasonSummary, 'seasonSummary', end_year-1, end_year)
+    savePickle(seasonSummary, 'pickleFiles/seasonSummary', end_year-1, end_year)
 
     print('Finished scraping game urls')
 
@@ -792,7 +792,7 @@ def scrapeAvailableGames(end_year=None):
     if end_year is None:
 
         #Load in required data
-        teams_and_dates = pd.read_pickle('teams_and_dates.pickle')
+        teams_and_dates = pd.read_pickle('pickleFiles/teams_and_dates.pickle')
         number_of_games = len(teams_and_dates.columns)
         print('Number of games to scrape = {}'.format(number_of_games))
 
@@ -819,10 +819,10 @@ def scrapeAvailableGames(end_year=None):
                 print("Scraped 75% of total games")
 
         # Pickle the 'my_games' dictionary using the highest protocol available.
-        savePickle(my_games_unclean, 'my_games_unclean')
+        savePickle(my_games_unclean, 'pickleFiles/my_games_unclean')
 
     else:
-        seasonSummary = pd.read_pickle('seasonSummary_{}_{}.pickle'.format(end_year-1, end_year))
+        seasonSummary = pd.read_pickle('pickleFiles/seasonSummary_{}_{}.pickle'.format(end_year-1, end_year))
         number_of_games = len(seasonSummary)
         print('Number of games to scrape = {}'.format(number_of_games))
 
@@ -849,7 +849,7 @@ def scrapeAvailableGames(end_year=None):
                 print("Scraped 75% of total games")
         
         # Pickle the 'my_games' dictionary using the highest protocol available.
-        savePickle(my_games_unclean, 'my_games_unclean', end_year-1, end_year)
+        savePickle(my_games_unclean, 'pickleFiles/my_games_unclean', end_year-1, end_year)
 
     print('Number of games scraped = {}'.format(len(my_games_unclean)))
 
@@ -861,7 +861,7 @@ def cleanUncleanGames(end_year):
     #Create variable start_year
     start_year = end_year - 1
 
-    my_games_unclean = pd.read_pickle('my_games_unclean_{}_{}.pickle'.format(start_year, end_year))
+    my_games_unclean = pd.read_pickle('pickleFiles/my_games_unclean_{}_{}.pickle'.format(start_year, end_year))
     my_games_clean = {}
 
     print('Number of games to clean = {}'.format(len(my_games_unclean)))
@@ -869,7 +869,7 @@ def cleanUncleanGames(end_year):
     for index, game in my_games_unclean.items():
         my_games_clean[index] = cleanGame(game)
 
-    savePickle(my_games_clean, 'my_games_clean', start_year, end_year)
+    savePickle(my_games_clean, 'pickleFiles/my_games_clean', start_year, end_year)
 
     print('Number of games cleaned  = {}'.format(len(my_games_clean)))
 
@@ -883,10 +883,10 @@ def updateLastTime(end_year):
     start_year = end_year - 1
 
     #Load in last_time_df from the PREVIOUS season, which will be copied and updated
-    last_time_df = pd.read_pickle('last_time_df_{}_{}.pickle'.format(start_year-1, end_year-1)).copy()
+    last_time_df = pd.read_pickle('pickleFiles/last_time_df_{}_{}.pickle'.format(start_year-1, end_year-1)).copy()
 
     #Load my_games_clean dictionary
-    my_games_clean = pd.read_pickle('my_games_clean_{}_{}.pickle'.format(start_year, end_year))
+    my_games_clean = pd.read_pickle('pickleFiles/my_games_clean_{}_{}.pickle'.format(start_year, end_year))
 
     #Set columns to iterate through
     cols = ['G', 'A', 'PTS', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S']
@@ -926,7 +926,7 @@ def updateLastTime(end_year):
             pass
 
     #Save last_time_df
-    savePickle(last_time_df, 'last_time_df', start_year, end_year)
+    savePickle(last_time_df, 'pickleFiles/last_time_df', start_year, end_year)
 
 def updateGamesSince(end_year):
     """A function to update the DataFrame that notes the number of games since a player has scored, gotten an assist, etc."""
@@ -937,10 +937,10 @@ def updateGamesSince(end_year):
     print("Updating GamesSince to reflect new stats' timelines for the season spanning {} to {}".format(start_year, end_year))
 
     #Load in GamesSince from the PREVIOUS season, which will be copied and updated
-    GamesSince = pd.read_pickle('GamesSince_{}_{}.pickle'.format(start_year-1, end_year-1)).copy()
+    GamesSince = pd.read_pickle('pickleFiles/GamesSince_{}_{}.pickle'.format(start_year-1, end_year-1)).copy()
 
     #Load my_games_clean dictionary
-    my_games_clean = pd.read_pickle('my_games_clean_{}_{}.pickle'.format(start_year, end_year))
+    my_games_clean = pd.read_pickle('pickleFiles/my_games_clean_{}_{}.pickle'.format(start_year, end_year))
 
     #Set columns to iterate through
     cols = ['G', 'A', 'PTS', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S']
@@ -974,7 +974,7 @@ def updateGamesSince(end_year):
                 GamesSince.loc[game_df[game_df['+/-'] >= 0].index, column] += 1
 
     #Save GamesSince
-    savePickle(GamesSince, 'GamesSince', start_year, end_year)
+    savePickle(GamesSince, 'pickleFiles/GamesSince', start_year, end_year)
 
     print('Finished updating GamesSince for the year {} through {}'.format(start_year, end_year))
 
@@ -989,7 +989,7 @@ def incorporateNewStats(end_year):
     start_year = end_year - 1
 
     #Instantiate my_games_clean
-    my_games_clean = pd.read_pickle('my_games_clean_{}_{}.pickle'.format(start_year, end_year))
+    my_games_clean = pd.read_pickle('pickleFiles/my_games_clean_{}_{}.pickle'.format(start_year, end_year))
 
     print('Adding {} games to my_df'.format(len(my_games_clean)))
 
@@ -1005,7 +1005,7 @@ def incorporateNewStats(end_year):
         if column in my_df.columns:
             my_df[column] = my_df[column].astype(int)
 
-    savePickle(my_df, 'my_df', start_year, end_year)
+    savePickle(my_df, 'pickleFiles/my_df', start_year, end_year)
 
 '--------------- Aggregate Scraping, Updating Functions ---------------'
 
@@ -1044,14 +1044,14 @@ def scrapeSpecificDay(day='2018-11-26'):
     else:
         myDate = pd.to_datetime(day, format='%Y-%m-%d').date()
         #Save new version of LastTime
-        myLastTime = pd.read_pickle('dailyLastTime/dailyLastTime_{}.pickle'.format(myDate - datetime.timedelta(days=1)))
-        savePickle(myLastTime, 'dailyLastTime/dailyLastTime_{}'.format(myDate))
+        myLastTime = pd.read_pickle('pickleFiles/dailyLastTime/dailyLastTime_{}.pickle'.format(myDate - datetime.timedelta(days=1)))
+        savePickle(myLastTime, 'pickleFiles/dailyLastTime/dailyLastTime_{}'.format(myDate))
         #Save new version of GamesSince
-        myGamesSince = pd.read_pickle('dailyGamesSince/dailyGamesSince_{}.pickle'.format(myDate - datetime.timedelta(days=1)))
-        savePickle(myGamesSince, 'dailyGamesSince/dailyGamesSince_{}'.format(myDate))
+        myGamesSince = pd.read_pickle('pickleFiles/dailyGamesSince/dailyGamesSince_{}.pickle'.format(myDate - datetime.timedelta(days=1)))
+        savePickle(myGamesSince, 'pickleFiles/dailyGamesSince/dailyGamesSince_{}'.format(myDate))
         #Save new version of my_df
-        my_df = pd.read_pickle('dailyMyDF/dailyMyDF_{}.pickle'.format(myDate - datetime.timedelta(days=1)))
-        savePickle(my_df, 'dailyMyDF/dailyMyDF_{}'.format(myDate))
+        my_df = pd.read_pickle('pickleFiles/dailyMyDF/dailyMyDF_{}.pickle'.format(myDate - datetime.timedelta(days=1)))
+        savePickle(my_df, 'pickleFiles/dailyMyDF/dailyMyDF_{}'.format(myDate))
 
 def scrapeToToday():
     """Scrape games day-by-day, up to current day
@@ -1062,7 +1062,7 @@ def scrapeToToday():
     today = pd.to_datetime('today').date()
     while True:
         try:
-            myDF = pd.read_pickle('dailyMyDF/dailyMyDF_{}.pickle'.format(myDate))
+            myDF = pd.read_pickle('pickleFiles/dailyMyDF/dailyMyDF_{}.pickle'.format(myDate))
             break
         except:
             myDate -= datetime.timedelta(days=1)
@@ -1102,7 +1102,7 @@ def scrapeYear(end_year):
     incorporateNewStats(end_year)
 
     #Report major stats from my_df for this year
-    my_df = pd.read_pickle('my_df_{}_{}.pickle'.format(end_year-1, end_year))
+    my_df = pd.read_pickle('pickleFiles/my_df_{}_{}.pickle'.format(end_year-1, end_year))
     my_df_QC(my_df)
 
 def scrapeToNow(start_date='2000/12/31'):
@@ -1120,7 +1120,7 @@ def openLatestMyDF():
     myDate = pd.to_datetime('today').date()
     while True:
         try:
-            myDF = pd.read_pickle('dailyMyDF/dailyMyDF_{}.pickle'.format(myDate))
+            myDF = pd.read_pickle('pickleFiles/dailyMyDF/dailyMyDF_{}.pickle'.format(myDate))
             break
         except:
             myDate -= datetime.timedelta(days=1)
@@ -1130,7 +1130,7 @@ def openLatestLastTime():
     myDate = pd.to_datetime('today').date()
     while True:
         try:
-            lastTime = pd.read_pickle('dailyLastTime/dailyLastTime_{}.pickle'.format(myDate))
+            lastTime = pd.read_pickle('pickleFiles/dailyLastTime/dailyLastTime_{}.pickle'.format(myDate))
             break
         except:
             myDate -= datetime.timedelta(days=1)
@@ -1140,7 +1140,7 @@ def openLatestGamesSince():
     myDate = pd.to_datetime('today').date()
     while True:
         try:
-            gamesSince = pd.read_pickle('dailyGamesSince/dailyGamesSince_{}.pickle'.format(myDate))
+            gamesSince = pd.read_pickle('pickleFiles/dailyGamesSince/dailyGamesSince_{}.pickle'.format(myDate))
             break
         except:
             myDate -= datetime.timedelta(days=1)
@@ -1180,9 +1180,9 @@ def restartAll():
         all_time_clean_games = {}
 
         #Save all new variables
-        savePickle(last_time_df, 'last_time_df')
-        savePickle(my_games_clean, 'my_games_clean')
-        savePickle(all_time_clean_games, 'all_time_clean_games')
+        savePickle(last_time_df, 'pickleFiles/last_time_df')
+        savePickle(my_games_clean, 'pickleFiles/my_games_clean')
+        savePickle(all_time_clean_games, 'pickleFiles/all_time_clean_games')
 
     else:
         pass
@@ -1193,8 +1193,8 @@ def showRecentPerformers():
     myDate = pd.to_datetime('today').date() - datetime.timedelta(days=1)
 
     #Load in LastTime and GamesSince dataframes
-    lastTime = pd.read_pickle('dailyLastTime/dailyLastTime_{}.pickle'.format(myDate))
-    gamesSince = pd.read_pickle('dailyGamesSince/dailyGamesSince_{}.pickle'.format(myDate))
+    lastTime = pd.read_pickle('pickleFiles/dailyLastTime/dailyLastTime_{}.pickle'.format(myDate))
+    gamesSince = pd.read_pickle('pickleFiles/dailyGamesSince/dailyGamesSince_{}.pickle'.format(myDate))
 
     #Select only players who've played this year
     currentPlayers = lastTime[lastTime['Last Game Date'] > pd.to_datetime('2018-10-1', format='%Y-%m-%d').date()]
