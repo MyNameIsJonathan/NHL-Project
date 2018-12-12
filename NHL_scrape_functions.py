@@ -121,9 +121,14 @@ def cleanGame(game_df):
 
 '--------------- Todays Games Functions ---------------'
 
-def findTodaysGames():
+def findTodaysGames(my_date=None):
     """Get today's date and create url, date string, and scrape data"""
-    today = pd.to_datetime('today').date()
+    if my_date is None:
+        today = pd.to_datetime('today').date()
+    else:
+        today = my_date
+
+        
     url = 'https://www.hockey-reference.com/leagues/NHL_2019_games.html' #Change this url for '19-'20 season
     my_games_df = pd.read_html(url)[0]
     my_games_df = my_games_df[['Date', 'Home', 'Visitor']]
@@ -141,9 +146,15 @@ def openTodaysGames():
             myDate -= datetime.timedelta(days=1)
     return todaysGames
 
-def todaysPlayerDroughts():
-    """Get stats for players who play today"""
-    today = pd.to_datetime('today').date()
+def todaysPlayerDroughts(my_date=None):
+    """Get stats for players who play today
+    Input: my_date; type: string; format: "yyyy-mm-dd" """
+    if my_date is None:
+        today = pd.to_datetime('today').date()
+    else:
+        today = my_date
+
+
     todaysGames = pd.read_pickle('todaysGames/todaysGames_{}.pickle'.format(str(today)))
     #Get the list of teams playing today
     teams_playing_today = list(todaysGames['Home'].unique()) + list(todaysGames['Visitor'].unique())
@@ -160,7 +171,7 @@ def todaysPlayerDroughts():
     numberOfPlayersToday = len(players_playing_today)
     savePickle(numberOfPlayersToday, 'numberOfPlayersToday/numberOfPlayersToday_{}'.format(str(today)))
 
-    #Open the GamesSince df to see the games since each of today's players scored, etc.
+    #Open yesterday's GamesSince df to see the games since each of today's players scored, etc.
     GamesSince = pd.read_pickle('dailyGamesSince/dailyGamesSince_{}.pickle'.format(today - datetime.timedelta(days=1)))
     todays_GamesSince = GamesSince.reindex(players_playing_today, fill_value=0)
 
@@ -193,17 +204,29 @@ def openNumberOfPlayers():
             myDate -= datetime.timedelta(days=1)
     return numberOfPlayersToday
 
-def makeTodaysHTML():
+def makeTodaysHTML(my_date=None):
 
-    today = pd.to_datetime('today').date()
+    if my_date is None:
+        today = pd.to_datetime('today').date()
+    else:
+        today = my_date
 
     # Load in the three main dataframes and select for current players, if necessary
-    myDF = openLatestMyDF().sort_values('G', ascending=False)
+    while True:
+        try:
+            myDF = pd.read_pickle('dailyMyDF/dailyMyDF_{}.pickle'.format(today))
+            lastTimeDF = pd.read_pickle('dailyLastTime/dailyLastTime_{}.pickle'.format(today))
+            gamesSinceDF = pd.read_pickle('dailyGamesSince/dailyGamesSince_{}.pickle'.format(today))
+            break
+        except:
+            today -= datetime.timedelta(days=1)
+
+
+    myDF = myDF.sort_values('G', ascending=False)
     myDF['TOI'] = myDF['TOI'].astype(int)
     myDF = myDF.sort_values(['G', 'PTS'], ascending=False)
     myDF = myDF.reindex(['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Shifts', 'TOI'], axis=1)
 
-    lastTimeDF = openLatestLastTime()
     lastTimeDF = lastTimeDF[lastTimeDF['Last Game Date'] >= pd.to_datetime('2018-7-1', format="%Y-%m-%d").date()] # Select for player who've played in last 30 days only
     lastTimeDF = lastTimeDF[lastTimeDF['G'] > pd.to_datetime('2000-10-03', format="%Y-%m-%d").date()] # Players who've never scored have last goal set as 2000/10/3. Remove these palyers
     lastTimeDF = lastTimeDF.sort_values(['G', 'A'])
@@ -212,7 +235,6 @@ def makeTodaysHTML():
     # Grab the players in this df, for slicing retired players from the gamesSince DF
     currentPlayers = lastTimeDF.index
 
-    gamesSinceDF = openLatestGamesSince()
     gamesSinceDF = gamesSinceDF.loc[currentPlayers, :]
     gamesSinceDF = gamesSinceDF.sort_values(['G', 'A'], ascending=False)
 
@@ -1052,13 +1074,20 @@ def scrapeToToday():
     while myDate != today:
         scrapeSpecificDay(day=str(myDate))
         # Find games for this date
-        findTodaysGames()
+        findTodaysGames(myDate)
         # Find players playing on this date
-        todaysPlayerDroughts()
+        todaysPlayerDroughts(myDate)
+        # Make the html for these data
+        makeTodaysHTML()
         myDate += datetime.timedelta(days=1)
 
+    # Also find todays games, todays player droughts, and make the HTML for today
+    findTodaysGames()
+    todaysPlayerDroughts()
+    makeTodaysHTML()
+
     #Report on recent performers
-    showRecentPerformers()
+    # showRecentPerformers()
 
 def scrapeYear(end_year):
     """Function to scrape, clean, save, and incorporate data from the given 

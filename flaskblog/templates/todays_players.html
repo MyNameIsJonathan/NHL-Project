@@ -4,6 +4,14 @@
 <div class="container">
     <div class="bg-text">
 
+    <div>
+        <br/>
+        <h1 data-aos="fade-right">A wonderful collection of interesting games-since statistics</h1>
+        <br/>
+        <h2 data-aos="fade-left" class="todays-players-heading">These range from the last time a player scored, to the last time he had a minus rating or game-winning goal</h2>
+        <br/>
+    </div>
+
     <div class="player-wrapper">
         <div class="todays-players">
             <span data-aos="fade-right"> Of the <br><strong>{{ numberOfPlayersToday }}</strong> <br>players playing today,</span>
@@ -11,7 +19,7 @@
         <div class="vertical-line" data-aos="fade-up"></div>
         <div class="todays-players">
             <span data-aos="fade-left">
-                <strong>{{ todaysDroughts['G'].index[0] }}</strong> <br>hasn't scored in the most games <br> - <strong>{{ todaysDroughts['G']['G'][0] }}</strong> - <br>since his last game on <br><strong>{{'NOT ENTERED' }}</strong>.
+                <strong>{{ todaysDroughts['G'].index[0] }}</strong><br>hasn't scored in the most games <br> - <strong>{{ todaysDroughts['G']['G'][0] }}</strong> - <br>since his last game on <br><strong>{{'NOT ENTERED' }}</strong>.
             </span>
         </div>
     </div>
@@ -20,12 +28,12 @@
 
     <div class="player-wrapper">
                 <div class="todays-players">
-                    <span data-aos="fade-right"> Of the <br><strong>{{ numberOfPlayersToday }}</strong> <br>players playing today,</span>
+                    <span data-aos="fade-right"> Of the <br><strong>{{ numberOfPlayersToday }}</strong><br>players playing today,</span>
                 </div>
                 <div class="vertical-line" data-aos="fade-up"></div>
                 <div class="todays-players">
                     <span data-aos="fade-left">
-                        <strong>{{ todaysDroughts['A'].index[0] }}</strong> <br>hasn't recorded an assist in the most games, <br><strong>{{ todaysDroughts['A']['A'][0] }}</strong>, <br>since his last game on <br><strong>{{ 'NOT ENTERED' }}</strong>.
+                        <strong>{{ todaysDroughts['A'].index[0] }}</strong><br>hasn't recorded an assist in the most games, <br> - <strong>{{ todaysDroughts['A']['A'][0] }}</strong> - <br>since his last game on <br><strong>{{ 'NOT ENTERED' }}</strong>.
                 </span>
         </div>
     </div>
@@ -39,7 +47,7 @@
                 <div class="vertical-line" data-aos="fade-up"></div>
                 <div class="todays-players">
                     <span data-aos="fade-left">
-                        <strong>{{ todaysDroughts['+'].index[0] }}</strong> hasn't had a positive rating in the most games, <strong>{{ todaysDroughts['+']['+'][0] }}</strong>, since his last game on <strong>{{ 'NOT ENTERED' }}</strong>.
+                        <strong>{{ todaysDroughts['+'].index[0] }}</strong> hasn't had a positive rating in the most games<br> - <strong>{{ todaysDroughts['+']['+'][0] }}</strong> - <br>since his last game on <br><strong>{{ 'NOT ENTERED' }}</strong>.
                 </span>
         </div>
     </div>
@@ -53,7 +61,7 @@
                 <div class="vertical-line" data-aos="fade-up"></div>
                 <div class="todays-players">
                     <span data-aos="fade-left">
-                        <strong>{{ todaysDroughts['-'].index[0] }}</strong> hasn't had a negative rating in the most games, <strong>{{ todaysDroughts['-']['-'][0] }}</strong>, since his last game on <strong>{{ 'NOT ENTERED' }}</strong>.
+                        <strong>{{ todaysDroughts['-'].index[0] }}</strong> hasn't had a negative rating in the most games<br> - <strong>{{ todaysDroughts['-']['-'][0] }}</strong> - <br>since his last game on <br></rb><strong>{{ 'NOT ENTERED' }}</strong>.
                 </span>
         </div>
     </div>
@@ -67,7 +75,7 @@
                 <div class="vertical-line" data-aos="fade-up"></div>
                 <div class="todays-players">
                     <span data-aos="fade-left">
-                        <strong>{{ todaysDroughts['PIM'].index[0] }}</strong> hasn't had a penalty in the most games, <strong>{{ todaysDroughts['PIM']['PIM'][0] }}</strong>, since his last game on <strong>{{ 'NOT ENTERED' }}</strong>.
+                        <strong>{{ todaysDroughts['PIM'].index[0] }}</strong> hasn't had a penalty in the most games <br> - <strong>{{ todaysDroughts['PIM']['PIM'][0] }}</strong> - <br>since his last game on <br><strong>{{ 'NOT ENTERED' }}</strong>.
                 </span>
         </div>
     </div>
@@ -81,7 +89,7 @@
                 <div class="vertical-line" data-aos="fade-up"></div>
                 <div class="todays-players">
                     <span data-aos="fade-left">
-                        <strong>{{ todaysDroughts['EV'].index[0] }}</strong> hasn't scored an even-strength goal in the most games, <strong>{{ todaysDroughts['EV']['EV'][0] }}</strong>, since his last game on <strong>{{ 'NOT ENTERED' }}</strong>.
+                        <strong>{{ todaysDroughts['EV'].index[0] }}</strong> hasn't scored an even-strength goal in the most games <br> - <strong>{{ todaysDroughts['EV']['EV'][0] }}</strong> - <br>since his last game on <br><strong>{{ 'NOT ENTERED' }}</strong>.
                 </span>
         </div>
     </div>
@@ -95,7 +103,7 @@
                 <div class="vertical-line" data-aos="fade-up"></div>
                 <div class="todays-players">
                     <span data-aos="fade-left">
-                        <strong>{{ todaysDroughts['PP'].index[0] }}</strong> hasn't scored a power play goal in the most games, <strong>{{ todaysDroughts['PP']['PP'][0] }}</strong>, since his last game on <strong>{{ 'NOT ENTERED' }}</strong>.
+                        <strong>{{ todaysDroughts['PP'].index[0] }}</strong> hasn't scored a power play goal in the most games<br> - <strong>{{ todaysDroughts['PP']['PP'][0] }}</strong> - <br>since his last game on <br><strong>{{ 'NOT ENTERED' }}</strong>.
                 </span>
         </div>
     </div>
@@ -109,7 +117,7 @@
                 <div class="vertical-line" data-aos="fade-up"></div>
                 <div class="todays-players">
                     <span data-aos="fade-left">
-                        <strong>{{ todaysDroughts['SH'].index[0] }}</strong> hasn't scored a shorthanded goal in the most games, <strong>{{ todaysDroughts['SH']['SH'][0] }}</strong>, since his last game on <strong>{{ 'NOT ENTERED' }}</strong>.
+                        <strong>{{ todaysDroughts['SH'].index[0] }}</strong> hasn't scored a shorthanded goal in the most games<br> - <strong>{{ todaysDroughts['SH']['SH'][0] }}</strong> - <br>since his last game on <br><strong>{{ 'NOT ENTERED' }}</strong>.
                 </span>
         </div>
     </div>
@@ -123,7 +131,7 @@
                 <div class="vertical-line" data-aos="fade-up"></div>
                 <div class="todays-players">
                     <span data-aos="fade-left">
-                        <strong>{{ todaysDroughts['GW'].index[0] }}</strong> hasn't scored a game-winning goal in the most games, <strong>{{ todaysDroughts['GW']['GW'][0] }}</strong>, since his last game on <strong>{{ 'NOT ENTERED' }}</strong>.
+                        <strong>{{ todaysDroughts['GW'].index[0] }}</strong> hasn't scored a game-winning goal in the most games<br> - <strong>{{ todaysDroughts['GW']['GW'][0] }}</strong> - <br>since his last game on <br><strong>{{ 'NOT ENTERED' }}</strong>.
                 </span>
         </div>
     </div>
@@ -137,7 +145,7 @@
                 <div class="vertical-line" data-aos="fade-up"></div>
                 <div class="todays-players">
                     <span data-aos="fade-left">
-                        <strong>{{ todaysDroughts['S'].index[0] }}</strong> hasn't had a shot in the most games, <strong>{{ todaysDroughts['S']['S'][0] }}</strong>, since his last game on <strong>{{ 'NOT ENTERED' }}</strong>.
+                        <strong>{{ todaysDroughts['S'].index[0] }}</strong> hasn't had a shot in the most games<br> - <strong>{{ todaysDroughts['S']['S'][0] }}</strong> - <br>since his last game on <br><strong>{{ 'NOT ENTERED' }}</strong>.
                 </span>
         </div>
     </div>

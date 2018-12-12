@@ -47,10 +47,15 @@ h1 {
   text-align: center;
   margin-top: 20px;
   margin-bottom: 20px;
+  font-size: 3em;
 }
 
 h2 {
   text-align: center;
+}
+
+h2.todays-players-heading {
+  font-size: 1.4em;
 }
 
 td {
@@ -153,6 +158,7 @@ strong {
 #navbarToggle {
   padding-right: 0px;
   font-weight: 100;
+  color: #CCCCCC;
 }
 
 .container {
@@ -188,6 +194,11 @@ strong {
 
 .nav-item .nav-link {
   padding: 10px 10px;
+}
+
+.navbar-collapse {
+  color: #CCCCCC;
+  z-index: 2;
 }
 
 .stat-table {
@@ -237,7 +248,7 @@ strong {
   height: 100%;
 }
 
-.player-wrapper{
+.player-wrapper {
   display: table;
   width: 100%;
   text-align: center;
