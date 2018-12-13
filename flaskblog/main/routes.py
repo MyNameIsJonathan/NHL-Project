@@ -8,9 +8,9 @@ import datetime
 main = Blueprint('main', __name__)
 
 
-#These functions 'create' pages within your site. 
-# This one creates the 'home' page, while the one 
-# below creates the NHL Stats page
+# These functions 'create' routes to pages within your site. 
+# This one creates the 'home' page route, while the one 
+# below creates the NHL Stats page route
 @main.route("/")  #Having two @app. here means that this page is rendered when either website.com/ or website.com/home are visited
 @main.route("/home")
 def home():

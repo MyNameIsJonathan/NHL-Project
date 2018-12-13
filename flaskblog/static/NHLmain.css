@@ -24,20 +24,6 @@ body {
   box-sizing: border-box;
 }
 
-/*
-body {
-	background: url('../static/images/uqebOQJ.jpg') no-repeat center center fixed;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
-  background-size: cover;
-  background-color:#333;
-  color: #cccccc;
-  font-weight: 200;
-  font-family: 'Open Sans';
-}
-*/
-
 h1, h2, h3, h4, h5, h6 {
   color: #FFFFFF;
   font-weight: 100;
@@ -123,14 +109,43 @@ strong {
 #main-nav-bar {
   color: #FFFFFF;
   font-weight: 100;
-  font-size: 2.3rem;
   padding: 7px 14px;
   text-align: center;
   border-style: solid;
   border-radius: 2px;
   border-color: #cccccc;
   border-width: 2px;
+  max-width: 80%;
+}
 
+@media screen and (min-width: 653px) {
+  #main-nav-bar {
+    font-size: .5em;
+  }
+}
+
+@media screen and (min-width: 531px) and (max-width: 652px) {
+  #main-nav-bar {
+    font-size: .4em;
+  }
+}
+
+@media screen  and (min-width: 421px) and (max-width: 530px) {
+  #main-nav-bar {
+    font-size: .3em;
+  }
+}
+
+@media screen  and (min-width: 325px) and (max-width: 420px) {
+  #main-nav-bar {
+    font-size: .2em;
+  }
+}
+
+@media screen  and (min-width: 0px) and (max-width: 304px) {
+  #main-nav-bar {
+    font-size: .1em;
+  }
 }
 
 #register-logout-button {
@@ -159,6 +174,7 @@ strong {
   padding-right: 0px;
   font-weight: 100;
   color: #CCCCCC;
+  font-size: 1.5em;
 }
 
 .container {
@@ -209,7 +225,7 @@ strong {
 
 .stamkos-image {
   height: auto;
-  width: 70%;
+  width: 95%;
   opacity: 0.7;
   box-shadow: 0 0 8px 8px black inset;
 }
@@ -254,6 +270,37 @@ strong {
   text-align: center;
   margin-bottom: 50px;
   margin-top: 50px;
+}
+
+.form-control {
+  width: 20rem;
+  align-content: center;
+  display: inline-block;
+  background-color: transparent;
+  border-width: 1px;
+  border-color: #FFFFFF;
+  color: #FFFFFF;
+  font-weight: 100;
+}
+
+.form-control-label {
+  font-size: 1.35rem;
+  font-weight: 100;
+}
+
+.ml-2 {
+  color: rgba(248, 218, 86, 0.712);
+}
+
+.btn.btn-outline-info {
+  color: rgba(248, 218, 86, 0.712);
+  border-color: rgba(248, 218, 86, 0.712);
+}
+
+legend.border-bottom.mb-4 {
+  padding-bottom: .5rem;
+  font-size: 2rem;
+  font-weight: 200;
 }
 
 ::-webkit-scrollbar-track {

@@ -175,11 +175,21 @@ def todaysPlayerDroughts(my_date=None):
     GamesSince = pd.read_pickle('pickleFiles/dailyGamesSince/dailyGamesSince_{}.pickle'.format(today - datetime.timedelta(days=1)))
     todays_GamesSince = GamesSince.reindex(players_playing_today, fill_value=0)
 
+    # Open yesterday's lastTimeDF
+    todays_lastTime = pd.read_pickle('pickleFiles/dailyLastTime/dailyLastTime_{}.pickle'.format(today - datetime.timedelta(days=1)))
+    todays_lastTime = todays_lastTime.reindex(players_playing_today, fill_value=0)
+
     #Save the top 5 players for each category of GamesSince, such as the 5 players who haven't scored in the most games
     todaysDroughts = {}
-    for column in todays_GamesSince.columns:
+
+    #Select all columns except Total Recorded Games
+    myColumns = ['G', 'A', 'PTS', '+', '-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S']
+
+    for column in myColumns:
         todays_GamesSince = todays_GamesSince.sort_values(column, ascending=False)
-        todaysDroughts[column] = todays_GamesSince.head()
+        myPlayer = todays_GamesSince.head(1).index[0]
+        myDate = todays_lastTime.loc[myPlayer, column]
+        todaysDroughts[column] = [myPlayer, todays_GamesSince.loc[myPlayer, column], datetime.datetime.strftime(myDate,'%b %d, %Y')]
 
     #Save the dictionary, todaysDroughts, for uploading on website
     savePickle(todaysDroughts, 'pickleFiles/todaysDroughts/todaysDroughts_{}'.format(str(today)))
@@ -1223,5 +1233,3 @@ def showRecentPerformers():
 #     scrapeToToday()
 
 '----------------------------------------------------------'
-
-
