@@ -177,6 +177,10 @@ strong {
   font-size: 1.5em;
 }
 
+.home-credits {
+  font-size: 2.7em;
+}
+
 .container {
   text-align: center;
   box-sizing: border-box;
@@ -295,6 +299,82 @@ strong {
 .btn.btn-outline-info {
   color: rgba(248, 218, 86, 0.712);
   border-color: rgba(248, 218, 86, 0.712);
+}
+
+.technology-list {
+  list-style: none;
+  font-size: 2em;
+  font-weight: 100;
+}
+
+.btn.btn-outline-info {
+  background-color: transparent;
+  border-width: 1px;
+  border-color: rgba(248, 218, 86, 0.712);
+  border-radius: 2px;
+}
+
+.tweet-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-content: space-between;
+}
+
+.tweet-box {
+  color: #cccccc;
+  border-radius: 10px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #cccccc;
+  height: 7em;
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+  width: 40em;
+  border-spacing: 4px;
+  align-items: center;
+  margin: 10px 5px;
+}
+
+.tweet-user-box {
+  font-weight: 200;
+  width: 45%;
+  display: flex;
+  padding: 7px 15px;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.tweet-text-box {
+  padding: 10px;
+  display: table-cell;
+  justify-content: center;
+  align-content: center;
+  flex-direction: column;
+  width: 80%;
+  border-left: 1px solid #FFFFFF;
+}
+
+.tweet-username {
+  font-size: 1.3rem;
+  display: flex;
+}
+
+.tweet-date {
+  font: 0.5em;
+  display: flex;
+}
+
+.tweet-text {
+  font-size: .8em;
+  display: flex;
+  font-weight: 200;
+}
+
+.tweet-text {
+  font-size: 1em;
 }
 
 legend.border-bottom.mb-4 {

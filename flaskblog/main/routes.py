@@ -2,6 +2,7 @@ from flask import render_template, request, Blueprint
 import pandas as pd
 import NHL_scrape_functions
 import datetime
+import random
 
 # source /Users/jonathanolson/Projects/Environments/nhl_flask/bin/activate
 
@@ -32,3 +33,12 @@ def todays_players():
     numberOfPlayersToday = NHL_scrape_functions.openNumberOfPlayers()
 
     return render_template('todays_players.html', title = "Today's Players", todaysDroughts=todaysDroughts, numberOfPlayersToday=numberOfPlayersToday)
+
+@main.route("/stamkostweets")
+def stamkostweets():
+    #Open a random tweet mentioning stamkos from the last week
+    my_tweets = pd.read_pickle(f"pickleFiles/stamkosTweets/stamkosTweets_{pd.to_datetime('today').date()}.pickle")
+    my_numbers = random.sample(range(150), 150)
+    my_tweets = [my_tweets[i] for i in my_numbers]
+
+    return render_template('stamkostweets.html', title='Stamkos Tweets', my_tweets=my_tweets)
