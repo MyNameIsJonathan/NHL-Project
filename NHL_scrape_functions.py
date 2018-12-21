@@ -1227,6 +1227,62 @@ def showRecentPerformers():
         for player in currentPlayersGamesSince.sort_values(column, ascending=False).head(3).index:
             print('{}\t{}\t{}'.format(column, player, currentPlayersGamesSince.loc[player, column]))
 
+'--------------- Algorithms ---------------'
+
+def KnuthMorrisPratt(pattern, text):
+    """
+    Find all the occurrences of the pattern in the text
+    and return a list of all positions in the text
+    where the pattern starts in the text. 
+    Returns None if pattern not found in text
+    """
+
+    def computePrefix(P):
+        """Calcuates the prefixes for the Knuth-Morris-Pratt Algorithm, below """
+        # Create an array, s, that will store the border len for each string, ending at index i
+        s = [0] * len(P)
+
+        # Create a border variable to store current max border length
+        border = 0
+
+        # Loop through P and update max border for each substring P[0:i]
+        for i in range(1, len(P)):
+            # While we have a previous border > 0 and the current character doesn't 
+            # match the next character after the border, reduce border to previous size
+            while (border > 0) and (P[i] != P[border]):
+                border = s[border - 1]
+            # If we have another match, extend border to include new character
+            if P[i] == P[border]:
+                border += 1
+            # If we don't have a match, reset border to 0
+            else:
+                border = 0
+            # Store current border length for P[i] in array s
+            s[i] = border
+
+        # Return the array s, which indicates the maximum border for all substrings P[0:i]  
+        return s
+
+    # Create a master string, S, which has (1) the pattern (2) the symbol "$" and (3) the text
+    S = pattern + '$' + text
+
+    # Compute the prefix function for S
+    s = computePrefix(S)
+
+    # Create an empty array for the result
+    result = list()
+
+    # Loop through s and P, looking for matches
+    for i in range(len(pattern)+1, len(S)):
+        if s[i] == len(pattern):
+            result.append(i - 2*len(pattern))
+    
+    if len(result) == 0:
+        return None
+    else:
+        return result
+
+
 '--------------- Call To Provided Functions ---------------'
 
 # if __name__ == '__main__':
