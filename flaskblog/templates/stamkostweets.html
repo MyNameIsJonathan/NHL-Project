@@ -11,11 +11,16 @@
 </head>
 
 <body>
+    <h1 id="stamkos-tweets-title">Tweets mentioning my favorite player</h1>
+    <div class="stamkos-name-div">
+        <h1>Steven Stamkos</h1>
+    </div>
+    <span id="stamkos-subtitle">Captain of the Tampa Bay Lightning of the NHL&trade;</span>
+    <h2 id="KMP-disclaimer">(Filtered for explicit content using the Knuth-Morris-Pratt Algorithm)</h2>
     <hr>
-    <h1>Tweets mentioning my favorite player, Steven Stamkos -- the captain of the Tampa Bay Lightning of the NHL</h1>
+    <br>
     <div class="tweet-container">
-
-        {% for i in range(150) %}
+        {% for i in range( my_length ) %}
 
         <div class="tweet-box" data-aos="fade-up">
             <div class="tweet-user-box">
@@ -24,13 +29,15 @@
             </div>
             <div class="tweet-text-box">
                 <!-- <span class="tweet-favorite_count">{{ my_tweets[0].favorite_count }}</span>-->
-                <span class="tweet-text">{{ my_tweets[i].text }}</span>
+                <div class="tweet-text">{{ my_tweets[i].text }}</div>
             </div>
         </div>
 
         {% endfor %}
-        
     </div>
+    <br>
+    <br>
+    <br>
 </body>
 </html>
 

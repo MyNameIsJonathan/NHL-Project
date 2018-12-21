@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- AOS Scroll Animations -->
-    <link href="https://cdn.rawgit.com/michalsnik/aos/2.1.1/dist/aos.css" rel="stylesheet">
-    <script src="https://cdn.rawgit.com/michalsnik/aos/2.1.1/dist/aos.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
@@ -61,7 +61,12 @@
     {% block content %}{% endblock %}
   </main>
 
-  <script src="plugins/aos/aos.js"></script>
+  <footer class="footer">
+    <div class="text-muted">Made with care by Jonathan Olson</div>
+    <div class="text-muted">2018</div>
+  </footer>
+
+
   <script type="text/javascript">
     AOS.init({
       duration: 3000,
@@ -69,5 +74,4 @@
   </script>
 
 </body>
-
 </html>

@@ -4,8 +4,8 @@ body:before {
   content: '';
   position: fixed;
   width: 100%;
-  height: 100vh;
-  background-image: url('../static/images/uqebOQJ.jpg');
+  height: 100%;
+  background-image: url('../static/images/uqebOQJ_low_qual.jpg');
   background-position: center center;
   background-repeat: no-repeat;
   background-position: 100% 100%;
@@ -18,6 +18,7 @@ body:before {
 
 body {
   color: #CCCCCC;
+  min-width: 320px;
 }
 
 * {
@@ -71,6 +72,14 @@ span {
   line-height: normal;
 }
 
+ul {
+  padding: 0em;
+}
+
+.text-muted {
+  font-size: .8em;
+}
+
 .stat-table th {
   background-color: transparent;
   color: #CCCCCC;
@@ -100,12 +109,6 @@ hr {
   background-color: #CCCCCC;
 }
 
-
-strong {
-  font-size: 140%;
-  color: rgba(248, 218, 86, 0.712);
-}
-
 #main-nav-bar {
   color: #FFFFFF;
   font-weight: 100;
@@ -116,36 +119,6 @@ strong {
   border-color: #cccccc;
   border-width: 2px;
   max-width: 80%;
-}
-
-@media screen and (min-width: 653px) {
-  #main-nav-bar {
-    font-size: .5em;
-  }
-}
-
-@media screen and (min-width: 531px) and (max-width: 652px) {
-  #main-nav-bar {
-    font-size: .4em;
-  }
-}
-
-@media screen  and (min-width: 421px) and (max-width: 530px) {
-  #main-nav-bar {
-    font-size: .3em;
-  }
-}
-
-@media screen  and (min-width: 325px) and (max-width: 420px) {
-  #main-nav-bar {
-    font-size: .2em;
-  }
-}
-
-@media screen  and (min-width: 0px) and (max-width: 304px) {
-  #main-nav-bar {
-    font-size: .1em;
-  }
 }
 
 #register-logout-button {
@@ -177,6 +150,31 @@ strong {
   font-size: 1.5em;
 }
 
+#stamkos-tweets-title {
+  padding: 1em 0em 0em 0em;
+  margin: 0em;
+}
+
+#stamkos-subtitle {
+  font-style: italic;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  font-size: 1.7em;
+  font-weight: 100;
+}
+
+#KMP-disclaimer {
+  color: #bebebe;
+  font-size: 1em;
+  font-style: italic;
+  margin: 1.6em 0em;
+}
+
+#user_email {
+  font-size: 1.2em;
+  color: rgb(163, 163, 163);
+}
+
 .home-credits {
   font-size: 2.7em;
 }
@@ -184,7 +182,8 @@ strong {
 .container {
   text-align: center;
   box-sizing: border-box;
-  max-width: 100%;
+  width: auto;
+  padding: 0% 2%;
 }
 
 .site-header .navbar-nav .nav-link {
@@ -201,6 +200,13 @@ strong {
 
 .site-header .navbar-nav .nav-link.active {
   font-weight: 500;
+}
+
+.site-header {
+  width: auto;
+  max-width: 100%;
+  margin: 1em;
+  padding: 0em;
 }
 
 .navbar {
@@ -239,19 +245,26 @@ strong {
   margin: 0px 0px 40px 0px;
 }
 
+.stamkos-name-div {
+  background-color: rgba(255, 220, 62, 0.582);
+  margin: 1.5em 30%;
+  padding: 1em 0em;
+  border-radius: 10px;
+}
+
 .bg-text {
   background-color: rgb(0,0,0); /* Fallback color */
   background-color: rgba(0,0,0, 0.4); /* Black w/opacity/see-through */
   color: #CCCCCC;
-  padding: 1em;
+  padding: 1em .25em;
   text-align: center;
   display: block;
   border-radius: 2px;
+  width: auto;
 }
 
 .todays-players {
   width: 49.9%;
-  height: 100%;
   line-height: 13.5em;
   text-align: center;
   font-size: 2.5em;
@@ -271,9 +284,16 @@ strong {
 .player-wrapper {
   display: table;
   width: 100%;
+  height: 5em;
   text-align: center;
-  margin-bottom: 50px;
-  margin-top: 50px;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+.player-hr {
+  margin: 2.5em 12.5%;
+  width: 75%;
+  align-self: center;
 }
 
 .form-control {
@@ -314,6 +334,10 @@ strong {
   border-radius: 2px;
 }
 
+.todays-player-text {
+  font-size: 1em;
+}
+
 .tweet-container {
   display: flex;
   flex-direction: row;
@@ -328,7 +352,7 @@ strong {
   border-width: 1px;
   border-style: solid;
   border-color: #cccccc;
-  height: 7em;
+  height: auto;
   display: flex;
   justify-content: space-around;
   text-align: center;
@@ -349,32 +373,46 @@ strong {
 
 .tweet-text-box {
   padding: 10px;
-  display: table-cell;
+  margin: 12px 0px;
+  display: flex;
   justify-content: center;
-  align-content: center;
-  flex-direction: column;
+  align-items: center;
   width: 80%;
   border-left: 1px solid #FFFFFF;
 }
 
 .tweet-username {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   display: flex;
 }
 
 .tweet-date {
-  font: 0.5em;
+  font: 0.45em;
   display: flex;
 }
 
 .tweet-text {
-  font-size: .8em;
+  font-size: .6em;
   display: flex;
   font-weight: 200;
+  align-items: center;
 }
 
 .tweet-text {
   font-size: 1em;
+}
+
+.footer {
+  position: relative;
+  bottom: 0;
+  width: 100%;
+  height: 80px;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1em 0em;
+  flex-direction: column;
 }
 
 legend.border-bottom.mb-4 {
@@ -389,11 +427,78 @@ legend.border-bottom.mb-4 {
 }
 
 ::-webkit-scrollbar {
-  height: 5px;
+  height: 8px;
   width: 8px;
 	background-color: rgba(248, 218, 86, 0.712);
 }
 
 ::-webkit-scrollbar-thumb {
 	background-color: rgba(248, 218, 86, 0.712);	
+}
+
+strong {
+  font-size: 1.3em;
+  color: rgba(248, 218, 86, 0.712);
+}
+
+@media screen and (min-width: 683px) {
+  #main-nav-bar {
+    font-size: .5em;
+  }
+}
+
+@media screen and (min-width: 531px) and (max-width: 682px) {
+  #main-nav-bar {
+    font-size: .4em;
+  }
+
+  h1, strong {
+    font-size: 45px;
+  }
+
+  .todays-player-text {
+    font-size: 30px;
+  }
+}
+
+@media screen  and (min-width: 450px) and (max-width: 530px) {
+  #main-nav-bar {
+    font-size: .3em;
+  }
+
+  h1, strong {
+    font-size: 40px;
+  }
+
+  .todays-player-text {
+    font-size: 27px;
+  }
+}
+
+@media screen  and (min-width: 325px) and (max-width: 449px) {
+  #main-nav-bar {
+    font-size: .2em;
+  }
+
+  h1, strong {
+    font-size: 33px;
+  }
+
+  .todays-player-text {
+    font-size: 20px;
+  }
+}
+
+@media screen  and (min-width: 0px) and (max-width: 324px) {
+  #main-nav-bar {
+    font-size: .1em;
+  }
+
+  h1, strong {
+    font-size: 27px;
+  }
+
+  .todays-player-text {
+    font-size: 17px;
+  }
 }

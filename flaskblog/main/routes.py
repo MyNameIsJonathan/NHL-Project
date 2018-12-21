@@ -38,7 +38,8 @@ def todays_players():
 def stamkostweets():
     #Open a random tweet mentioning stamkos from the last week
     my_tweets = pd.read_pickle(f"pickleFiles/stamkosTweets/stamkosTweets_{pd.to_datetime('today').date()}.pickle")
-    my_numbers = random.sample(range(150), 150)
+    my_length = len(my_tweets)
+    my_numbers = random.sample(range(my_length), my_length)
     my_tweets = [my_tweets[i] for i in my_numbers]
 
-    return render_template('stamkostweets.html', title='Stamkos Tweets', my_tweets=my_tweets)
+    return render_template('stamkostweets.html', title='Stamkos Tweets', my_tweets=my_tweets, my_length=my_length)

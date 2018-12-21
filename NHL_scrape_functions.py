@@ -185,10 +185,22 @@ def todaysPlayerDroughts(my_date=None):
     #Select all columns except Total Recorded Games
     myColumns = ['G', 'A', 'PTS', '+', '-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S']
 
+    # Loop through columns to select oldest feat for each. Skip player if they've never accomplished selected feat within 
+    # the dates of my dataset (my dataset spans 2000-10-4 and later, so date='2000-10-3')
+    null_date = pd.to_datetime('2000-10-3', format="%Y-%m-%d").date()
     for column in myColumns:
         todays_GamesSince = todays_GamesSince.sort_values(column, ascending=False)
-        myPlayer = todays_GamesSince.head(1).index[0]
-        myDate = todays_lastTime.loc[myPlayer, column]
+        myDate = None
+        player_counter = 0
+        # Find first player with lastTime date > 2000-10-3, showing theyve accomplished the feat since my dataset 
+        # began on 2000-10-4
+        while myDate is None:
+            myPlayer = todays_GamesSince.index[player_counter]
+            newDate = todays_lastTime.loc[myPlayer, column]
+            if newDate > null_date:
+                myDate = newDate
+            else:
+                player_counter += 1
         todaysDroughts[column] = [myPlayer, todays_GamesSince.loc[myPlayer, column], datetime.datetime.strftime(myDate,'%b %d, %Y')]
 
     #Save the dictionary, todaysDroughts, for uploading on website
