@@ -4,6 +4,7 @@ import csv
 import pandas as pd
 from NHL_scrape_functions import savePickle, KnuthMorrisPratt
 
+
 explicit_words = [
     'anal', 
     'anus', 
@@ -24,8 +25,11 @@ explicit_words = [
     'bugger', 
     'bum', 
     'butt', 
-    'buttplug', 
+    'buttplug',
+    'clit', 
     'clitoris', 
+    'chode',
+    'chodestroker',
     'cock', 
     'coon', 
     'crap', 
@@ -55,12 +59,9 @@ explicit_words = [
     'knobend', 
     'knob end', 
     'labia', 
-    'lmao', 
-    'lmfao', 
     'muff', 
     'nigger', 
     'nigga', 
-    'omg', 
     'penis', 
     'piss', 
     'poop', 
@@ -82,29 +83,35 @@ explicit_words = [
     'twat', 
     'vagina', 
     'wank', 
-    'whore', 
-    'wtf']
+    'whore']
 
+# Get keys and tokens for twitter scrape via tweepy. These are saved in local environment
 my_consumer_key = os.environ['my_consumer_key']
 my_consumer_secret = os.environ['my_consumer_secret']
 my_access_token = os.environ['my_access_token']
 my_access_token_secret = os.environ['my_access_token_secret']
 
+# Use tokens and keys for authorization for twitter access
 auth = tweepy.OAuthHandler(my_consumer_key, my_consumer_secret)
 auth.set_access_token(my_access_token, my_access_token_secret)
 
+# Instantiate the tweepy api instance 
 api = tweepy.API(auth, wait_on_rate_limit=True)
 
+
+# Search twitter for tweets given a key word, saving these tweets in the list 'searched_tweets'
 searched_tweets = []
 max_tweets = 150 #We want a total of 150 tweets, which will be displayed on the website
-last_id = -1 #Start with a null tweet id
-while len(searched_tweets) < max_tweets: 
+last_id = -1 #Start with a null tweet id; incrementing last_id obviates scraping the same tweet multiple times
+while len(searched_tweets) < max_tweets: # While we have fewer than the desired number of tweets
     count = max_tweets - len(searched_tweets)
-    try:
+    try: # Watch for tweepy error, otherwise keep scraping
         new_tweets = api.search(q='stamkos', count=count, max_id=str(last_id - 1))
-        if not new_tweets:
+        if not new_tweets: # If we scrape no new tweets before we have our desited number of tweets saved
             break
-        for tweet in new_tweets:
+        for tweet in new_tweets: #
+            # Filter out tweets that are retweeted (contain RT or are marked as retweeted) 
+            # Filter out tweets that have a swear word contained in the list explicit_words; use Knuth-Morris-Prayy algorithm to improve speed
             contains_swear = False
             if (not tweet.retweeted) and ('RT @' not in tweet.text): # We dont want retweeted tweets, to prevent duplicates
                 for swear_word in explicit_words:

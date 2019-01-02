@@ -43,3 +43,4 @@ def stamkostweets():
     my_tweets = [my_tweets[i] for i in my_numbers]
 
     return render_template('stamkostweets.html', title='Stamkos Tweets', my_tweets=my_tweets, my_length=my_length)
+

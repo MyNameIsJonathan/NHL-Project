@@ -14,7 +14,7 @@ import os.path
 
 def getURLS(month, day, year):
 
-    """[Function to use the given date to create the html links to www.hockey-reference.com for that day's games. 
+    """[Uses the given date to create the html links to www.hockey-reference.com for that day's games. 
         Scrapes that website and creates the link for each of the games on that day]
     
     Returns:
@@ -62,7 +62,7 @@ def getURLS(month, day, year):
 
 def scrapeGame(my_url, game_date, home_team_name, away_team_name):
 
-    """[Function to pull stats from a single game, given the url (attained through getURLS), the date (also from getURLS), home and away teams]
+    """[Pulls stats from a single game, given the url (attained through getURLS), the date (also from getURLS), home and away teams]
     Returns:
         [Pandas DataFrame] -- [a clean df that has the game's stats]
     """
@@ -133,8 +133,14 @@ def findTodaysGames(my_date=None):
     my_games_df = pd.read_html(url)[0]
     my_games_df = my_games_df[['Date', 'Home', 'Visitor']]
     my_games_df = my_games_df[my_games_df['Date'] == str(today)]
-    #Save todaysGames df with the date
-    savePickle(my_games_df, 'pickleFiles/todaysGames/todaysGames_{}'.format(str(today)))
+
+    # If no games found, return None
+    if len(my_games_df) == 0:
+        return None
+    else:
+        #Save todaysGames df with the date
+        savePickle(my_games_df, 'pickleFiles/todaysGames/todaysGames_{}'.format(str(today)))
+        return 'Successful'
 
 def openTodaysGames():
     myDate = pd.to_datetime('today').date()
@@ -1096,11 +1102,13 @@ def scrapeToToday():
     while myDate != today:
         scrapeSpecificDay(day=str(myDate))
         # Find games for this date
-        findTodaysGames(myDate)
-        # Find players playing on this date
-        todaysPlayerDroughts(myDate)
-        # Make the html for these data
-        makeTodaysHTML()
+        todays_games = findTodaysGames(myDate)
+        # Only find droughts and make HTML if games are scheduled
+        if todays_games:    
+            # Find players playing on this date
+            todaysPlayerDroughts(myDate)
+            # Make the html for these data
+            makeTodaysHTML()
         myDate += datetime.timedelta(days=1)
 
     # Also find todays games, todays player droughts, and make the HTML for today
@@ -1210,6 +1218,7 @@ def restartAll():
         pass
 
 def showRecentPerformers():
+
     """A function to return summarizing statistics focusing on GamesSince for current players"""
     #Select yesterday -- even if no games were played then, the update functions will accomodate and create it accurate dataframes
     myDate = pd.to_datetime('today').date() - datetime.timedelta(days=1)
@@ -1243,10 +1252,14 @@ def showRecentPerformers():
 
 def KnuthMorrisPratt(pattern, text):
     """
+
     Find all the occurrences of the pattern in the text
     and return a list of all positions in the text
     where the pattern starts in the text. 
-    Returns None if pattern not found in text
+
+    Returns None if pattern not found in text, else returns 
+    the 0-based indices of where the pattern begins within the text
+
     """
 
     def computePrefix(P):
@@ -1293,8 +1306,7 @@ def KnuthMorrisPratt(pattern, text):
         return None
     else:
         return result
-
-
+   
 '--------------- Call To Provided Functions ---------------'
 
 # if __name__ == '__main__':
