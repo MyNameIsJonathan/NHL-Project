@@ -1,4 +1,4 @@
-from flaskblog import db, login_manager #Goes into __init__.py file and imports db
+from flasksite import db, login_manager #Goes into __init__.py file and imports db
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from datetime import datetime
 from flask_login import UserMixin

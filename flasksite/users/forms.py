@@ -3,7 +3,7 @@ from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from flask_login import current_user
-from flaskblog.models import User
+from flasksite.models import User
 
 
 #We are going to write Python classes that will be representative of our forms.
@@ -36,7 +36,7 @@ class LoginForm(FlaskForm): #Inherits from FlaskForm
 class UpdateAccountForm(FlaskForm): #Inherits from FlaskForm
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Email', validators=[DataRequired(), Email()])
-    picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'])])
+    picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'], 'Please use jpg or png files only!')])
     submit = SubmitField('Update')
 
 

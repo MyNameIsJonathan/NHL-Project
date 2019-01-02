@@ -1,8 +1,10 @@
 {% extends "layout.html" %}
 {% block content %}
-    <div class="content-section">
-        <div class="media">
+    <div class="content-section account-container">
+        <div class="spanning-flex-box">
             <img class="rounded-circle account-img" src="{{ image_file }}" alt="User Profile Picture">
+        </div>
+        <div class="media">
             <div class="media-body">
                 <h2 class="account-heading">{{ current_user.username }}</h2>
                 <p id="user_email">{{ current_user.email }}</p>
@@ -42,9 +44,14 @@
                         {% endif %}
                     </div>
                     <!-- INCLUDE AN ERROR REPORT FOR THE FILE UPLOAD -->
-                    <div class="form-group">
-                        {{ form.picture.label() }}
+                    <br>
+                    <div class="form-group picture-upload-box">
+                        <div class="centered-box form-control-label">
+                            {{ form.picture.label() }}
+                        </div>
+                        <div class="centered-box choose-file-button">
                         {{ form.picture(class="form-control-file") }}
+                        </div>
                         {% if form.picture.errors %}
                             {% for error in form.picture.errors %}
                                 <span class="danger">{{ error }}</span><br>
@@ -52,7 +59,7 @@
                         {% endif %}
                     </div>
                 </fieldset>
-                <div class="form-group">
+                <div class="form-group" id="submit">
                     {{ form.submit(class="btn btn-outline-info") }}
                 </div>
             </form>

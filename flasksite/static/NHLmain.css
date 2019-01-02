@@ -171,8 +171,9 @@ hr {
 }
 
 #user_email {
-  font-size: 1.2em;
+  font-size: 95%;
   color: rgb(163, 163, 163);
+  height: auto;
 }
 
 .home-credits {
@@ -182,7 +183,6 @@ hr {
 .container {
   text-align: center;
   box-sizing: border-box;
-  width: auto;
   padding: 0% 2%;
 }
 
@@ -298,6 +298,7 @@ hr {
 
 .form-control {
   width: 20rem;
+  max-width: 95%;
   align-content: center;
   display: inline-block;
   background-color: transparent;
@@ -310,6 +311,65 @@ hr {
 .form-control-label {
   font-size: 1.35rem;
   font-weight: 100;
+}
+
+.picture-upload-box {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-control-file {
+  display: inline-block;
+  font-weight: 100;
+  font-size: 1rem;
+  flex-direction: column;
+}
+
+.centered-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-content: center;
+  width: 20rem;
+}
+
+.choose-file-button {
+  border-width: 1px;
+  border-radius: .3rem;
+  border-color: #FFFFFF;
+  border-style: solid;
+  max-width: 95%;
+}
+
+.media {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  height: 7em;
+}
+
+.media-body {
+  flex: 0;
+}
+
+.spanning-flex-box {
+  height: 125px;
+}
+
+.rounded-circle.account-img {
+  height: 90%;
+  max-width: 125px;
+  min-width: 75px;
 }
 
 .ml-2 {
@@ -402,6 +462,14 @@ hr {
   font-size: 1em;
 }
 
+.account-container {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-content: space-between;
+}
+
 .footer {
   position: relative;
   bottom: 0;
@@ -441,9 +509,19 @@ strong {
   color: rgba(248, 218, 86, 0.712);
 }
 
+@media screen and (min-width: 1200px) and (max-width: 1268px) {
+  #main-nav-bar {
+    font-size: .9em;
+  }
+}
+
 @media screen and (min-width: 683px) {
   #main-nav-bar {
-    font-size: .5em;
+    font-size: .4em;
+  }
+
+  h1, strong {
+    font-size: 45px;
   }
 }
 
@@ -475,7 +553,7 @@ strong {
   }
 }
 
-@media screen  and (min-width: 325px) and (max-width: 449px) {
+@media screen  and (min-width: 357px) and (max-width: 449px) {
   #main-nav-bar {
     font-size: .2em;
   }
@@ -489,16 +567,30 @@ strong {
   }
 }
 
-@media screen  and (min-width: 0px) and (max-width: 324px) {
+@media screen  and (min-width: 325px) and (max-width: 356px) {
   #main-nav-bar {
-    font-size: .1em;
+    font-size: .13em;
   }
 
   h1, strong {
-    font-size: 27px;
+    font-size: 22px;
   }
 
   .todays-player-text {
-    font-size: 17px;
+    font-size: 19px;
+  }
+}
+
+@media screen  and (min-width: 0px) and (max-width: 324px) {
+  #main-nav-bar {
+    font-size: .13em;
+  }
+
+  h1, strong {
+    font-size: 29px;
+  }
+
+  .todays-player-text {
+    font-size: 18px;
   }
 }

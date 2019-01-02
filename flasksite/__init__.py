@@ -7,7 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_mail import Mail
-from flaskblog.config import Config
+from flasksite.config import Config
 
 
 db = SQLAlchemy()
@@ -37,9 +37,9 @@ def create_app(config_class=Config):
     mail.init_app(app)
 
     #Import down here to prevent circular imports
-    from flaskblog.users.routes import users #Here, we are importing the "users" Blutprint variable
-    from flaskblog.main.routes import main
-    from flaskblog.errors.handlers import errors
+    from flasksite.users.routes import users #Here, we are importing the "users" Blutprint variable
+    from flasksite.main.routes import main
+    from flasksite.errors.handlers import errors
     app.register_blueprint(users)
     app.register_blueprint(main)
     app.register_blueprint(errors)
