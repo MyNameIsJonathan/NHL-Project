@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+{% block content %}
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Stamkos Tweets</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <script src="main.js"></script>
+</head>
+
+<body>
+    <h1 id="stamkos-tweets-title">Tweets mentioning my favorite player</h1>
+    <div class="stamkos-name-div">
+        <h1>Steven Stamkos</h1>
+    </div>
+    <span id="stamkos-subtitle">Captain of the Tampa Bay Lightning of the NHL&trade;</span>
+    <h2 id="KMP-disclaimer">(Filtered for explicit content using the Knuth-Morris-Pratt Algorithm)</h2>
+    <hr>
+    <br>
+    <div class="tweet-container">
+        {% for i in range( my_length ) %}
+
+        <div class="tweet-box" data-aos="fade-up">
+            <div class="tweet-user-box">
+                <div class="tweet-username">@{{ my_tweets[i].author.screen_name }}</div>
+                <div class="tweet-date">{{ my_tweets[i].created_at }}</div>
+            </div>
+            <div class="tweet-text-box">
+                <!-- <span class="tweet-favorite_count">{{ my_tweets[0].favorite_count }}</span>-->
+                <div class="tweet-text">{{ my_tweets[i].text }}</div>
+            </div>
+        </div>
+
+        {% endfor %}
+    </div>
+    <br>
+    <br>
+    <br>
+</body>
+</html>
+
+{% endblock content %}

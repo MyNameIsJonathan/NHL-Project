@@ -1,0 +1,157 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container">
+    <div class="bg-text">
+
+    <div>
+        <br/>
+        <h1 data-aos="fade-right">A wonderful collection of interesting games-since statistics</h1>
+        <br/>
+        <h2 data-aos="fade-left" class="todays-players-heading">These range from the last time a player scored, to the last time he had a minus rating or game-winning goal</h2>
+        <br/>
+    </div>
+
+    <div class="player-wrapper">
+        <div class="todays-players">
+            <span class="todays-player-text" data-aos="fade-right"> Of the <br><strong>{{ numberOfPlayersToday }}</strong> <br>players playing today,</span>
+        </div>
+        <div class="vertical-line" data-aos="fade-up"></div>
+        <div class="todays-players">
+            <span data-aos="fade-left" class="todays-player-text">
+                <strong>{{ todaysDroughts['G'][0] }}</strong><br>hasn't scored in the most games <br> - <strong>{{ todaysDroughts['G'][1] }}</strong> - <br>since his game on <br><strong>{{ todaysDroughts['G'][2] }}</strong>.
+            </span>
+        </div>
+    </div>
+
+    <hr class="player-hr" data-aos="fade-up">
+
+    <div class="player-wrapper">
+                <div class="todays-players">
+                    <span class="todays-player-text" data-aos="fade-right"> Of the <br><strong>{{ numberOfPlayersToday }}</strong><br>players playing today,</span>
+                </div>
+                <div class="vertical-line" data-aos="fade-up"></div>
+                <div class="todays-players">
+                    <span data-aos="fade-left" class="todays-player-text">
+                        <strong>{{ todaysDroughts['A'][0] }}</strong><br>hasn't recorded an assist in the most games, <br> - <strong>{{ todaysDroughts['A'][1] }}</strong> - <br>since his game on <br><strong>{{ todaysDroughts['A'][2] }}</strong>.
+                </span>
+        </div>
+    </div>
+
+    <hr class="player-hr" data-aos="fade-up">
+
+    <div class="player-wrapper">
+                <div class="todays-players">
+                    <span class="todays-player-text" data-aos="fade-right"> Of the <br><strong>{{ numberOfPlayersToday }}</strong> <br>players playing today,</span>
+                </div>
+                <div class="vertical-line" data-aos="fade-up"></div>
+                <div class="todays-players">
+                    <span data-aos="fade-left" class="todays-player-text">
+                        <strong>{{ todaysDroughts['+'][0] }}</strong><br> hasn't had a positive rating in the most games<br> - <strong>{{ todaysDroughts['+'][1] }}</strong> - <br>since his game on <br><strong>{{ todaysDroughts['+'][2] }}</strong>.
+                </span>
+        </div>
+    </div>
+
+    <hr class="player-hr" data-aos="fade-up">
+
+    <div class="player-wrapper">
+                <div class="todays-players">
+                    <span class="todays-player-text" data-aos="fade-right"> Of the <br><strong>{{ numberOfPlayersToday }}</strong> <br>players playing today,</span>
+                </div>
+                <div class="vertical-line" data-aos="fade-up"></div>
+                <div class="todays-players">
+                    <span data-aos="fade-left" class="todays-player-text">
+                        <strong>{{ todaysDroughts['-'][0] }}</strong><br> hasn't had a negative rating in the most games<br> - <strong>{{ todaysDroughts['-'][1] }}</strong> - <br>since his game on <br></rb><strong>{{ todaysDroughts['-'][2] }}</strong>.
+                </span>
+        </div>
+    </div>
+
+    <hr class="player-hr" data-aos="fade-up">
+
+    <div class="player-wrapper">
+                <div class="todays-players">
+                    <span class="todays-player-text" data-aos="fade-right"> Of the <br><strong>{{ numberOfPlayersToday }}</strong> <br>players playing today,</span>
+                </div>
+                <div class="vertical-line" data-aos="fade-up"></div>
+                <div class="todays-players">
+                    <span data-aos="fade-left" class="todays-player-text">
+                        <strong>{{ todaysDroughts['PIM'][0] }}</strong><br> hasn't had a penalty in the most games <br> - <strong>{{ todaysDroughts['PIM'][1] }}</strong> - <br>since his game on <br><strong>{{ todaysDroughts['PIM'][2] }}</strong>.
+                </span>
+        </div>
+    </div>
+
+    <hr class="player-hr" data-aos="fade-up">
+
+    <div class="player-wrapper">
+                <div class="todays-players">
+                    <span class="todays-player-text" data-aos="fade-right"> Of the <br><strong>{{ numberOfPlayersToday }}</strong> <br>players playing today,</span>
+                </div>
+                <div class="vertical-line" data-aos="fade-up"></div>
+                <div class="todays-players">
+                    <span data-aos="fade-left" class="todays-player-text">
+                        <strong>{{ todaysDroughts['EV'][0] }}</strong><br> hasn't scored an even-strength goal in the most games <br> - <strong>{{ todaysDroughts['EV'][1] }}</strong> - <br>since his game on <br><strong>{{ todaysDroughts['EV'][2] }}</strong>.
+                </span>
+        </div>
+    </div>
+
+    <hr class="player-hr" data-aos="fade-up">
+
+    <div class="player-wrapper">
+                <div class="todays-players">
+                    <span class="todays-player-text" data-aos="fade-right"> Of the <br><strong>{{ numberOfPlayersToday }}</strong> <br>players playing today,</span>
+                </div>
+                <div class="vertical-line" data-aos="fade-up"></div>
+                <div class="todays-players">
+                    <span data-aos="fade-left" class="todays-player-text">
+                        <strong>{{ todaysDroughts['PP'][0] }}</strong><br> hasn't scored a power play goal in the most games<br> - <strong>{{ todaysDroughts['PP'][1] }}</strong> - <br>since his game on <br><strong>{{ todaysDroughts['PP'][2] }}</strong>.
+                </span>
+        </div>
+    </div>
+
+    <hr class="player-hr" data-aos="fade-up">
+
+    <div class="player-wrapper">
+                <div class="todays-players">
+                    <span class="todays-player-text" data-aos="fade-right"> Of the <br><strong>{{ numberOfPlayersToday }}</strong> <br>players playing today,</span>
+                </div>
+                <div class="vertical-line" data-aos="fade-up"></div>
+                <div class="todays-players">
+                    <span data-aos="fade-left" class="todays-player-text">
+                        <strong>{{ todaysDroughts['SH'][0] }}</strong><br> hasn't scored a shorthanded goal in the most games<br> - <strong>{{ todaysDroughts['SH'][1] }}</strong> - <br>since his game on <br><strong>{{ todaysDroughts['SH'][2] }}</strong>.
+                </span>
+        </div>
+    </div>
+
+    <hr class="player-hr" data-aos="fade-up">
+
+    <div class="player-wrapper">
+                <div class="todays-players">
+                    <span class="todays-player-text" data-aos="fade-right"> Of the <br><strong>{{ numberOfPlayersToday }}</strong> <br>players playing today,</span>
+                </div>
+                <div class="vertical-line" data-aos="fade-up"></div>
+                <div class="todays-players">
+                    <span data-aos="fade-left" class="todays-player-text">
+                        <strong>{{ todaysDroughts['GW'][0] }}</strong><br> hasn't scored a game-winning goal in the most games<br> - <strong>{{ todaysDroughts['GW'][1] }}</strong> - <br>since his game on <br><strong>{{ todaysDroughts['GW'][2] }}</strong>.
+                </span>
+        </div>
+    </div>
+
+    <hr class="player-hr" data-aos="fade-up">
+
+    <div class="player-wrapper">
+                <div class="todays-players">
+                    <span class="todays-player-text" data-aos="fade-right"> Of the <br><strong>{{ numberOfPlayersToday }}</strong> <br>players playing today,</span>
+                </div>
+                <div class="vertical-line" data-aos="fade-up"></div>
+                <div class="todays-players">
+                    <span data-aos="fade-left" class="todays-player-text">
+                        <strong>{{ todaysDroughts['S'][0] }}</strong><br> hasn't had a shot in the most games<br> - <strong>{{ todaysDroughts['S'][1] }}</strong> - <br>since his game on <br><strong>{{ todaysDroughts['S'][2] }}</strong>.
+                </span>
+        </div>
+    </div>
+
+    </div>
+
+
+
+{% endblock content %}

@@ -107,13 +107,13 @@ for team_str, players_list in NHL_teams_and_players.items():
 
 #Save each team as a pickle file
 for team in my_teams:
-    savePickle(team, team.Name)
+    savePickle(team, 'pickleFiles/' + team.Name)
 
 #Save my list of team names
-savePickle(my_teams, 'my_teams')
+savePickle(my_teams, 'pickleFiles/my_teams')
 
 #Save NHL_teams_and_players dataframe as pickle
-savePickle(NHL_teams_and_players, 'NHL_teams_and_players')
+savePickle(NHL_teams_and_players, 'pickleFiles/NHL_teams_and_players')
 
 #Loop to remove weird space characters
 for player in range(len(players)):
