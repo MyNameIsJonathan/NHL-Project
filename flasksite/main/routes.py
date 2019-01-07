@@ -1,4 +1,4 @@
-from flask import render_template, request, Blueprint
+from flask import render_template, request, Blueprint, send_from_directory
 import pandas as pd
 import NHL_scrape_functions
 import datetime
@@ -44,3 +44,7 @@ def stamkostweets():
 
     return render_template('stamkostweets.html', title='Stamkos Tweets', my_tweets=my_tweets, my_length=my_length)
 
+# Add route for favicon compatibility with older browsers
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico')
