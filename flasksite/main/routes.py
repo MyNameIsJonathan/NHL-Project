@@ -3,6 +3,7 @@ import pandas as pd
 import NHL_scrape_functions
 import datetime
 import random
+import os
 
 # source /Users/jonathanolson/Projects/Environments/nhl_flask/bin/activate
 
@@ -45,7 +46,7 @@ def stamkostweets():
     return render_template('stamkostweets.html', title='Stamkos Tweets', my_tweets=my_tweets, my_length=my_length)
 
 # Add route for favicon compatibility with older browsers
-@app.route('/favicon.ico')
+@main.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
