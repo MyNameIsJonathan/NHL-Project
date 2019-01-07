@@ -194,8 +194,6 @@ hr {
 
 .site-header .navbar-nav .nav-link:hover {
   color: rgba(248, 218, 86, 0.712);
-  transform: scale(1.15);
-  -webkit-transform: scale(1.15);
 }
 
 .site-header .navbar-nav .nav-link.active {

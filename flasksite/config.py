@@ -1,9 +1,13 @@
 import os
+import json
+
+with open("/etc/config.json") as config_file:
+    config = json.load(config_file)
 
 class Config():
     #Create a secret key in order to protect the site against arracks and similar
-    SECRET_KEY = os.environ.get('SECRET_KEY')
-    SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')
+    SECRET_KEY = config.get("SECRET_KEY")
+    SQLALCHEMY_DATABASE_URI = config.get("SQLALCHEMY_DATABASE_URI")
 
     #Setup email system for password resets -- NOT CURRENTLY FUNCTIONAL
     # MAIL_SERVER = 'smtp.googlemail.com'
