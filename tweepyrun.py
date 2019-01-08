@@ -4,7 +4,6 @@ import csv
 import pandas as pd
 from NHL_scrape_functions import savePickle, KnuthMorrisPratt
 
-
 explicit_words = [
     'anal', 
     'anus', 
@@ -98,7 +97,6 @@ auth.set_access_token(my_access_token, my_access_token_secret)
 # Instantiate the tweepy api instance 
 api = tweepy.API(auth, wait_on_rate_limit=True)
 
-
 # Search twitter for tweets given a key word, saving these tweets in the list 'searched_tweets'
 searched_tweets = []
 max_tweets = 150 #We want a total of 150 tweets, which will be displayed on the website
@@ -130,4 +128,4 @@ while len(searched_tweets) < max_tweets: # While we have fewer than the desired 
         print(e)
 
 # Save the list as a pickle file to be retrieved by the routes.py file for the website
-savePickle(searched_tweets, f"pickleFiles/stamkosTweets/stamkosTweets_{pd.to_datetime('today').date()}")
+savePickle(searched_tweets, f"/home/jonathan/NHL-Project/pickleFiles/stamkosTweets/stamkosTweets_{pd.to_datetime('today').date()}")
