@@ -45,8 +45,6 @@ def stamkostweets():
 
     return render_template('stamkostweets.html', title='Stamkos Tweets', my_tweets=my_tweets, my_length=my_length)
 
-# Add route for favicon compatibility with older browsers
-# @main.route('/favicon.ico')
-# def favicon():
-#     return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
-
+@main.route("/workflow")
+def workflow():
+    return render_template('workflow.html', title = 'NHL Stat Workflow')
