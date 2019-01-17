@@ -190,6 +190,9 @@ hr {
   color: #CCCCCC;
   font-size: .17em;
   margin: 7px;
+  align-items: center;
+  display: flex;
+  text-align: center;
 }
 
 .site-header .navbar-nav .nav-link:hover {
