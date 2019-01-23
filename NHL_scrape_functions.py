@@ -1090,7 +1090,7 @@ def scrapeToToday():
     today = pd.to_datetime('today').date()
     while True:
         try:
-            myDF = pd.read_pickle('pickleFiles/dailyMyDF/dailyMyDF_{}.pickle'.format(myDate))
+            myDF = pd.read_pickle('/home/jonathan/NHL-Project/pickleFiles/dailyMyDF/dailyMyDF_{}.pickle'.format(myDate))
             break
         except:
             myDate -= datetime.timedelta(days=1)
