@@ -193,6 +193,7 @@ hr {
   align-items: center;
   display: flex;
   text-align: center;
+  justify-content: center;
 }
 
 .site-header .navbar-nav .nav-link:hover {
