@@ -552,6 +552,10 @@ strong {
   .todays-player-text {
     font-size: 27px;
   }
+
+  .tweet-username {
+    font-size: 1.1rem;
+  }
 }
 
 @media screen  and (min-width: 357px) and (max-width: 449px) {
@@ -565,6 +569,10 @@ strong {
 
   .todays-player-text {
     font-size: 20px;
+  }
+
+  .tweet-username {
+    font-size: 1.0rem;
   }
 }
 
