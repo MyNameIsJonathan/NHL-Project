@@ -513,6 +513,22 @@ strong {
   color: rgba(248, 218, 86, 0.712);
 }
 
+.subtitle {
+  font-size: 1em;
+  font-size: 30px;
+}
+
+.workflow-list {
+  display: flex;
+  align-content: center;
+}
+
+.workflow-category {
+  border-width: 0px 1px 0px 1px;
+  border-color: #FFFFFF;
+  width: 95%;
+}
+
 @media screen and (min-width: 1200px) and (max-width: 1268px) {
   #main-nav-bar {
     font-size: .9em;

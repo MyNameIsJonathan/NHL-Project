@@ -5,127 +5,135 @@
     <div class="bg-text">
     <h1>My NHL Statistics Workflow</h1>
     <br>
-    <hr/>
-    <br>
-    <p>The following explains the workflow of my NHL Statistic scraping, 
+    <p class="subtitle">The following explains the workflow of my NHL Statistics scraping, 
         cleaning, and reporting methods</p>
         <br>
     <hr>
     <br>
+    <br>
 
-    <h2>Preparing Players’ Individual Statistics</h2>
-        <br>
-        <hr>
-        <h3>Find today’s games</h3>
+    <div class="workflow-category">
+        <h2>Preparing Players’ Individual Statistics</h2>
             <br>
-            <ol>
-                <li>Create a URL for each game using today’s date </li>
-                <li>Use URLs with BeautifulSoup to find all links contained 
-                    on the specified webpages</li>
-                <li>Filter retrieved links for boxscore table links only</li>
-                <li>Return the list of game URLs, home and away teams playing, 
-                    and date of each game</li>
-            </ol>
-        <h3>Scrape data from each game URL</h3>
+            <hr>
+            <h3>Find today’s games</h3>
+                <br>
+                <div class="workflow-list">
+                <ol>
+                    <li>Create a URL for each game using today’s date </li>
+                    <li>Use URLs with BeautifulSoup to find all links contained 
+                        on the specified webpages</li>
+                    <li>Filter retrieved links for boxscore table links only</li>
+                    <li>Return the list of game URLs, home and away teams playing, 
+                        and date of each game</li>
+                </ol>
+                </div>
+            <h3>Scrape data from each game URL</h3>
+                <br>
+                <p>Use URLs, teams, and dates from step 2 to pull each game’s 
+                    statistical summary from the web into a Pandas DataFrame</p>
+            <h3>Clean data from each game</h3>
+                    <br>
+                <p>Remove unnecessary columns if present, reformat column names 
+                    for readability, remove null values, etc.</p>
+            <h3>Update Last-Time table</h3>
+                    <br>
+                <p>Using the newly-cleaned data, update the last time each player 
+                    scored, recorded an assist, etc., for all categories</p>
+            <h3>Update Games-Since table</h3>
+                    <br>
+                <p>In a similar process to that immediately above, update each 
+                    player’s games-since statistics, which record the number of 
+                    games each player has played since recording each statistic, 
+                    such as the number of games played since a player’s last goal 
+                    or assist.</p>
+            <h3>Incorporate players’ cumulative stats into aggregate table</h3>
+                    <br>
+                <p>This serves as a running total for goals, assists, etc. for 
+                    each player, each year</p>
+            <h3>Repeat steps 2-7 for each day leading up to the present day</h3>
+                    <br>
+            <h3>Find today's players</h3>
+                    <br>
+                <p>Using Team and Player Python classes, use the day’s game lineup 
+                    to project which players are stepping on the ice today</p>
+            <h3>Find today’s main player droughts</h3>
+                    <br>
+                <p>Of all the players playing today, who hasn’t scored in the most 
+                    games? Who can’t seem to record an assist for the longest 
+                    stretch and when did that stretch start? Report the longest 
+                    drought seen for today’s players from each scoring category</p>
+            <h3>Report today’s players and their droughts</h3>
+                    <br>
+                <p>Create an HTML table from the list of today’s players and their 
+                    statistics, to be rendered on my webpage</p>
+    </div>
+    <br>
+    <br>
+    <br>
+
+    <div class="workflow-category"></div>
+        <h2>Reporting Tweets Mentioning Steven Stamkos</h2>
             <br>
-            <p>Use URLs, teams, and dates from step 2 to pull each game’s 
-                statistical summary from the web into a Pandas DataFrame</p>
-        <h3>Clean data from each game</h3>
+            <hr>
+            <h3>Securely store sensitive variables</h3>
+                    <br>
+                <p>Using a local file, record keys and tokens used to access the 
+                    Tweepy Python module and Twitter API</p>
+            <h3>Establish connection to the Twitter API, via Tweepy</h3>
+                    <br>
+                <p>Use aforementioned variables to establish connection</p>
+            <h3>Specify parameters of Twitter search, execute search</h3>
+                    <br>
+                <ol>
+                    <li>Indicate the desired number of tweets to return, the 
+                        desired content of the tweet (tweets containing the 
+                        name “Stamkos”), and a starting tweet ID to prevent 
+                        downloading the same tweet ID twice</li>
+                    <li>Save a list of explicit words that should not appear 
+                        in tweets; filter returned tweets by this list and if 
+                        a tweet contains one or more of the list words, remove 
+                        it from the download</li>
+                </ol>
+                <li>This method can be computationally expensive, 
+                    especially as the number of tweets increases. 
+                    A naïve implementation of this algorithm would 
+                    be on the order of O(|tweet| x |explicit_word|), 
+                    which could be prohibitively slow for longer 
+                    tweets, longer explicit words, or more explicit 
+                    words.</li>
+                <li>To accelerate this process, I implemented the 
+                    Knuth-Morris-Pratt algorithm, which uses calculated 
+                    suffixes of the word being searched for, in order 
+                    to more quickly compare against, and jump through, 
+                    the tweet. This reduces the algorithm’s complexity 
+                    to O(|tweet| + |explicit_word|) and is sufficiently 
+                    fast under these circumstances. Should more texts 
+                    be gathered in the future, this process may benefit 
+                    from the implementation of the hashing-dependent 
+                    Rabin-Karp algorithm.</li>
+
+            <h3>Save filtered tweets for display on the website</h3>
                 <br>
-            <p>Remove unnecessary columns if present, reformat column names 
-                for readability, remove null values, etc.</p>
-        <h3>Update Last-Time table</h3>
-                <br>
-            <p>Using the newly-cleaned data, update the last time each player 
-                scored, recorded an assist, etc., for all categories</p>
-        <h3>Update Games-Since table</h3>
-                <br>
-            <p>In a similar process to that immediately above, update each 
-                player’s games-since statistics, which record the number of 
-                games each player has played since recording each statistic, 
-                such as the number of games played since a player’s last goal 
-                or assist.</p>
-        <h3>Incorporate players’ cumulative stats into aggregate table</h3>
-                <br>
-            <p>This serves as a running total for goals, assists, etc. for 
-                each player, each year</p>
-        <h3>Repeat steps 2-7 for each day leading up to the present day</h3>
-                <br>
-        <h3>Find today's players</h3>
-                <br>
-            <p>Using Team and Player Python classes, use the day’s game lineup 
-                to project which players are stepping on the ice today</p>
-        <h3>Find today’s main player droughts</h3>
-                <br>
-            <p>Of all the players playing today, who hasn’t scored in the most 
-                games? Who can’t seem to record an assist for the longest 
-                stretch and when did that stretch start? Report the longest 
-                drought seen for today’s players from each scoring category</p>
-        <h3>Report today’s players and their droughts</h3>
-                <br>
-            <p>Create an HTML table from the list of today’s players and their 
-                statistics, to be rendered on my webpage</p>
+    </div>
+    <br>
     <br>
     <br>
 
-    <h2>Reporting Tweets Mentioning Steven Stamkos</h2>
-        <br>
-        <hr>
-        <h3>Securely store sensitive variables</h3>
-                <br>
-            <p>Using a local file, record keys and tokens used to access the 
-                Tweepy Python module and Twitter API</p>
-        <h3>Establish connection to the Twitter API, via Tweepy</h3>
-                <br>
-            <p>Use aforementioned variables to establish connection</p>
-        <h3>Specify parameters of Twitter search, execute search</h3>
-                <br>
-            <ol>
-                <li>Indicate the desired number of tweets to return, the 
-                    desired content of the tweet (tweets containing the 
-                    name “Stamkos”), and a starting tweet ID to prevent 
-                    downloading the same tweet ID twice</li>
-                <li>Save a list of explicit words that should not appear 
-                    in tweets; filter returned tweets by this list and if 
-                    a tweet contains one or more of the list words, remove 
-                    it from the download</li>
-                    <ol></ol>
-                        <li>This method can be computationally expensive, 
-                            especially as the number of tweets increases. 
-                            A naïve implementation of this algorithm would 
-                            be on the order of O(|tweet| x |explicit_word|), 
-                            which could be prohibitively slow for longer 
-                            tweets, longer explicit words, or more explicit 
-                            words.</li>
-                        <li>To accelerate this process, I implemented the 
-                            Knuth-Morris-Pratt algorithm, which uses calculated 
-                            suffixes of the word being searched for, in order 
-                            to more quickly compare against, and jump through, 
-                            the tweet. This reduces the algorithm’s complexity 
-                            to O(|tweet| + |explicit_word|) and is sufficiently 
-                            fast under these circumstances. Should more texts 
-                            be gathered in the future, this process may benefit 
-                            from the implementation of the hashing-dependent 
-                            Rabin-Karp algorithm.</li>
-            </ol>
-        <h3>Save filtered tweets for display on the website</h3>
+    <div class="workflow-category">
+        <h2>Hosting My Webpage Via a Personal Ubuntu Server</h2>
             <br>
-    <br>
-    <br>
-
-    <h2>Hosting My Webpage Via a Personal Ubuntu Server</h2>
-        <br>
-        <hr>
-        <br>
-        <p>My webpage is hosted on a personal Linode server running Ubuntu 18.10. 
-            I configured the server using SSH from my laptop, employing NginX to 
-            serve my web pages, Gunicorn as an interface to relay dynamic page 
-            information to NginX, and Supervisor to maintain functionality of 
-            the webpage. </p>
-        <br>
-        <p>This combination of technologies was recommended, explained, and 
-            demonstrated in the YouTube series <a href="https://www.youtube.com/watch?v=goToXTC96Co&index=3&list=WL&t=3947s">Python Flask Tutorial</a> by Corey Schafer </p>
-
+            <hr>
+            <br>
+            <p>My webpage is hosted on a personal Linode server running Ubuntu 18.10. 
+                I configured the server using SSH from my laptop, employing NginX to 
+                serve my web pages, Gunicorn as an interface to relay dynamic page 
+                information to NginX, and Supervisor to maintain functionality of 
+                the webpage. </p>
+            <br>
+            <p>This combination of technologies was recommended, explained, and 
+                demonstrated in the YouTube series <a href="https://www.youtube.com/watch?v=goToXTC96Co&index=3&list=WL&t=3947s">Python Flask Tutorial</a> by Corey Schafer </p>
+    
     </div>
 </div>
     
