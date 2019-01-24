@@ -568,7 +568,7 @@ strong {
   }
 }
 
-@media screen  and (min-width: 450px) and (max-width: 564px) {
+@media screen  and (min-width: 451px) and (max-width: 564px) {
   #main-nav-bar {
     font-size: .3em;
   }
@@ -586,7 +586,7 @@ strong {
   }
 }
 
-@media screen  and (min-width: 357px) and (max-width: 449px) {
+@media screen  and (min-width: 357px) and (max-width: 450px) {
   #main-nav-bar {
     font-size: .2em;
   }
