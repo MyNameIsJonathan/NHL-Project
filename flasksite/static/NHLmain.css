@@ -524,9 +524,13 @@ strong {
 }
 
 .workflow-category {
-  border-width: 0px 1px 0px 1px;
+  border-left-width: 1px;
+  border-right-width: 1px;
   border-color: #FFFFFF;
-  width: 95%;
+  width: 100%;
+  padding: 0% 5%;
+  display: flex;
+  justify-content: center;
 }
 
 @media screen and (min-width: 1200px) and (max-width: 1268px) {
