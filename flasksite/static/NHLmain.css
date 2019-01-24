@@ -527,21 +527,16 @@ strong {
   border-width: 1px;
   border-color: #FFFFFF;
   border-style: solid;
-  border-radius: 5ps;
+  border-radius: 5px;
   padding: 0.75em;
   width: auto;
 }
 
 .workflow-subtitle {
   display: flex;
-}
-
-.workflow-subtitle-horizontal-lines{
-  flex-grow: 1;
-  height: 50%;
-  border-top-width: 1px;
-  border-top-color: #FFFFFF;
-  border-top-style: solid;
+  color: transparent;
+  background-color: #CCCCCC;
+  border-radius: 5px;
 }
 
 @media screen and (min-width: 1200px) and (max-width: 1268px) {
