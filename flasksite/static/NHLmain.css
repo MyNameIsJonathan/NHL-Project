@@ -25,6 +25,10 @@ body {
   box-sizing: border-box;
 }
 
+.a {
+  color: rgba(248, 218, 86, 0.712);
+}
+
 h1, h2, h3, h4, h5, h6 {
   color: #FFFFFF;
   font-weight: 100;
@@ -521,7 +525,7 @@ strong {
 .workflow-list {
   display: flex;
   align-content: center;
-}
+
 
 .workflow-category {
   border-width: 1px;
