@@ -544,12 +544,6 @@ strong {
   border-radius: 5px;
 }
 
-@media screen and (min-width: 1200px) and (max-width: 1268px) {
-  #main-nav-bar {
-    font-size: .9em;
-  }
-}
-
 @media screen and (min-width: 683px) {
   #main-nav-bar {
     font-size: .4em;
@@ -560,7 +554,7 @@ strong {
   }
 }
 
-@media screen and (min-width: 531px) and (max-width: 682px) {
+@media screen and (min-width: 565px) and (max-width: 682px) {
   #main-nav-bar {
     font-size: .4em;
   }
@@ -574,7 +568,7 @@ strong {
   }
 }
 
-@media screen  and (min-width: 450px) and (max-width: 530px) {
+@media screen  and (min-width: 450px) and (max-width: 564px) {
   #main-nav-bar {
     font-size: .3em;
   }
