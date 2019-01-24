@@ -524,13 +524,24 @@ strong {
 }
 
 .workflow-category {
-  border-left-width: 1px;
-  border-right-width: 1px;
+  border-width: 1px;
   border-color: #FFFFFF;
-  width: 100%;
-  padding: 0% 5%;
+  border-style: solid;
+  border-radius: 5ps;
+  padding: 0.75em;
+  width: auto;
+}
+
+.workflow-subtitle {
   display: flex;
-  justify-content: center;
+}
+
+.workflow-subtitle-horizontal-lines{
+  flex-grow: 1;
+  height: 50%;
+  border-top-width: 1px;
+  border-top-color: #FFFFFF;
+  border-top-style: solid;
 }
 
 @media screen and (min-width: 1200px) and (max-width: 1268px) {
