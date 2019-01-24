@@ -123,6 +123,7 @@ hr {
   border-color: #cccccc;
   border-width: 2px;
   max-width: 80%;
+  font-size: .45em;
 }
 
 #register-logout-button {
@@ -544,17 +545,7 @@ strong {
   border-radius: 5px;
 }
 
-@media screen and (min-width: 1200px) and (max-width: 1268px) {
-  #main-nav-bar {
-    font-size: .9em;
-  }
-}
-
 @media screen and (min-width: 683px) {
-  #main-nav-bar {
-    font-size: .4em;
-  }
-
   h1, strong {
     font-size: 45px;
   }
