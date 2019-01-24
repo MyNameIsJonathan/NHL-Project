@@ -128,4 +128,4 @@ while len(searched_tweets) < max_tweets: # While we have fewer than the desired 
         print(e)
 
 # Save the list as a pickle file to be retrieved by the routes.py file for the website
-savePickle(searched_tweets, f"/home/jonathan/NHL-Project/pickleFiles/stamkosTweets/stamkosTweets_{pd.to_datetime('today').date()}")
+savePickle(searched_tweets, f"/home/jonathan/NHL-Project//home/jonathan/NHL-Project/pickleFiles/stamkosTweets/stamkosTweets_{pd.to_datetime('today').date()}")

@@ -34,7 +34,7 @@ def todays_players():
 @main.route("/stamkostweets")
 def stamkostweets():
     #Open tweets mentioning stamkos from the last week
-    my_tweets = pd.read_pickle(f"pickleFiles/stamkosTweets/stamkosTweets_{pd.to_datetime('today').date()}.pickle")
+    my_tweets = pd.read_pickle(f"/home/jonathan/NHL-Project/pickleFiles/stamkosTweets/stamkosTweets_{pd.to_datetime('today').date()}.pickle")
     my_length = len(my_tweets)
     my_numbers = random.sample(range(my_length), my_length)
     my_tweets = [my_tweets[i] for i in my_numbers]

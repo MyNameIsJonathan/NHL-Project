@@ -534,7 +534,8 @@ strong {
 
 .workflow-subtitle {
   display: flex;
-  color: transparent;
+  justify-content: center;
+  color: rgba(0, 0, 0, 0.5);
   background-color: #CCCCCC;
   border-radius: 5px;
 }
