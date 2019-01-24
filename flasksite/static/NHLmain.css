@@ -544,7 +544,8 @@ strong {
   background-color: #CCCCCC;
   border-radius: 5px;
 }
-/*
+
+/* TESTING
 @media screen and (min-width: 1200px) and (max-width: 1268px) {
   #main-nav-bar {
     font-size: .35em;
@@ -552,11 +553,31 @@ strong {
 }
 */
 
-@media screen and (min-width: 683px) {
+/* Between 455px and 624px, make the main webite title, "Jonathan's NHL Stats" take up 75% of the vw */
+@media screen and (min-width: 455px) and (max-width: 624px) {
   #main-nav-bar {
-    font-size: .4em;
+    font-size: 7.5vw;
   }
 
+  h1, strong {
+    font-size: 45px;
+  }
+}
+
+@media screen and (min-width: 372px) and (max-width: 454px) {
+  #main-nav-bar {
+    font-size: 6.5vw;
+  }
+}
+
+/* For screens smaller than 455px, make the main title 50% of vw */
+@media screen and (max-width: 371px) {
+  #main-nav-bar {
+    font-size: 5vw;
+  }
+}
+
+@media screen and (min-width: 683px) {
   h1, strong {
     font-size: 45px;
   }
