@@ -84,6 +84,10 @@ ul {
   font-size: .8em;
 }
 
+.table-responsive {
+  width: 95%;
+}
+
 .stat-table th {
   background-color: transparent;
   color: #CCCCCC;
