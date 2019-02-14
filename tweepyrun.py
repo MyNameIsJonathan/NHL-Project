@@ -3,8 +3,7 @@ import os
 import string
 import pandas as pd
 from sqlalchemy import create_engine
-from NHL_scrape_functions import KnuthMorrisPratt, openNHLMySQL
-
+import NHL_scrape_functions as nhl
 
 def scrapeTweets():
 
@@ -127,7 +126,7 @@ def scrapeTweets():
                         # Run KnuthMorrisPratt to search for presence of swear words in tweet text
                         # Runs in time O(|pattern| + |text|)
                         # Algorithm adapted from online homework assignment from my Coursera UCSD class on string algos
-                        if KnuthMorrisPratt(swear_word, tweet.text):
+                        if nhl.KnuthMorrisPratt(swear_word, tweet.text):
                             contains_swear = True
                             break
                     if contains_swear is False:
@@ -140,12 +139,9 @@ def scrapeTweets():
 
     return searched_tweets
 
-def saveTweetsinDB(tweets):
+def saveTweetsinDB(tweets, engine):
 
     """[ Saves the provided tweets in the MySQL database, overwriting previous tweets in the DB. Does not return. ]"""
-
-    # Open an SQLAlchemy engine to MySQL DB
-    engine = openNHLMySQL('stamkosTweets')
 
     # Create a set of printable characters. Will be used to filter text and users
     printable = set(string.printable)
@@ -186,5 +182,6 @@ def openTweets(engine):
 
 
 if __name__ == '__main__':
+    engine = nhl.createEngine()
     myTweets = scrapeTweets()
-    saveTweetsinDB(myTweets)
+    saveTweetsinDB(myTweets, engine)
