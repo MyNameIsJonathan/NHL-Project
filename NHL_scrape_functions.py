@@ -10,6 +10,7 @@ import json
 from bs4 import BeautifulSoup
 from My_Classes import LengthException
 from sqlalchemy import create_engine
+from flask import current_app
 
 
 # def backupTables():
