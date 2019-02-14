@@ -1,5 +1,4 @@
 from flask import render_template, request, Blueprint, send_from_directory
-from flask_mysqldb import MySQL
 import NHL_scrape_functions as nhl
 import tweepyrun as twp
 import pandas as pd
