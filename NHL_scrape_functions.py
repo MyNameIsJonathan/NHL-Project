@@ -1059,12 +1059,12 @@ def KnuthMorrisPratt(pattern, text):
 '----------------------------------------------------------'
 
 
-engine = createEngine()
-backupsEngine = createEngine(database='backups')
+# engine = createEngine()
+# backupsEngine = createEngine(database='backups')
 
 # resetToDay(engine, backupsEngine, date='2019-02-05')
 
-scrapeToToday(engine)
+# scrapeToToday(engine)
 
 ''' Helpful table backups
 
