@@ -12,265 +12,62 @@ from My_Classes import LengthException
 from sqlalchemy import create_engine
 
 
-'''
+# def backupTables():
 
--- MySQL Tables --
+#     today = pd.to_datetime('today').date()
 
-    Created and filled to date:
+#     # Create engines: one for the 'backups' database, one for the current data database
+#     backupsEngine = createEngine(database='backups')
+#     engine = createEngine(database=None)
 
-        games
-        2018_2019_stats
-        2018_2019_GamesSince
-        2018_2019_LastTime
-        stamkosTweets
-    
-    Not yet created and/or filled:
+#     # Instantiate the current, active dataframes
+#     games = openMySQLTable('games', engine)
+#     gamesSince = openMySQLTable('2018_2019_GamesSince', engine)
+#     lastTime = openMySQLTable('2018_2019_LastTime', engine)
+#     stats = openMySQLTable('2018_2019_stats', engine)
 
-        None        
+#     # Instantiate the MySQL databases as pandas dataframes, for editing
+#     gamesBackup = openMySQLTable('gamesBackup', backupsEngine)
+#     gamesSinceBackup = openMySQLTable('gamesSinceBackup', backupsEngine)
+#     lastTimeBackup = openMySQLTable('lastTimeBackup', backupsEngine)
+#     statsBackup = openMySQLTable('statsBackup', backupsEngine)
 
+#     # Add today's date in a new column, 'Backup_Date', to the current, active DFs
+#     games['Backup_Date'] = today
+#     gamesSince['Backup_Date'] = today
+#     lastTime['Backup_Date'] = today
+#     stats['Backup_Date'] = today
 
--- Table Descriptions --
+#     # Concat the current backups with the new rows from the current active DFs
+#     gamesBackup = pd.concat([gamesBackup, games])
+#     gamesSinceBackup = pd.concat([gamesSinceBackup, gamesSince])
+#     lastTimeBackup = pd.concat([lastTimeBackup, lastTime])
+#     statsBackup = pd.concat([statsBackup, stats])
 
-    SHOW TABLES
-    +------------------------+
-    | Tables_in_nhl_database |
-    +------------------------+
-    | 2018_2019_GamesSince   |
-    | 2018_2019_LastTime     |
-    | 2018_2019_stats        |
-    | c                      |
-    | dailyDataFrames        |
-    | games                  |
-    | stamkosTweets          |
-    +------------------------+
+#     # Update backup tables in MySQL backups database
+#     gamesBackup.to_sql(
+#         name='gamesBackup',
+#         con=backupsEngine,
+#         index=False,
+#         if_exists='replace')
 
-    2018_2019_GamesSince
-    +----------------------+------------+------+-----+---------+-------+
-    | Field                | Type       | Null | Key | Default | Extra |
-    +----------------------+------------+------+-----+---------+-------+
-    | Player               | text       | YES  |     | NULL    |       |
-    | G                    | bigint(20) | YES  |     | NULL    |       |
-    | A                    | bigint(20) | YES  |     | NULL    |       |
-    | PTS                  | bigint(20) | YES  |     | NULL    |       |
-    | +                    | bigint(20) | YES  |     | NULL    |       |
-    | -                    | bigint(20) | YES  |     | NULL    |       |
-    | PIM                  | bigint(20) | YES  |     | NULL    |       |
-    | EV                   | bigint(20) | YES  |     | NULL    |       |
-    | PP                   | bigint(20) | YES  |     | NULL    |       |
-    | SH                   | bigint(20) | YES  |     | NULL    |       |
-    | GW                   | bigint(20) | YES  |     | NULL    |       |
-    | S                    | bigint(20) | YES  |     | NULL    |       |
-    | Total Recorded Games | bigint(20) | YES  |     | NULL    |       |
-    | Plus                 | double     | YES  |     | NULL    |       |
-    | Minus                | double     | YES  |     | NULL    |       |
-    +----------------------+------------+------+-----+---------+-------+
+#     gamesSinceBackup.to_sql(
+#         name='gamesSinceBackup',
+#         con=backupsEngine,
+#         index=False,
+#         if_exists='replace')
 
-    2018_2019_LastTime
-    +----------------+------+------+-----+---------+-------+
-    | Field          | Type | Null | Key | Default | Extra |
-    +----------------+------+------+-----+---------+-------+
-    | Player         | text | YES  |     | NULL    |       |
-    | G              | text | YES  |     | NULL    |       |
-    | A              | text | YES  |     | NULL    |       |
-    | PTS            | text | YES  |     | NULL    |       |
-    | +              | date | YES  |     | NULL    |       |
-    | -              | date | YES  |     | NULL    |       |
-    | PIM            | text | YES  |     | NULL    |       |
-    | EV             | text | YES  |     | NULL    |       |
-    | PP             | date | YES  |     | NULL    |       |
-    | SH             | text | YES  |     | NULL    |       |
-    | GW             | text | YES  |     | NULL    |       |
-    | S              | text | YES  |     | NULL    |       |
-    | Last Game Date | text | YES  |     | NULL    |       |
-    | Plus           | text | YES  |     | NULL    |       |
-    | Minus          | text | YES  |     | NULL    |       |
-    +----------------+------+------+-----+---------+-------+
+#     lastTimeBackup.to_sql(
+#         name='lastTimeBackup',
+#         con=backupsEngine,
+#         index=False,
+#         if_exists='replace')
 
-    2018_2019_stats
-    +--------+------------+------+-----+---------+-------+
-    | Field  | Type       | Null | Key | Default | Extra |
-    +--------+------------+------+-----+---------+-------+
-    | Player | text       | YES  |     | NULL    |       |
-    | +/-    | bigint(20) | YES  |     | NULL    |       |
-    | A      | bigint(20) | YES  |     | NULL    |       |
-    | EV     | bigint(20) | YES  |     | NULL    |       |
-    | G      | bigint(20) | YES  |     | NULL    |       |
-    | GW     | bigint(20) | YES  |     | NULL    |       |
-    | PIM    | bigint(20) | YES  |     | NULL    |       |
-    | PP     | bigint(20) | YES  |     | NULL    |       |
-    | PTS    | bigint(20) | YES  |     | NULL    |       |
-    | S      | bigint(20) | YES  |     | NULL    |       |
-    | SH     | bigint(20) | YES  |     | NULL    |       |
-    | Shifts | bigint(20) | YES  |     | NULL    |       |
-    | TOI    | double     | YES  |     | NULL    |       |
-    +--------+------------+------+-----+---------+-------+
-
-    dailyDataFrames
-    +------------+------------+------+-----+---------+-------+
-    | Field      | Type       | Null | Key | Default | Extra |
-    +------------+------------+------+-----+---------+-------+
-    | id         | bigint(20) | YES  |     | NULL    |       |
-    | date       | text       | YES  |     | NULL    |       |
-    | stats      | text       | YES  |     | NULL    |       |
-    | lastTime   | text       | YES  |     | NULL    |       |
-    | gamesSince | text       | YES  |     | NULL    |       |
-    +------------+------------+------+-----+---------+-------+
-
-    games
-    +-------------+------------+------+-----+---------+-------+
-    | Field       | Type       | Null | Key | Default | Extra |
-    +-------------+------------+------+-----+---------+-------+
-    | Date        | datetime   | YES  |     | NULL    |       |
-    | Away        | text       | YES  |     | NULL    |       |
-    | Home        | text       | YES  |     | NULL    |       |
-    | Home Abbr   | text       | YES  |     | NULL    |       |
-    | Away Abbr   | text       | YES  |     | NULL    |       |
-    | HTML Link   | text       | YES  |     | NULL    |       |
-    | Game        | text       | YES  |     | NULL    |       |
-    | Game Number | bigint(20) | YES  |     | NULL    |       |
-    +-------------+------------+------+-----+---------+-------+
-
-    stamkosTweets
-    +------------+------+------+-----+---------+-------+
-    | Field      | Type | Null | Key | Default | Extra |
-    +------------+------+------+-----+---------+-------+
-    | created_at | text | YES  |     | NULL    |       |
-    | text       | text | YES  |     | NULL    |       |
-    | user       | text | YES  |     | NULL    |       |
-    +------------+------+------+-----+---------+-------+
-
-    todaysDroughts;
-    +----------------------+------------+------+-----+---------+-------+
-    | Field                | Type       | Null | Key | Default | Extra |
-    +----------------------+------------+------+-----+---------+-------+
-    | id                   | bigint(20) | YES  |     | NULL    |       |
-    | Date                 | text       | YES  |     | NULL    |       |
-    | todaysDroughts       | text       | YES  |     | NULL    |       |
-    | numberOfPlayersToday | bigint(20) | YES  |     | NULL    |       |
-    +----------------------+------------+------+-----+---------+-------+
-
-'''
-
-# Creating games TABLE
-def MYSQLcreateGAMEStable():
-
-
-    MYSQL_PASSWORD = os.environ['MYSQL_PASSWORD']
-    MYSQL_PORT = os.environ['MYSQL_PORT']
-    MYSQL_DATABASE = os.environ['MYSQL_DATABASE']
-    MYSQL_HOST = os.environ['MYSQL_HOST']
-    MYSQL_USER = os.environ['MYSQL_USER']
-
-    engine = create_engine(f'mysql+mysqldb://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}')
-
-    url = 'https://www.hockey-reference.com/leagues/NHL_2019_games.html'
-    g = pd.read_html(url)[0]
-    games = g.copy(deep=True)
-    games = games.drop(columns=[i for i in games.columns if not i in ['Date', 'Home', 'Visitor']])
-    games = games.rename(columns={'Visitor': 'Away'})
-    games['Home Abbr'] = None
-    games['Away Abbr'] = None
-    games['HTML Link'] = None
-    games['Game'] = None
-    games['Game Number'] = None
-
-    teams = pd.read_pickle('/homejonathan/NHL-Project/pickleFiles/Teams/my_teams.pickle')
-
-    for team in teams:
-        print(team.Name)
-        if team.Name == 'Detroit Redwings':
-            team.Name = 'Detroit Red Wings'
-            print(team.Name)
-        myGroup = games.loc[games['Home'] == team.Name]
-        myGroup.loc[:, 'Home Abbr'] = [team.Abbreviation] * len(myGroup)
-        games.loc[games['Home'] == team.Name] = myGroup
-        
-        myGroup = games.loc[games['Away'] == team.Name]
-        myGroup['Away Abbr'] = [team.Abbreviation] * len(myGroup)
-        games.loc[games['Away'] == team.Name] = myGroup
-
-    for i in range(len(games)):
-        date = pd.to_datetime(games.loc[i, 'Date'], format='%Y-%m-%d').date()
-        year = date.year
-        month = date.month
-        day = date.day
-        homeTeam = games.loc[i, 'Home Abbr']
-        games.loc[i, 'HTML Link'] = f"https://www.hockey-reference.com/boxscores/{date.strftime('%Y%m%d')}0{homeTeam}.html"
-        games.loc[i, 'Game Number'] = i+1
-
-    gamesList = pd.read_pickle('/homejonathan/NHL-Project/myGames.pickle')
-
-    for i in range(len(gamesList)):
-        myjson = json.dumps(gamesList[i], default=str)
-        mydict = json.loads(myjson)
-        gamesList[i] = myjson
-
-
-    for i in range(len(gamesList)):
-        games.at[i, 'Game'] = gamesList[i]
-
-    games.to_sql(
-        name='games',
-        con=engine,
-        index=False,
-        if_exists='replace')
-
-def backupTables():
-
-    today = pd.to_datetime('today').date()
-
-    # Create engines: one for the 'backups' database, one for the current data database
-    backupsEngine = createEngine(database='backups')
-    engine = createEngine(database=None)
-
-    # Instantiate the current, active dataframes
-    games = openMySQLTable('games', engine)
-    gamesSince = openMySQLTable('2018_2019_GamesSince', engine)
-    lastTime = openMySQLTable('2018_2019_LastTime', engine)
-    stats = openMySQLTable('2018_2019_stats', engine)
-
-    # Instantiate the MySQL databases as pandas dataframes, for editing
-    gamesBackup = openMySQLTable('gamesBackup', backupsEngine)
-    gamesSinceBackup = openMySQLTable('gamesSinceBackup', backupsEngine)
-    lastTimeBackup = openMySQLTable('lastTimeBackup', backupsEngine)
-    statsBackup = openMySQLTable('statsBackup', backupsEngine)
-
-    # Add today's date in a new column, 'Backup_Date', to the current, active DFs
-    games['Backup_Date'] = today
-    gamesSince['Backup_Date'] = today
-    lastTime['Backup_Date'] = today
-    stats['Backup_Date'] = today
-
-    # Concat the current backups with the new rows from the current active DFs
-    gamesBackup = pd.concat([gamesBackup, games])
-    gamesSinceBackup = pd.concat([gamesSinceBackup, gamesSince])
-    lastTimeBackup = pd.concat([lastTimeBackup, lastTime])
-    statsBackup = pd.concat([statsBackup, stats])
-
-    # Update backup tables in MySQL backups database
-    gamesBackup.to_sql(
-        name='gamesBackup',
-        con=backupsEngine,
-        index=False,
-        if_exists='replace')
-
-    gamesSinceBackup.to_sql(
-        name='gamesSinceBackup',
-        con=backupsEngine,
-        index=False,
-        if_exists='replace')
-
-    lastTimeBackup.to_sql(
-        name='lastTimeBackup',
-        con=backupsEngine,
-        index=False,
-        if_exists='replace')
-
-    statsBackup.to_sql(
-        name='statsBackup',
-        con=backupsEngine,
-        index=False,
-        if_exists='replace')
+#     statsBackup.to_sql(
+#         name='statsBackup',
+#         con=backupsEngine,
+#         index=False,
+#         if_exists='replace')
 
 def getResetDate(backupsEngine, desiredDate='2019-02-05'):
 
@@ -364,18 +161,11 @@ def createEngine(database=None):
         [ sqlalchemy.engine.base.Engine ] -- [ A connection to the NHL MySQL Database for the given table]
     """
 
-    print('Creating MySQL Connection Engine')
-
-    if database is None:
-        MYSQL_DATABASE = os.environ['MYSQL_DATABASE']
-    else:
-        MYSQL_DATABASE = database
-
-    MYSQL_PASSWORD = os.environ['MYSQL_PASSWORD']
-    MYSQL_PORT = os.environ['MYSQL_PORT']
-
-    MYSQL_HOST = os.environ['MYSQL_HOST']
-    MYSQL_USER = os.environ['MYSQL_USER']
+    MYSQL_DATABASE = current_app.config['MYSQL_DATABASE']
+    MYSQL_PASSWORD = current_app.config['MYSQL_PASSWORD']
+    MYSQL_PORT = current_app.config['MYSQL_PORT']
+    MYSQL_HOST = current_app.config['MYSQL_HOST']
+    MYSQL_USER = current_app.config['MYSQL_USER']
 
     engine = create_engine(f'mysql+mysqldb://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}')
 
@@ -621,14 +411,6 @@ def todaysPlayerDroughts(todaysGames, engine):
         con=engine,
         index=False,
         if_exists='replace')
-
-def openNumberOfPlayers(engine):
-
-    today = pd.Timestamp(pd.to_datetime('today').date()) - datetime.timedelta(days=1)
-
-    numberPlayers = engine.execute(f"SELECT * FROM todaysDroughts WHERE Date = '{str(today)}'").fetchone()[-1]
-
-    return numberPlayers
 
 def makeTodaysHTML(engine):
 
