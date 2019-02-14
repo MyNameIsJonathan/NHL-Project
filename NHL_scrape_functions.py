@@ -61,6 +61,8 @@ from sqlalchemy import create_engine
     | GW                   | bigint(20) | YES  |     | NULL    |       |
     | S                    | bigint(20) | YES  |     | NULL    |       |
     | Total Recorded Games | bigint(20) | YES  |     | NULL    |       |
+    | Plus                 | double     | YES  |     | NULL    |       |
+    | Minus                | double     | YES  |     | NULL    |       |
     +----------------------+------------+------+-----+---------+-------+
 
     2018_2019_LastTime
@@ -68,55 +70,57 @@ from sqlalchemy import create_engine
     | Field          | Type | Null | Key | Default | Extra |
     +----------------+------+------+-----+---------+-------+
     | Player         | text | YES  |     | NULL    |       |
-    | G              | date | YES  |     | NULL    |       |
-    | A              | date | YES  |     | NULL    |       |
-    | PTS            | date | YES  |     | NULL    |       |
+    | G              | text | YES  |     | NULL    |       |
+    | A              | text | YES  |     | NULL    |       |
+    | PTS            | text | YES  |     | NULL    |       |
     | +              | date | YES  |     | NULL    |       |
     | -              | date | YES  |     | NULL    |       |
-    | PIM            | date | YES  |     | NULL    |       |
-    | EV             | date | YES  |     | NULL    |       |
+    | PIM            | text | YES  |     | NULL    |       |
+    | EV             | text | YES  |     | NULL    |       |
     | PP             | date | YES  |     | NULL    |       |
-    | SH             | date | YES  |     | NULL    |       |
-    | GW             | date | YES  |     | NULL    |       |
-    | S              | date | YES  |     | NULL    |       |
-    | Last Game Date | date | YES  |     | NULL    |       |
+    | SH             | text | YES  |     | NULL    |       |
+    | GW             | text | YES  |     | NULL    |       |
+    | S              | text | YES  |     | NULL    |       |
+    | Last Game Date | text | YES  |     | NULL    |       |
+    | Plus           | text | YES  |     | NULL    |       |
+    | Minus          | text | YES  |     | NULL    |       |
     +----------------+------+------+-----+---------+-------+
 
     2018_2019_stats
-    +--------+--------+------+-----+---------+-------+
-    | Field  | Type   | Null | Key | Default | Extra |
-    +--------+--------+------+-----+---------+-------+
-    | index  | text   | YES  |     | NULL    |       |
-    | +/-    | double | YES  |     | NULL    |       |
-    | A      | double | YES  |     | NULL    |       |
-    | EV     | double | YES  |     | NULL    |       |
-    | G      | double | YES  |     | NULL    |       |
-    | GW     | double | YES  |     | NULL    |       |
-    | PIM    | double | YES  |     | NULL    |       |
-    | PP     | double | YES  |     | NULL    |       |
-    | PTS    | double | YES  |     | NULL    |       |
-    | S      | double | YES  |     | NULL    |       |
-    | SH     | double | YES  |     | NULL    |       |
-    | Shifts | double | YES  |     | NULL    |       |
-    | TOI    | double | YES  |     | NULL    |       |
-    +--------+--------+------+-----+---------+-------+
+    +--------+------------+------+-----+---------+-------+
+    | Field  | Type       | Null | Key | Default | Extra |
+    +--------+------------+------+-----+---------+-------+
+    | Player | text       | YES  |     | NULL    |       |
+    | +/-    | bigint(20) | YES  |     | NULL    |       |
+    | A      | bigint(20) | YES  |     | NULL    |       |
+    | EV     | bigint(20) | YES  |     | NULL    |       |
+    | G      | bigint(20) | YES  |     | NULL    |       |
+    | GW     | bigint(20) | YES  |     | NULL    |       |
+    | PIM    | bigint(20) | YES  |     | NULL    |       |
+    | PP     | bigint(20) | YES  |     | NULL    |       |
+    | PTS    | bigint(20) | YES  |     | NULL    |       |
+    | S      | bigint(20) | YES  |     | NULL    |       |
+    | SH     | bigint(20) | YES  |     | NULL    |       |
+    | Shifts | bigint(20) | YES  |     | NULL    |       |
+    | TOI    | double     | YES  |     | NULL    |       |
+    +--------+------------+------+-----+---------+-------+
 
     dailyDataFrames
-    +------------+---------+------+-----+---------+----------------+
-    | Field      | Type    | Null | Key | Default | Extra          |
-    +------------+---------+------+-----+---------+----------------+
-    | id         | int(11) | NO   | PRI | NULL    | auto_increment |
-    | date       | date    | YES  |     | NULL    |                |
-    | mydf       | json    | YES  |     | NULL    |                |
-    | lastTime   | json    | YES  |     | NULL    |                |
-    | gamesSince | json    | YES  |     | NULL    |                |
-    +------------+---------+------+-----+---------+----------------+
+    +------------+------------+------+-----+---------+-------+
+    | Field      | Type       | Null | Key | Default | Extra |
+    +------------+------------+------+-----+---------+-------+
+    | id         | bigint(20) | YES  |     | NULL    |       |
+    | date       | text       | YES  |     | NULL    |       |
+    | stats      | text       | YES  |     | NULL    |       |
+    | lastTime   | text       | YES  |     | NULL    |       |
+    | gamesSince | text       | YES  |     | NULL    |       |
+    +------------+------------+------+-----+---------+-------+
 
     games
     +-------------+------------+------+-----+---------+-------+
     | Field       | Type       | Null | Key | Default | Extra |
     +-------------+------------+------+-----+---------+-------+
-    | Date        | text       | YES  |     | NULL    |       |
+    | Date        | datetime   | YES  |     | NULL    |       |
     | Away        | text       | YES  |     | NULL    |       |
     | Home        | text       | YES  |     | NULL    |       |
     | Home Abbr   | text       | YES  |     | NULL    |       |
@@ -134,6 +138,16 @@ from sqlalchemy import create_engine
     | text       | text | YES  |     | NULL    |       |
     | user       | text | YES  |     | NULL    |       |
     +------------+------+------+-----+---------+-------+
+
+    todaysDroughts;
+    +----------------------+------------+------+-----+---------+-------+
+    | Field                | Type       | Null | Key | Default | Extra |
+    +----------------------+------------+------+-----+---------+-------+
+    | id                   | bigint(20) | YES  |     | NULL    |       |
+    | Date                 | text       | YES  |     | NULL    |       |
+    | todaysDroughts       | text       | YES  |     | NULL    |       |
+    | numberOfPlayersToday | bigint(20) | YES  |     | NULL    |       |
+    +----------------------+------------+------+-----+---------+-------+
 
 '''
 
@@ -213,7 +227,7 @@ def backupTables():
     games = openMySQLTable('games', engine)
     gamesSince = openMySQLTable('2018_2019_GamesSince', engine)
     lastTime = openMySQLTable('2018_2019_LastTime', engine)
-    stats = openStats(engine)
+    stats = openMySQLTable('2018_2019_stats', engine)
 
     # Instantiate the MySQL databases as pandas dataframes, for editing
     gamesBackup = openMySQLTable('gamesBackup', backupsEngine)
@@ -259,6 +273,8 @@ def backupTables():
         if_exists='replace')
 
 def getResetDate(backupsEngine, desiredDate='2019-02-05'):
+
+    print(f'Resetting to {desiredDate}')
 
     # Convert desiredDate to datetime.date
     desiredDate = pd.to_datetime(desiredDate, format='%Y-%m-%d').date()
@@ -381,7 +397,7 @@ def getFirstUnscrapedDay(engine):
     unscrapedDays = games.loc[games['Game'].isnull()]
     firstUnscrapedDay = unscrapedDays.loc[:, 'Date'].min().date()
 
-    print('First unscraped day successfully found')
+    print(f'First unscraped day successfully found: {firstUnscrapedDay}')
 
     return firstUnscrapedDay
 
@@ -406,7 +422,7 @@ def openMySQLTable(table_name, engine):
     elif table_name == '2018_2019_LastTime':
         return pd.read_sql_table('2018_2019_LastTime', engine, parse_dates=['G', 'A', 'PTS', 'Plus', 'Minus', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Last_Game_Date', 'Last Game Date'])
     elif table_name == '2018_2019_stats':
-        return pd.read_sql_table('2018_2019_stats', engine).drop(columns=[i for i in myDF.columns if i == 'Backup_Date'])
+        return pd.read_sql_table('2018_2019_stats', engine)
     elif table_name == 'gamesBackup':
         return pd.read_sql_table('gamesBackup', engine)
     elif table_name == 'gamesSinceBackup':
@@ -416,7 +432,9 @@ def openMySQLTable(table_name, engine):
     elif table_name == 'statsBackup':
         return pd.read_sql_table('statsBackup', engine)
     elif table_name == 'todaysDroughts':
-        return openMySQLTable('todaysDroughts', engine)
+        return pd.read_sql_table('todaysDroughts', engine) 
+    elif table_name == 'dailyDataFrames':
+        return pd.read_sql_table('dailyDataFrames', engine)
 
 '--------------- Single-Game-Specific Functions ---------------'
 
@@ -580,19 +598,12 @@ def todaysPlayerDroughts(todaysGames, engine):
     # the dates of my dataset (my dataset spans 2000-10-4 and later, so date='2000-10-3')
     null_date = pd.to_datetime('2000-10-3', format="%Y-%m-%d").date()
     for column in myColumns:
-        todays_GamesSince = todays_GamesSince.sort_values(column, ascending=False)
-        myDate = None
-        player_counter = 0
-        # Find first player with lastTime date > 2000-10-3, showing theyve accomplished the feat since my dataset 
-        # began on 2000-10-4
-        while myDate is None:
-            myPlayer = todays_GamesSince.index[player_counter]
-            newDate = pd.to_datetime(todays_lastTime.loc[myPlayer, column], format='%Y-%m-%d').date()
-            if newDate > null_date:
-                myDate = newDate
-            else:
-                player_counter += 1
-        todaysDroughts[column] = [myPlayer, todays_GamesSince.loc[myPlayer, column], datetime.datetime.strftime(myDate,'%b %d, %Y')]
+        myAvailablePlayers = todays_lastTime.loc[todays_lastTime[column].dt.date > null_date].index
+        mySlice = todays_GamesSince.loc[myAvailablePlayers, :]
+        myPlayer = mySlice.loc[mySlice[column] == mySlice[column].min()].index[0]
+        myDate = mySlice.loc[myPlayer, column]
+
+        todaysDroughts[column] = [myPlayer, todays_GamesSince.loc[myPlayer, column], str(myDate)]
 
     #Save the dictionary, todaysDroughts, for uploading on website
     droughtsDF =  openMySQLTable('todaysDroughts', engine)
@@ -612,28 +623,28 @@ def todaysPlayerDroughts(todaysGames, engine):
 def makeTodaysHTML(engine):
 
     # Load in the three main dataframes and select for current players, if necessary
-    myDF = openMySQLTable('2018_2019_stats', engine).set_index('Player')
+    stats = openMySQLTable('2018_2019_stats', engine).set_index('Player')
     lastTime = openMySQLTable('2018_2019_LastTime', engine).set_index('Player')
     gamesSince = openMySQLTable('2018_2019_GamesSince', engine).set_index('Player')
 
     # Clean myDF
-    myDF['TOI'] = myDF['TOI'].astype(int)
-    myDF = myDF.sort_values(['G', 'PTS'], ascending=False)
-    myDF = myDF.reindex(['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Shifts', 'TOI'], axis=1)
+    stats['TOI'] = stats['TOI'].astype(int)
+    stats = stats.sort_values(['G', 'PTS'], ascending=False)
+    stats = stats.reindex(['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Shifts', 'TOI'], axis=1)
 
     # Clean lastTime
-    lastTime = lastTime[lastTime['Last Game Date'] >= pd.to_datetime('2018-7-1', format="%Y-%m-%d").date()] # Select for players who've played in last 30 days only
-    lastTime = lastTime[lastTime['G'] > pd.to_datetime('2000-10-03', format="%Y-%m-%d").date()] # Players who've never scored have last goal set as 2000/10/3. Remove these players
+    lastTime = lastTime[lastTime['Last Game Date'].dt.date >= pd.to_datetime('2018-7-1', format="%Y-%m-%d").date()] # Select for players who've played in last 30 days only
+    lastTime = lastTime[lastTime['G'].dt.date > pd.to_datetime('2000-10-03', format="%Y-%m-%d").date()] # Players who've never scored have last goal set as 2000/10/3. Remove these players
     lastTime = lastTime.sort_values(['G', 'A'])
     lastTime = lastTime.reindex(['Last Game Date', 'G', 'A', 'PTS', 'Plus' 'Minus', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S'], axis=1)
 
     # Grab the players in this df, for slicing retired players from the gamesSince DF
     currentPlayers = lastTime.index
-    gamesSince = gamesSince.reindex[currentPlayers]
+    gamesSince = gamesSince.reindex(currentPlayers)
     gamesSince = gamesSince.sort_values(['G', 'A'], ascending=False)
 
     # Replace date '2000-10-3' with 'Never'
-    myDF = myDF.replace(to_replace=pd.to_datetime('2000-10-3', format="%Y-%m-%d").date(), value='Never')
+    stats = stats.replace(to_replace=pd.to_datetime('2000-10-3', format="%Y-%m-%d").date(), value='Never')
     lastTime = lastTime.replace(to_replace=pd.to_datetime('2000-10-3', format="%Y-%m-%d").date(), value='Never')
     gamesSince = gamesSince.replace(to_replace=pd.to_datetime('2000-10-3', format="%Y-%m-%d").date(), value='Never')
 
@@ -641,12 +652,26 @@ def makeTodaysHTML(engine):
     pd.set_option('colheader_justify', 'center') 
 
     # Save the HTML strings in a dictionary, to be loaded on routes.py file for display. This prevents it from being calculated everytime the user is routed to "Today's Players"
-    myDFJSON = myDF.to_json()
-    lastTimeJSON = lastTime.to_json()
-    gamesSinceJSON = gamesSince.to_json()
+    statsJSON = stats.iloc[:10, :].to_json()
+    lastTimeJSON = lastTime.iloc[:10, :].to_json()
+    gamesSinceJSON = gamesSince.iloc[:10, :].to_json()
 
     # Save JSONs of the three dataframes in the MySQL DB table = dailyDataFrames;
-    engine.execute(f"INSERT INTO dailyDataFrames (date, mydf, lastTime, gamesSince) VALUES ({pd.to_datetime('today').date()}, {myDFJSON}, {lastTimeJSON}, {gamesSinceJSON})")
+    dailyDataFrames = openMySQLTable('dailyDataFrames', engine)
+    newRow = pd.Series({
+        'id': len(dailyDataFrames) + 1,
+        'date': pd.to_datetime('today').date(),
+        'stats': statsJSON,
+        'lastTime': lastTimeJSON,
+        'gamesSince': gamesSinceJSON})
+    dailyDataFrames = dailyDataFrames.append(newRow, ignore_index=True)
+
+    # Save the DF to the MySQL database
+    dailyDataFrames.to_sql(
+        name='dailyDataFrames',
+        con=engine,
+        index=False,
+        if_exists='replace')
 
 def opentodaysHTML(engine):
 
@@ -654,12 +679,12 @@ def opentodaysHTML(engine):
     myHTML = engine.execute(f"SELECT * FROM dailyDataFrames ORDER BY date DESC LIMIT 1").fetchone()
 
     # Select each component from myHTML (index: value --> 0: id, 1: date, 2: mydf, 3: lastTime, 4: gamesSince). Convert these dicts to DataFrames
-    mydf = pd.DataFrame.from_dict(myHTML[2])
-    lastTime = pd.DataFrame.from_dict(myHTML[3])
-    gamesSince = pd.DataFrame.from_dict(myHTML[4])
+    mydf = pd.DataFrame.from_dict(json.loads(myHTML['stats']))
+    lastTime = pd.DataFrame.from_dict(json.loads(myHTML['lastTime']))
+    gamesSince = pd.DataFrame.from_dict(json.loads(myHTML['gamesSince']))
 
     # Convert DFs to html
-    myDFHTML = myDF.head(10).to_html(classes=['table', 'stat-table'], index_names=False, justify='center')
+    myDFHTML = mydf.head(10).to_html(classes=['table', 'stat-table'], index_names=False, justify='center')
     lastTimeHTML = lastTime.head(10).to_html(classes=['table', 'stat-table'], index_names=False, justify='center')
     gamesSinceHTML = gamesSince.head(10).to_html(classes=['table', 'stat-table'], index_names=False, justify='center')
 
@@ -1037,59 +1062,73 @@ def KnuthMorrisPratt(pattern, text):
 engine = createEngine()
 backupsEngine = createEngine(database='backups')
 
-resetToDay(engine, backupsEngine, date='2019-02-05')
+# resetToDay(engine, backupsEngine, date='2019-02-05')
 
 scrapeToToday(engine)
 
 ''' Helpful table backups
 
-gs = pd.read_sql_table('2018_2019_GamesSince', con=engine)
-lt = pd.read_sql_table('2018_2019_LastTime', con=engine, parse_dates=['G', 'A', 'PTS', 'Plus', 'Minus', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Last_Game_Date', 'Last Game Date'])
-stats = pd.read_sql_table('2018_2019_stats', con=engine)
-games = pd.read_pickle('/Users/jonathanolson/GitHub/NHL-Project/gamesDefault.pickle')
+gs = openMySQLTable('2018_2019_GamesSince', engine)
+lt = openMySQLTable('2018_2019_LastTime', engine)
+stats = openMySQLTable('2018_2019_stats', engine)
+games = openMySQLTable('games', engine)
 
 gsb = openMySQLTable('gamesSinceBackup', backupsEngine)
 ltb = openMySQLTable('lastTimeBackup', backupsEngine)
 statsb = openMySQLTable('statsBackup', backupsEngine)
 
-gs.to_pickle('/Users/jonathanolson/GitHub/NHL-Project/gamesSinceDefault.pickle')
-lt.to_pickle('/Users/jonathanolson/GitHub/NHL-Project/lastTimeDefault.pickle')
-stats.to_pickle('/Users/jonathanolson/GitHub/NHL-Project/statsDefault.pickle')
-games.to_pickle('/Users/jonathanolson/GitHub/NHL-Project/gamesDefault.pickle')
+gs = pd.read_pickle('/Users/jonathanolson/GitHub/NHL-Project/gamesSinceDefault.pickle').reset_index()
+lt = pd.read_pickle('/Users/jonathanolson/GitHub/NHL-Project/lastTimeDefault.pickle').reset_index()
+stats = pd.read_pickle('/Users/jonathanolson/GitHub/NHL-Project/statsDefault.pickle').reset_index()
+games = pd.read_pickle('/Users/jonathanolson/GitHub/NHL-Project/gamesDefault.pickle')
 
-gsb.to_pickle('/Users/jonathanolson/GitHub/NHL-Project/gamesSinceBackupDefault.pickle')
-ltb.to_pickle('/Users/jonathanolson/GitHub/NHL-Project/lastTimeBackupDefault.pickle')
-statsb.to_pickle('/Users/jonathanolson/GitHub/NHL-Project/statsBackupDefault.pickle')
+gsb = pd.read_pickle('/Users/jonathanolson/GitHub/NHL-Project/gamesSinceBackupDefault.pickle')
+ltb = pd.read_pickle('/Users/jonathanolson/GitHub/NHL-Project/lastTimeBackupDefault.pickle')
+statsb = pd.read_pickle('/Users/jonathanolson/GitHub/NHL-Project/statsBackupDefault.pickle')
+
+
+gs.to_sql(
+    name='2018_2019_GamesSince',
+    con=engine,
+    index=False,
+    if_exists='replace')
+
+lt.to_sql(
+    name='2018_2019_LastTime',
+    con=engine,
+    index=False,
+    if_exists='replace')
+
+stats.to_sql(
+    name='2018_2019_stats',
+    con=engine,
+    index=False,
+    if_exists='replace')
+
+games.to_sql(
+    name='games',
+    con=engine,
+    index=False,
+    if_exists='replace')
+
+
+gsb.to_sql(
+    name='gamesSinceBackup',
+    con=backupsEngine,
+    index=False,
+    if_exists='replace')
+
+ltb.to_sql(
+    name='lastTimeBackup',
+    con=backupsEngine,
+    index=False,
+    if_exists='replace')
+
+statsb.to_sql(
+    name='statsBackup',
+    con=backupsEngine,
+    index=False,
+    if_exists='replace')
+
 
 '''
-
-# gs1 = pd.read_pickle('/Users/jonathanolson/GitHub/NHL-Project/gamesSinceDefault.pickle')
-# lt1 = pd.read_pickle('/Users/jonathanolson/GitHub/NHL-Project/lastTimeDefault.pickle')
-# stats1 = pd.read_pickle('/Users/jonathanolson/GitHub/NHL-Project/statsDefault.pickle')
-
-# gsb1 = pd.read_pickle('/Users/jonathanolson/GitHub/NHL-Project/gamesSinceBackupDefault.pickle')
-# ltb1 = pd.read_pickle('/Users/jonathanolson/GitHub/NHL-Project/lastTimeBackupDefault.pickle')
-# statsb1 = pd.read_pickle('/Users/jonathanolson/GitHub/NHL-Project/statsBackupDefault.pickle')
-
-
-# stats = pd.read_sql_table('2018_2019_stats', con=engine)
-# stats2 = stats.copy()
-# stats3 = stats.copy()
-
-# stats['Backup_Date'] = pd.to_datetime('2019-02-01', format='%Y-%m-%d')
-# stats2['Backup_Date'] = pd.to_datetime('2019-02-05', format='%Y-%m-%d')
-# stats3['Backup_Date'] = pd.to_datetime('2019-02-12', format='%Y-%m-%d')
-
-# stats4 = pd.concat([stats, stats2, stats3], sort=True, ignore_index=True)
-
-# stats4.to_sql(
-#     name='statsBackup',
-#     con=backupsEngine,
-#     index=False,
-#     if_exists='replace')
-
-# lt.to_sql(
-#     name='2018_2019_LastTime',
-#     con=engine,
-#     index=False,
-#     if_exists='replace')
