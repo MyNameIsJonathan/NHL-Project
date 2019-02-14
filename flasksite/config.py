@@ -9,6 +9,9 @@ class Config():
     SECRET_KEY = config.get("SECRET_KEY")
     SQLALCHEMY_DATABASE_URI = config.get("SQLALCHEMY_DATABASE_URI")
 
+    MYSQL_PASSWORD = config.get("MYSQL_PASSWORD")
+    MYSQL_DB = config.get("MYSQL_DB")
+
     #Setup email system for password resets -- NOT CURRENTLY FUNCTIONAL
     # MAIL_SERVER = 'smtp.googlemail.com'
     # MAIL_PORT = 587

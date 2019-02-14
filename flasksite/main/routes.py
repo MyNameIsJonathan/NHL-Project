@@ -1,16 +1,18 @@
 from flask import render_template, request, Blueprint, send_from_directory
+from flask_mysqldb import MySQL
 import NHL_scrape_functions as nhl
+import tweepyrun as twp
 import pandas as pd
 import datetime
 import random
 import os
 
+# Create a blueprint for the Flask site
 main = Blueprint('main', __name__)
+mysql = MySQL(main)
 
-# These functions 'create' routes to pages within your site. 
-# This one creates the 'home' page route, while the one 
-# below creates the NHL Stats page route
-@main.route("/")  #Having two @main. here means that this page is rendered when either website.com/ or website.com/home are visited
+# Instantiate the route decorators for Flask
+@main.route("/")
 @main.route("/home")
 def home():
     return render_template('home.html')
@@ -33,13 +35,18 @@ def todays_players():
 
 @main.route("/stamkostweets")
 def stamkostweets():
-    #Open tweets mentioning stamkos from the last week
-    my_tweets = pd.read_pickle(f"/home/jonathan/NHL-Project/pickleFiles/stamkosTweets/stamkosTweets_{pd.to_datetime('today').date()}.pickle")
-    my_length = len(my_tweets)
-    my_numbers = random.sample(range(my_length), my_length)
-    my_tweets = [my_tweets[i] for i in my_numbers]
 
-    return render_template('stamkostweets.html', title='Stamkos Tweets', my_tweets=my_tweets, my_length=my_length)
+    # Create an engine SQLAlchemy connection to the stamkosTweets table in MySQL DB
+    engine = nhl.openNHLMySQL('stamkosTweets')
+
+    #Open tweets mentioning stamkos from the last week
+    my_tweets = twp.openTweets(engine)
+
+    # Choose a random order of tweets
+    # my_numbers = random.sample(range(len(my_tweets)), len(my_tweets))
+    # my_tweets = [my_tweets[i] for i in my_numbers]
+
+    return render_template('stamkostweets.html', title='Stamkos Tweets', my_tweets=my_tweets, my_length=len(my_tweets))
 
 @main.route("/workflow")
 def workflow():
