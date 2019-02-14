@@ -435,6 +435,8 @@ def openMySQLTable(table_name, engine):
         return pd.read_sql_table('todaysDroughts', engine) 
     elif table_name == 'dailyDataFrames':
         return pd.read_sql_table('dailyDataFrames', engine)
+    elif table_name == 'stamkosTweets':
+        return pd.read_sql_table('stamkosTweets', engine)
 
 '--------------- Single-Game-Specific Functions ---------------'
 
@@ -619,6 +621,14 @@ def todaysPlayerDroughts(todaysGames, engine):
         con=engine,
         index=False,
         if_exists='replace')
+
+def openNumberOfPlayers(engine):
+
+    today = pd.Timestamp(pd.to_datetime('today').date()) - datetime.timedelta(days=1)
+
+    numberPlayers = engine.execute(f"SELECT * FROM todaysDroughts WHERE Date = '{str(today)}'").fetchone()[-1]
+
+    return numberPlayers
 
 def makeTodaysHTML(engine):
 
