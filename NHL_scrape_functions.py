@@ -174,7 +174,7 @@ def MYSQLcreateGAMEStable():
     games['Game'] = None
     games['Game Number'] = None
 
-    teams = pd.read_pickle('/Users/jonathanolson/GitHub/NHL-Project/pickleFiles/Teams/my_teams.pickle')
+    teams = pd.read_pickle('/homejonathan/NHL-Project/pickleFiles/Teams/my_teams.pickle')
 
     for team in teams:
         print(team.Name)
@@ -198,7 +198,7 @@ def MYSQLcreateGAMEStable():
         games.loc[i, 'HTML Link'] = f"https://www.hockey-reference.com/boxscores/{date.strftime('%Y%m%d')}0{homeTeam}.html"
         games.loc[i, 'Game Number'] = i+1
 
-    gamesList = pd.read_pickle('/Users/jonathanolson/GitHub/NHL-Project/myGames.pickle')
+    gamesList = pd.read_pickle('/homejonathan/NHL-Project/myGames.pickle')
 
     for i in range(len(gamesList)):
         myjson = json.dumps(gamesList[i], default=str)
@@ -569,7 +569,7 @@ def todaysPlayerDroughts(todaysGames, engine):
     teams_playing_today = list(todaysGames['Home'].unique()) + list(todaysGames['Away'].unique())
 
     #Fill players_playing_today by iterating through the team-player dictionary from the file team_creation.py
-    NHL_teams_and_players = pd.read_pickle('/Users/jonathanolson/GitHub/NHL-Project/pickleFiles/Teams/NHL_teams_and_players.pickle')
+    NHL_teams_and_players = pd.read_pickle('/homejonathan/NHL-Project/pickleFiles/Teams/NHL_teams_and_players.pickle')
 
     #Instantiate a list of player names who play today and fill it 
     players_playing_today = []
@@ -1077,14 +1077,14 @@ gsb = openMySQLTable('gamesSinceBackup', backupsEngine)
 ltb = openMySQLTable('lastTimeBackup', backupsEngine)
 statsb = openMySQLTable('statsBackup', backupsEngine)
 
-gs = pd.read_pickle('/Users/jonathanolson/GitHub/NHL-Project/gamesSinceDefault.pickle').reset_index()
-lt = pd.read_pickle('/Users/jonathanolson/GitHub/NHL-Project/lastTimeDefault.pickle').reset_index()
-stats = pd.read_pickle('/Users/jonathanolson/GitHub/NHL-Project/statsDefault.pickle').reset_index()
-games = pd.read_pickle('/Users/jonathanolson/GitHub/NHL-Project/gamesDefault.pickle')
+gs = pd.read_pickle('/homejonathan/NHL-Project/gamesSinceDefault.pickle').reset_index()
+lt = pd.read_pickle('/homejonathan/NHL-Project/lastTimeDefault.pickle').reset_index()
+stats = pd.read_pickle('/homejonathan/NHL-Project/statsDefault.pickle').reset_index()
+games = pd.read_pickle('/homejonathan/NHL-Project/gamesDefault.pickle')
 
-gsb = pd.read_pickle('/Users/jonathanolson/GitHub/NHL-Project/gamesSinceBackupDefault.pickle')
-ltb = pd.read_pickle('/Users/jonathanolson/GitHub/NHL-Project/lastTimeBackupDefault.pickle')
-statsb = pd.read_pickle('/Users/jonathanolson/GitHub/NHL-Project/statsBackupDefault.pickle')
+gsb = pd.read_pickle('/homejonathan/NHL-Project/gamesSinceBackupDefault.pickle')
+ltb = pd.read_pickle('/homejonathan/NHL-Project/lastTimeBackupDefault.pickle')
+statsb = pd.read_pickle('/homejonathan/NHL-Project/statsBackupDefault.pickle')
 
 
 gs.to_sql(
