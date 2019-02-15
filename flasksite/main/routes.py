@@ -65,10 +65,13 @@ def todays_players():
 @main.route("/stamkostweets")
 def stamkostweets():
 
-    cursor = mysql.get_db().cursor()
+    conn = mysql.connect()
+    cursor =conn.cursor()
+
+    # cursor = mysql.get_db().cursor()
 
     #Open tweets mentioning stamkos from the last week
-    my_tweetsCursor = cursor.execute("SELECT * FROM stamkosTweets ORDER BY date DESC LIMIT 150")
+    my_tweetsCursor = cursor.execute("SELECT * FROM stamkosTweets DESC LIMIT 150")
     my_tweets = my_tweetsCursor.fetchone()
 
     # Choose a random order of tweets
