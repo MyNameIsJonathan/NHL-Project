@@ -29,9 +29,7 @@ def nhl_stats():
 
     # Get the last row of the table, sorted by date. This means itll be today's html, unless there was an error, allowing it to fall back on yesterdays html
     cursor.execute("SELECT * FROM dailyDataFrames ORDER BY date DESC LIMIT 1")
-    myHTML = cursor.fetchone()
-    print('myHTML = cursor.fetchone(). MyHTML return type:', type(myHTML))
-    print('MyHTML lenth:', len(myHTML))
+    myHTML = cursor.fetchone()[0]
 
     # Select each component from myHTML (index: value --> 0: id, 1: date, 2: mydf, 3: lastTime, 4: gamesSince). Convert these dicts to DataFrames
     mydf = pd.DataFrame.from_dict(json.loads(myHTML['stats']))
@@ -57,7 +55,7 @@ def todays_players():
     today = pd.to_datetime('today').date()
     cursor = mysql.get_db().cursor()
     cursor.execute("SELECT * FROM todaysDroughts WHERE Date = '%s'" % (today))
-    todaysDroughts = cursor.fetchone()
+    todaysDroughts = cursor.fetchone()[0]
 
     droughtsDict = ast.literal_eval(todaysDroughts[2])
     numberOfPlayersToday = todaysDroughts[-1]
@@ -73,7 +71,7 @@ def stamkostweets():
 
     #Open tweets mentioning stamkos from the last week
     cursor.execute("SELECT * FROM stamkosTweets")
-    my_tweets = cursor.fetchone()
+    my_tweets = cursor.fetchone()[0]
 
     # Choose a random order of tweets
     # my_numbers = random.sample(range(len(my_tweets)), len(my_tweets))
