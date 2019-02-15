@@ -32,7 +32,7 @@ def nhl_stats():
     myHTML = cursor.fetchall()
 
     # Select each component from myHTML (index: value --> 0: id, 1: date, 2: mydf, 3: lastTime, 4: gamesSince). Convert these dicts to DataFrames
-    for item in myHTML:
+    for item in myHTML:j
         mydf = pd.DataFrame.from_dict(json.loads(item[2]))
         lastTime = pd.DataFrame.from_dict(json.loads(item[3]))
         gamesSince = pd.DataFrame.from_dict(json.loads(item[4]))
@@ -42,12 +42,7 @@ def nhl_stats():
     lastTimeHTML = lastTime.head(10).to_html(classes=['table', 'stat-table'], index_names=False, justify='center')
     gamesSinceHTML = gamesSince.head(10).to_html(classes=['table', 'stat-table'], index_names=False, justify='center')
 
-    todaysHTML = {
-        'myDF': myDFHTML,
-        'lastTime': lastTimeHTML,
-        'gamesSince': gamesSinceHTML}
-
-    return render_template('nhl_stats.html', title = 'NHL Stats', myDF=todaysHTML['myDF'], lastTimeDF=todaysHTML['lastTimeDF'], gamesSinceDF=todaysHTML['gamesSinceDF'])
+    return render_template('nhl_stats.html', title = 'NHL Stats', myDF=myDFHTML, lastTimeDF=lastTimeHTML, gamesSinceDF=gamesSinceHTML)
 
 @main.route("/todays_players")
 def todays_players():
