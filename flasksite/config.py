@@ -9,7 +9,7 @@ class Config():
     SECRET_KEY = config.get("SECRET_KEY")
     SQLALCHEMY_DATABASE_URI = config.get("SQLALCHEMY_DATABASE_URI")
 
-    MYSQL_DATABASE = config.get("MYSQL_DATABASE")
+    MYSQL_DATABASE_DB = config.get("MYSQL_DATABASE")
     MYSQL_DATABASE_PASSWORD = config.get("MYSQL_PASSWORD")
     MYSQL_DATABASE_PORT = config.get("MYSQL_PORT")
     MYSQL_DATABASE_HOST = config.get("MYSQL_HOST")
