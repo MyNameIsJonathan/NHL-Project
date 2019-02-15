@@ -63,7 +63,7 @@ def todays_players():
 
     for item in todaysDroughts:
         droughtsDict = ast.literal_eval(item[2])
-        numberOfPlayersToday = ast.literal_eval(item[3])
+        numberOfPlayersToday = item[3]
 
     return render_template('todays_players.html', title = "Today's Players", todaysDroughts=droughtsDict, numberOfPlayersToday=numberOfPlayersToday)
 
