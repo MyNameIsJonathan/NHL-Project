@@ -29,14 +29,12 @@ def nhl_stats():
 
     # Get the last row of the table, sorted by date. This means itll be today's html, unless there was an error, allowing it to fall back on yesterdays html
     cursor.execute("SELECT * FROM dailyDataFrames ORDER BY date DESC LIMIT 1")
-    stats = cursor.fetchone()[2]
-    lastTime = cursor.fetchone()[3]
-    gamesSince = cursor.fetchone()[4]
+    myHTML = cursor.fetchone()[0]
 
     # Select each component from myHTML (index: value --> 0: id, 1: date, 2: mydf, 3: lastTime, 4: gamesSince). Convert these dicts to DataFrames
-    mydf = pd.DataFrame.from_dict(json.loads(stats))
-    lastTime = pd.DataFrame.from_dict(json.loads(mlastTime))
-    gamesSince = pd.DataFrame.from_dict(json.loads(gamesSince))
+    mydf = pd.DataFrame.from_dict(json.loads(myHTML[2]))
+    lastTime = pd.DataFrame.from_dict(json.loads(myHTML[3]))
+    gamesSince = pd.DataFrame.from_dict(json.loads(myHTML[4]))
 
     # Convert DFs to html
     myDFHTML = mydf.head(10).to_html(classes=['table', 'stat-table'], index_names=False, justify='center')
