@@ -31,7 +31,7 @@ def nhl_stats():
     cursor.execute("SELECT * FROM dailyDataFrames ORDER BY date DESC LIMIT 1")
     myHTML = cursor.fetchone()
     print('myHTML = cursor.fetchone(). MyHTML return type:', type(myHTML))
-    print('MyHTML lenth:', len(MyHTML))
+    print('MyHTML lenth:', len(myHTML))
 
     # Select each component from myHTML (index: value --> 0: id, 1: date, 2: mydf, 3: lastTime, 4: gamesSince). Convert these dicts to DataFrames
     mydf = pd.DataFrame.from_dict(json.loads(myHTML['stats']))
