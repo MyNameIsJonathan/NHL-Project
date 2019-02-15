@@ -71,7 +71,7 @@ def stamkostweets():
     # cursor = mysql.get_db().cursor()
 
     #Open tweets mentioning stamkos from the last week
-    my_tweetsCursor = cursor.execute("SELECT * FROM stamkosTweets DESC LIMIT 150")
+    my_tweetsCursor = cursor.execute("SELECT * FROM stamkosTweets")
     my_tweets = my_tweetsCursor.fetchone()
 
     # Choose a random order of tweets
