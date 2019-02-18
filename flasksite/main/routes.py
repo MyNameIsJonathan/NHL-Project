@@ -56,17 +56,14 @@ def todays_players():
     # Simple band-aid fix for current issues with scraping NHL stats. Remove this once the scrape is fixed
     for i in range(5):
         cursor.execute("SELECT * FROM todaysDroughts WHERE Date = '%s'" % (today))
-        todaysDroughts = cursor.fetchall()
+        todaysDroughts = cursor.fetchone()
         if todaysDroughts:
             break
         today -= datetime.timedelta(days=1)
 
-    # Get a single row proxy
-    myRow = todaysDroughts.pop()
-
     # Row proxy is indexable; select the dictionary and number of players today
-    droughtsDict = ast.literal_eval(item[2])
-    numberOfPlayersToday = item[3]
+    droughtsDict = ast.literal_eval(todaysDroughts[2])
+    numberOfPlayersToday = todaysDroughts[3]
 
     return render_template('todays_players.html', title = "Today's Players", todaysDroughts=droughtsDict, numberOfPlayersToday=numberOfPlayersToday)
 
