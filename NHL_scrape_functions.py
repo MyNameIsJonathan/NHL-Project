@@ -385,7 +385,7 @@ def todaysPlayerDroughts(todaysGames, engine):
     teams_playing_today = list(todaysGames['Home'].unique()) + list(todaysGames['Away'].unique())
 
     #Fill players_playing_today by iterating through the team-player dictionary from the file team_creation.py
-    NHL_teams_and_players = pd.read_pickle('/homejonathan/NHL-Project/pickleFiles/Teams/NHL_teams_and_players.pickle')
+    NHL_teams_and_players = pd.read_pickle('/home/jonathan/NHL-Project/pickleFiles/Teams/NHL_teams_and_players.pickle')
 
     #Instantiate a list of player names who play today and fill it
     players_playing_today = []
