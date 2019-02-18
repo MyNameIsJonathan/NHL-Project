@@ -8,95 +8,95 @@ from flasksite.config import Config
 
 
 
-engine = create_engine(f'mysql+mysqldb://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}')
+# engine = create_engine(f'mysql+mysqldb://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}')
 
 def scrapeTweets():
 
     """[ Scrapes 150 tweets mentioning 'Stamkos' using the Tweepy library to access the Twitter API ]
-    
+
     Returns:
         [ list ] -- [ a list of 150 tweets. Each tweet is of type: tweepy.models.Status ]
     """
 
     # Create a list of explicit words to look for
     explicit_words = [
-        'anal', 
-        'anus', 
-        'arse', 
-        'ass', 
-        'ballsack', 
-        'balls', 
-        'bastard', 
-        'bitch', 
-        'biatch', 
-        'bloody', 
-        'blowjob', 
-        'blow job', 
-        'bollock', 
-        'bollok', 
-        'boner', 
-        'boob', 
-        'bugger', 
-        'bum', 
-        'butt', 
+        'anal',
+        'anus',
+        'arse',
+        'ass',
+        'ballsack',
+        'balls',
+        'bastard',
+        'bitch',
+        'biatch',
+        'bloody',
+        'blowjob',
+        'blow job',
+        'bollock',
+        'bollok',
+        'boner',
+        'boob',
+        'bugger',
+        'bum',
+        'butt',
         'buttplug',
-        'clit', 
-        'clitoris', 
+        'clit',
+        'clitoris',
         'chode',
         'chodestroker',
-        'cock', 
-        'coon', 
-        'crap', 
-        'cunt', 
+        'cock',
+        'coon',
+        'crap',
+        'cunt',
         'damn',
         'damnit',
-        'dammit', 
-        'dick', 
-        'dildo', 
-        'dyke', 
-        'fag', 
-        'feck', 
-        'fellate', 
-        'fellatio', 
-        'felching', 
-        'fuck', 
-        'f u c k', 
-        'fudgepacker', 
-        'fudge packer', 
-        'flange', 
-        'Goddamn', 
-        'God damn', 
-        'hell', 
-        'homo', 
-        'jerk', 
-        'jizz', 
-        'knobend', 
-        'knob end', 
-        'labia', 
-        'muff', 
-        'nigger', 
-        'nigga', 
-        'penis', 
-        'piss', 
-        'poop', 
-        'prick', 
-        'pube', 
-        'pussy', 
-        'queer', 
-        'scrotum', 
-        'sex', 
-        'shit', 
-        's hit', 
-        'sh1t', 
-        'slut', 
-        'smegma', 
-        'spunk', 
-        'tit', 
-        'tosser', 
-        'turd', 
-        'twat', 
-        'vagina', 
-        'wank', 
+        'dammit',
+        'dick',
+        'dildo',
+        'dyke',
+        'fag',
+        'feck',
+        'fellate',
+        'fellatio',
+        'felching',
+        'fuck',
+        'f u c k',
+        'fudgepacker',
+        'fudge packer',
+        'flange',
+        'Goddamn',
+        'God damn',
+        'hell',
+        'homo',
+        'jerk',
+        'jizz',
+        'knobend',
+        'knob end',
+        'labia',
+        'muff',
+        'nigger',
+        'nigga',
+        'penis',
+        'piss',
+        'poop',
+        'prick',
+        'pube',
+        'pussy',
+        'queer',
+        'scrotum',
+        'sex',
+        'shit',
+        's hit',
+        'sh1t',
+        'slut',
+        'smegma',
+        'spunk',
+        'tit',
+        'tosser',
+        'turd',
+        'twat',
+        'vagina',
+        'wank',
         'whore']
 
     # Get keys and tokens for twitter scrape via tweepy. These are saved in local environment
@@ -109,7 +109,7 @@ def scrapeTweets():
     auth = tweepy.OAuthHandler(my_consumer_key, my_consumer_secret)
     auth.set_access_token(my_access_token, my_access_token_secret)
 
-    # Instantiate the tweepy api instance 
+    # Instantiate the tweepy api instance
     api = tweepy.API(auth, wait_on_rate_limit=True)
 
     # Search twitter for tweets given a key word, saving these tweets in the list 'searched_tweets'
@@ -123,7 +123,7 @@ def scrapeTweets():
             if not new_tweets: # If we scrape no new tweets before we have our desited number of tweets saved
                 break
             for tweet in new_tweets: #
-                # Filter out tweets that are retweeted (contain RT or are marked as retweeted) 
+                # Filter out tweets that are retweeted (contain RT or are marked as retweeted)
                 # Filter out tweets that have a swear word contained in the list explicit_words; use Knuth-Morris-Prayy algorithm to improve speed
                 contains_swear = False
                 if (not tweet.retweeted) and ('RT @' not in tweet.text): # We dont want retweeted tweets, to prevent duplicates
@@ -177,7 +177,7 @@ def saveTweetsinDB(tweets, engine):
 def openTweets(engine):
 
     """[ Use the provided SQLAlchemy engine to access tweets of Stamkos ]
-    
+
     Returns:
         [ Pandas.DataFrame ] -- [ returns a Pandas.DataFrame of the tweets' time, text, and author name ]
     """
