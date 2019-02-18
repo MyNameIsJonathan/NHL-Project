@@ -163,11 +163,13 @@ def nonFlaskCreateEngine():
         [ sqlalchemy.engine.base.Engine ] -- [ A connection to the NHL MySQL Database for the given table]
     """
 
-    MYSQL_DATABASE = Config.get(MYSQL_DATABASE_DB)
-    MYSQL_PASSWORD = Config.get(MYSQL_DATABASE_PASSWORD)
-    MYSQL_PORT = Config.get(MYSQL_DATABASE_PORT)
-    MYSQL_HOST = Config.get(MYSQL_DATABASE_HOST)
-    MYSQL_USER = Config.get(MYSQL_DATABASE_USER)
+    myConfig = Config()
+
+    MYSQL_DATABASE = myConfig.MYSQL_DATABASE_DB
+    MYSQL_PASSWORD = myConfig.MYSQL_DATABASE_PASSWORD
+    MYSQL_PORT = myConfig.MYSQL_DATABASE_PORT
+    MYSQL_HOST = myConfig.MYSQL_DATABASE_HOST
+    MYSQL_USER = myConfig.MYSQL_DATABASE_USER
 
     engine = create_engine(f'mysql+mysqldb://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}')
 
@@ -183,13 +185,11 @@ def createEngine(database=None):
         [ sqlalchemy.engine.base.Engine ] -- [ A connection to the NHL MySQL Database for the given table]
     """
 
-    myConfig = Config()
-
-    MYSQL_DATABASE = myConfig.MYSQL_DATABASE_DB
-    MYSQL_PASSWORD = myConfig.MYSQL_DATABASE_PASSWORD
-    MYSQL_PORT = myConfig.MYSQL_DATABASE_PORT
-    MYSQL_HOST = myConfig.MYSQL_DATABASE_HOST
-    MYSQL_USER = myConfig.MYSQL_DATABASE_USER
+    MYSQL_DATABASE = current_app.config['MYSQL_DATABASE']
+    MYSQL_PASSWORD = current_app.config['MYSQL_PASSWORD']
+    MYSQL_PORT = current_app.config['MYSQL_PORT']
+    MYSQL_HOST = current_app.config['MYSQL_HOST']
+    MYSQL_USER = current_app.config['MYSQL_USER']
 
     engine = create_engine(f'mysql+mysqldb://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}')
 
@@ -893,14 +893,14 @@ gsb = openMySQLTable('gamesSinceBackup', backupsEngine)
 ltb = openMySQLTable('lastTimeBackup', backupsEngine)
 statsb = openMySQLTable('statsBackup', backupsEngine)
 
-gs = pd.read_pickle('/homejonathan/NHL-Project/gamesSinceDefault.pickle').reset_index()
-lt = pd.read_pickle('/homejonathan/NHL-Project/lastTimeDefault.pickle').reset_index()
-stats = pd.read_pickle('/homejonathan/NHL-Project/statsDefault.pickle').reset_index()
-games = pd.read_pickle('/homejonathan/NHL-Project/gamesDefault.pickle')
+gs = pd.read_pickle('/home/jonathan/NHL-Project/gamesSinceDefault.pickle').reset_index()
+lt = pd.read_pickle('/home/jonathan/NHL-Project/lastTimeDefault.pickle').reset_index()
+stats = pd.read_pickle('/home/jonathan/NHL-Project/statsDefault.pickle').reset_index()
+games = pd.read_pickle('/home/jonathan/NHL-Project/gamesDefault.pickle')
 
-gsb = pd.read_pickle('/homejonathan/NHL-Project/gamesSinceBackupDefault.pickle')
-ltb = pd.read_pickle('/homejonathan/NHL-Project/lastTimeBackupDefault.pickle')
-statsb = pd.read_pickle('/homejonathan/NHL-Project/statsBackupDefault.pickle')
+gsb = pd.read_pickle('/home/jonathan/NHL-Project/gamesSinceBackupDefault.pickle')
+ltb = pd.read_pickle('/home/jonathan/NHL-Project/lastTimeBackupDefault.pickle')
+statsb = pd.read_pickle('/home/jonathan/NHL-Project/statsBackupDefault.pickle')
 
 
 gs.to_sql(
