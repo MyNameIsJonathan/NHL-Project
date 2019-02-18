@@ -14,4 +14,3 @@ class Config():
     MYSQL_DATABASE_PORT = config.get("MYSQL_PORT")
     MYSQL_DATABASE_HOST = config.get("MYSQL_HOST")
     MYSQL_DATABASE_USER = config.get("MYSQL_USER")
-

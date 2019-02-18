@@ -183,11 +183,13 @@ def createEngine(database=None):
         [ sqlalchemy.engine.base.Engine ] -- [ A connection to the NHL MySQL Database for the given table]
     """
 
-    MYSQL_DATABASE = Config.get('MYSQL_DATABASE_DB')
-    MYSQL_PASSWORD = Config.get('MYSQL_DATABASE_PASSWORD')
-    MYSQL_PORT = Config.get('MYSQL_DATABASE_PORT')
-    MYSQL_HOST = Config.get('MYSQL_DATABASE_HOST')
-    MYSQL_USER = Config.get('MYSQL_DATABASE_USER')
+    myConfig = Config()
+
+    MYSQL_DATABASE = myConfig.MYSQL_DATABASE_DB
+    MYSQL_PASSWORD = myConfig.MYSQL_DATABASE_PASSWORD
+    MYSQL_PORT = myConfig.MYSQL_DATABASE_PORT
+    MYSQL_HOST = myConfig.MYSQL_DATABASE_HOST
+    MYSQL_USER = myConfig.MYSQL_DATABASE_USER
 
     engine = create_engine(f'mysql+mysqldb://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}')
 
