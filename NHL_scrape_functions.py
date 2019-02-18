@@ -154,7 +154,7 @@ def resetToDay(engine, backupsEngine, date='2019-02-05'):
 
 
 '--------------- MySql Functions ---------------'
- =
+ 
 def nonFlaskCreateEngine():
 
     """[ Opens a connection to the provided table in the NHL Stats MySQL Database]
