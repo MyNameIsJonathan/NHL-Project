@@ -55,11 +55,11 @@ def todays_players():
 
     # Simple band-aid fix for current issues with scraping NHL stats. Remove this once the scrape is fixed
     for i in range(5):
-        today -= datetime.timedelta(days=1)
         cursor.execute("SELECT * FROM todaysDroughts WHERE Date = '%s'" % (today))
         todaysDroughts = cursor.fetchall()
         if todaysDroughts:
             break
+        today -= datetime.timedelta(days=1)
 
     for item in todaysDroughts:
         droughtsDict = ast.literal_eval(item[2])
@@ -83,6 +83,6 @@ def stamkostweets():
             'created_at': tweet[0],
             'text': tweet[1],
             'author': tweet[2]
-        } 
+        }
 
     return render_template('stamkostweets.html', title='Stamkos Tweets', my_tweets=my_tweets, my_length=len(my_tweets))

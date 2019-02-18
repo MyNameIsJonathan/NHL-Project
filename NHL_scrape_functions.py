@@ -11,6 +11,7 @@ from bs4 import BeautifulSoup
 from My_Classes import LengthException
 from sqlalchemy import create_engine
 from flask import current_app
+from flasksite.config import Config
 
 
 # def backupTables():
@@ -76,7 +77,7 @@ def getResetDate(backupsEngine, desiredDate='2019-02-05'):
 
     # Convert desiredDate to datetime.date
     desiredDate = pd.to_datetime(desiredDate, format='%Y-%m-%d').date()
-    
+
     # Load in a table, find the list of backup dates
     df = openMySQLTable('gamesSinceBackup', backupsEngine)
     myDates = list(df['Backup_Date'].dt.date.unique())
@@ -153,11 +154,31 @@ def resetToDay(engine, backupsEngine, date='2019-02-05'):
 
 
 '--------------- MySql Functions ---------------'
+ =
+def nonFlaskCreateEngine():
+
+    """[ Opens a connection to the provided table in the NHL Stats MySQL Database]
+
+    Returns:
+        [ sqlalchemy.engine.base.Engine ] -- [ A connection to the NHL MySQL Database for the given table]
+    """
+
+    MYSQL_DATABASE = Config.get(MYSQL_DATABASE_DB)
+    MYSQL_PASSWORD = Config.get(MYSQL_DATABASE_PASSWORD)
+    MYSQL_PORT = Config.get(MYSQL_DATABASE_PORT)
+    MYSQL_HOST = Config.get(MYSQL_DATABASE_HOST)
+    MYSQL_USER = Config.get(MYSQL_DATABASE_USER)
+
+    engine = create_engine(f'mysql+mysqldb://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}')
+
+    print('MySQL Connection Engine successfully created')
+
+    return engine
 
 def createEngine(database=None):
 
     """[ Opens a connection to the provided table in the NHL Stats MySQL Database]
-    
+
     Returns:
         [ sqlalchemy.engine.base.Engine ] -- [ A connection to the NHL MySQL Database for the given table]
     """
@@ -175,9 +196,9 @@ def createEngine(database=None):
     return engine
 
 def getFirstUnscrapedDay(engine):
-  
+
     """[ Uses the 'games' MySQL table to find the latest day whose games are not yet scraped]
-    
+
     Returns:
         [ datetime.date ] -- [ Date of latest day whose games are not yet scraped ]
     """
@@ -223,7 +244,7 @@ def openMySQLTable(table_name, engine):
     elif table_name == 'statsBackup':
         return pd.read_sql_table('statsBackup', engine)
     elif table_name == 'todaysDroughts':
-        return pd.read_sql_table('todaysDroughts', engine) 
+        return pd.read_sql_table('todaysDroughts', engine)
     elif table_name == 'dailyDataFrames':
         return pd.read_sql_table('dailyDataFrames', engine)
     elif table_name == 'stamkosTweets':
@@ -233,9 +254,9 @@ def openMySQLTable(table_name, engine):
 
 def getURLS(date):
 
-    """[Uses the given date to create the html links to www.hockey-reference.com for that day's games. 
+    """[Uses the given date to create the html links to www.hockey-reference.com for that day's games.
         Scrapes that website and creates the link for each of the games on that day]
-    
+
     Returns:
         [list] -- [boxscore_links : html links to the boxscores for each game of each day]
         [list] -- [my_home_teams : list of home teams. The ith game's home team is in the ith position in this list]
@@ -290,7 +311,7 @@ def scrapeGame(my_url, game_date, home_team_name, away_team_name):
 
     # Read table from hockey-reference
     df_list = pd.read_html(my_url, header=1)
-    
+
     #Select only teams' stats DataFrames, as the penalty dataframe will not exist if there are no penalties, causing indexing issues otherwise
     myDFs = []
     for df in df_list:
@@ -345,9 +366,9 @@ def cleanGame(game_df):
 
 def findTodaysGames(engine):
     """Get today's date and create url, date string, and scrape data"""
-    
+
     today = pd.to_datetime('today').date()
-    
+
     games = openMySQLTable('games', engine)
 
     return games[games['Date'] == str(today)]
@@ -364,7 +385,7 @@ def todaysPlayerDroughts(todaysGames, engine):
     #Fill players_playing_today by iterating through the team-player dictionary from the file team_creation.py
     NHL_teams_and_players = pd.read_pickle('/homejonathan/NHL-Project/pickleFiles/Teams/NHL_teams_and_players.pickle')
 
-    #Instantiate a list of player names who play today and fill it 
+    #Instantiate a list of player names who play today and fill it
     players_playing_today = []
     for team in teams_playing_today:
         players_playing_today.extend([player.Name for player in NHL_teams_and_players[team]])
@@ -375,11 +396,11 @@ def todaysPlayerDroughts(todaysGames, engine):
 
     #Open yesterday's GamesSince df to see the games since each of today's players scored, etc.
     GamesSince = openMySQLTable('2018_2019_GamesSince', engine).set_index('Player')
-    todays_GamesSince = GamesSince.reindex(players_playing_today)
+    todays_GamesSince = GamesSince.loc[players_playing_today, :]
 
     # Open yesterday's lastTimeDF
     lastTime = openMySQLTable('2018_2019_LastTime', engine).set_index('Player')
-    todays_lastTime = lastTime.reindex(players_playing_today)
+    todays_lastTime = lastTime.loc[players_playing_today, :]
 
     #Save the top 5 players for each category of GamesSince, such as the 5 players who haven't scored in the most games
     todaysDroughts = {}
@@ -387,13 +408,13 @@ def todaysPlayerDroughts(todaysGames, engine):
     #Select all columns except Total Recorded Games
     myColumns = ['G', 'A', 'PTS', 'Plus', 'Minus', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S']
 
-    # Loop through columns to select oldest feat for each. Skip player if they've never accomplished selected feat within 
+    # Loop through columns to select oldest feat for each. Skip player if they've never accomplished selected feat within
     # the dates of my dataset (my dataset spans 2000-10-4 and later, so date='2000-10-3')
     null_date = pd.to_datetime('2000-10-3', format="%Y-%m-%d").date()
     for column in myColumns:
         myAvailablePlayers = todays_lastTime.loc[todays_lastTime[column].dt.date > null_date].index
         mySlice = todays_GamesSince.loc[myAvailablePlayers, :]
-        myPlayer = mySlice.loc[mySlice[column] == mySlice[column].min()].index[0]
+        myPlayer = mySlice.loc[mySlice[column] == mySlice[column].max()].index[0]
         myDate = mySlice.loc[myPlayer, column]
 
         todaysDroughts[column] = [myPlayer, todays_GamesSince.loc[myPlayer, column], str(myDate)]
@@ -442,7 +463,7 @@ def makeTodaysHTML(engine):
     gamesSince = gamesSince.replace(to_replace=pd.to_datetime('2000-10-3', format="%Y-%m-%d").date(), value='Never')
 
     # Set pandas options
-    pd.set_option('colheader_justify', 'center') 
+    pd.set_option('colheader_justify', 'center')
 
     # Save the HTML strings in a dictionary, to be loaded on routes.py file for display. This prevents it from being calculated everytime the user is routed to "Today's Players"
     statsJSON = stats.iloc[:10, :].to_json()
@@ -503,8 +524,8 @@ def scrapeSpecificDaysURLS(engine, date):
         return 'No Games Found'
     else:
         return daysGames
-    
-def scrapeSpecificDaysGames(date, myGames): 
+
+def scrapeSpecificDaysGames(date, myGames):
 
     #Create rawGames dict to store scraped games
     rawGames = {}
@@ -522,7 +543,7 @@ def scrapeSpecificDaysGames(date, myGames):
     for i in range(number_of_games):
         homeTeam = myGames.loc[i, 'Home']
         rawGames[homeTeam] = scrapeGame(
-            my_url=myGames.loc[i, 'HTML Link'], 
+            my_url=myGames.loc[i, 'HTML Link'],
             game_date=myGames.loc[i, 'Date'],
             home_team_name=myGames.loc[i, 'Home'],
             away_team_name=myGames.loc[i, 'Away'])
@@ -534,7 +555,7 @@ def scrapeSpecificDaysGames(date, myGames):
         elif my_count == threshold_75:
             print("Scraped 75% of total games")
         time.sleep(1)
-    
+
 
     print('Number of games scraped = {}'.format(len(rawGames)))
 
@@ -778,14 +799,14 @@ def scrapeToToday(engine):
         # Find games for this date
         todays_games = findTodaysGames(engine)
         # Only find droughts and make HTML if games are scheduled
-        if not todays_games.empty:    
+        if not todays_games.empty:
             # Find players playing on this date
             todaysPlayerDroughts(todays_games, engine)
             # Make the html for these data
             makeTodaysHTML(engine)
         date += datetime.timedelta(days=1)
 
-    # Also find todays games, todays player droughts, and make the HTML for today
+    # Also find todays games, todays player droughts, and makes todays HTML
     todaysGames = findTodaysGames(engine)
     todaysPlayerDroughts(todaysGames, engine)
     makeTodaysHTML(engine)
@@ -797,9 +818,9 @@ def KnuthMorrisPratt(pattern, text):
 
     Find all the occurrences of the pattern in the text
     and return a list of all positions in the text
-    where the pattern starts in the text. 
+    where the pattern starts in the text.
 
-    Returns None if pattern not found in text, else returns 
+    Returns None if pattern not found in text, else returns
     the 0-based indices of where the pattern begins within the text
 
     """
@@ -814,7 +835,7 @@ def KnuthMorrisPratt(pattern, text):
 
         # Loop through P and update max border for each substring P[0:i]
         for i in range(1, len(P)):
-            # While we have a previous border > 0 and the current character doesn't 
+            # While we have a previous border > 0 and the current character doesn't
             # match the next character after the border, reduce border to previous size
             while (border > 0) and (P[i] != P[border]):
                 border = s[border - 1]
@@ -827,7 +848,7 @@ def KnuthMorrisPratt(pattern, text):
             # Store current border length for P[i] in array s
             s[i] = border
 
-        # Return the array s, which indicates the maximum border for all substrings P[0:i]  
+        # Return the array s, which indicates the maximum border for all substrings P[0:i]
         return s
 
     # Create a master string, S, which has (1) the pattern (2) the symbol "$" and (3) the text
@@ -843,12 +864,12 @@ def KnuthMorrisPratt(pattern, text):
     for i in range(len(pattern)+1, len(S)):
         if s[i] == len(pattern):
             result.append(i - 2*len(pattern))
-    
+
     if len(result) == 0:
         return None
     else:
         return result
-   
+
 '----------------------------------------------------------'
 
 

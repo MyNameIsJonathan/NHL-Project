@@ -4,6 +4,11 @@ import string
 import pandas as pd
 from sqlalchemy import create_engine
 import NHL_scrape_functions as nhl
+from flasksite.config import Config
+
+
+
+engine = create_engine(f'mysql+mysqldb://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}')
 
 def scrapeTweets():
 
@@ -159,6 +164,8 @@ def saveTweetsinDB(tweets, engine):
         myseries = pd.Series(list(currentTweet.values()), index=list(tweet._json.keys()), name=tweet.id)
         myseries = myseries.drop([i for i in myseries.index if not i in mycols])
         tweetdf = tweetdf.append(myseries)
+
+    tweetdf['created_at'] = pd.to_datetime(tweetdf['created_at']).dt.date
 
     # Submit tweetdf to MySQL DB
     tweetdf.to_sql(
