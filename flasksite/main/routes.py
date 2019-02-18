@@ -61,9 +61,12 @@ def todays_players():
             break
         today -= datetime.timedelta(days=1)
 
-    for item in todaysDroughts:
-        droughtsDict = ast.literal_eval(item[2])
-        numberOfPlayersToday = item[3]
+    # Get a single row proxy
+    myRow = todaysDroughts.pop()
+
+    # Row proxy is indexable; select the dictionary and number of players today
+    droughtsDict = ast.literal_eval(item[2])
+    numberOfPlayersToday = item[3]
 
     return render_template('todays_players.html', title = "Today's Players", todaysDroughts=droughtsDict, numberOfPlayersToday=numberOfPlayersToday)
 
