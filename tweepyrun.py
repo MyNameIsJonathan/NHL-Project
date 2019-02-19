@@ -189,6 +189,6 @@ def openTweets(engine):
 
 
 if __name__ == '__main__':
-    engine = nhl.createEngine()
+    engine = nhl.nonFlaskCreateEngine()
     myTweets = scrapeTweets()
     saveTweetsinDB(myTweets, engine)

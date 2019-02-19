@@ -14,63 +14,6 @@ from flask import current_app
 from flasksite.config import Config
 
 
-# def backupTables():
-
-#     today = pd.to_datetime('today').date()
-
-#     # Create engines: one for the 'backups' database, one for the current data database
-#     backupsEngine = createEngine(database='backups')
-#     engine = createEngine(database=None)
-
-#     # Instantiate the current, active dataframes
-#     games = openMySQLTable('games', engine)
-#     gamesSince = openMySQLTable('2018_2019_GamesSince', engine)
-#     lastTime = openMySQLTable('2018_2019_LastTime', engine)
-#     stats = openMySQLTable('2018_2019_stats', engine)
-
-#     # Instantiate the MySQL databases as pandas dataframes, for editing
-#     gamesBackup = openMySQLTable('gamesBackup', backupsEngine)
-#     gamesSinceBackup = openMySQLTable('gamesSinceBackup', backupsEngine)
-#     lastTimeBackup = openMySQLTable('lastTimeBackup', backupsEngine)
-#     statsBackup = openMySQLTable('statsBackup', backupsEngine)
-
-#     # Add today's date in a new column, 'Backup_Date', to the current, active DFs
-#     games['Backup_Date'] = today
-#     gamesSince['Backup_Date'] = today
-#     lastTime['Backup_Date'] = today
-#     stats['Backup_Date'] = today
-
-#     # Concat the current backups with the new rows from the current active DFs
-#     gamesBackup = pd.concat([gamesBackup, games])
-#     gamesSinceBackup = pd.concat([gamesSinceBackup, gamesSince])
-#     lastTimeBackup = pd.concat([lastTimeBackup, lastTime])
-#     statsBackup = pd.concat([statsBackup, stats])
-
-#     # Update backup tables in MySQL backups database
-#     gamesBackup.to_sql(
-#         name='gamesBackup',
-#         con=backupsEngine,
-#         index=False,
-#         if_exists='replace')
-
-#     gamesSinceBackup.to_sql(
-#         name='gamesSinceBackup',
-#         con=backupsEngine,
-#         index=False,
-#         if_exists='replace')
-
-#     lastTimeBackup.to_sql(
-#         name='lastTimeBackup',
-#         con=backupsEngine,
-#         index=False,
-#         if_exists='replace')
-
-#     statsBackup.to_sql(
-#         name='statsBackup',
-#         con=backupsEngine,
-#         index=False,
-#         if_exists='replace')
-
 def getResetDate(backupsEngine, desiredDate='2019-02-05'):
 
     print(f'Resetting to {desiredDate}')
@@ -875,12 +818,6 @@ def KnuthMorrisPratt(pattern, text):
 '----------------------------------------------------------'
 
 
-# engine = createEngine()
-# backupsEngine = createEngine(database='backups')
-
-# resetToDay(engine, backupsEngine, date='2019-02-05')
-
-# scrapeToToday(engine)
 
 ''' Helpful table backups
 
@@ -952,5 +889,62 @@ statsb.to_sql(
     index=False,
     if_exists='replace')
 
+
+def backupTables():
+
+    today = pd.to_datetime('today').date()
+
+    # Create engines: one for the 'backups' database, one for the current data database
+    backupsEngine = createEngine(database='backups')
+    engine = createEngine(database=None)
+
+    # Instantiate the current, active dataframes
+    games = openMySQLTable('games', engine)
+    gamesSince = openMySQLTable('2018_2019_GamesSince', engine)
+    lastTime = openMySQLTable('2018_2019_LastTime', engine)
+    stats = openMySQLTable('2018_2019_stats', engine)
+
+    # Instantiate the MySQL databases as pandas dataframes, for editing
+    gamesBackup = openMySQLTable('gamesBackup', backupsEngine)
+    gamesSinceBackup = openMySQLTable('gamesSinceBackup', backupsEngine)
+    lastTimeBackup = openMySQLTable('lastTimeBackup', backupsEngine)
+    statsBackup = openMySQLTable('statsBackup', backupsEngine)
+
+    # Add today's date in a new column, 'Backup_Date', to the current, active DFs
+    games['Backup_Date'] = today
+    gamesSince['Backup_Date'] = today
+    lastTime['Backup_Date'] = today
+    stats['Backup_Date'] = today
+
+    # Concat the current backups with the new rows from the current active DFs
+    gamesBackup = pd.concat([gamesBackup, games])
+    gamesSinceBackup = pd.concat([gamesSinceBackup, gamesSince])
+    lastTimeBackup = pd.concat([lastTimeBackup, lastTime])
+    statsBackup = pd.concat([statsBackup, stats])
+
+    # Update backup tables in MySQL backups database
+    gamesBackup.to_sql(
+        name='gamesBackup',
+        con=backupsEngine,
+        index=False,
+        if_exists='replace')
+
+    gamesSinceBackup.to_sql(
+        name='gamesSinceBackup',
+        con=backupsEngine,
+        index=False,
+        if_exists='replace')
+
+    lastTimeBackup.to_sql(
+        name='lastTimeBackup',
+        con=backupsEngine,
+        index=False,
+        if_exists='replace')
+
+    statsBackup.to_sql(
+        name='statsBackup',
+        con=backupsEngine,
+        index=False,
+        if_exists='replace')
 
 '''
