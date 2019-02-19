@@ -33,7 +33,7 @@ def nhl_stats():
 
     # Select each component from myHTML (index: value --> 0: id, 1: date, 2: mydf, 3: lastTime, 4: gamesSince). Convert these dicts to DataFrames
     for item in myHTML:
-        mydf = pd.DataFrame.from_dict(json.loads(item[2])).sort_values(['G', 'A']) #mydf is stored in column #2
+        mydf = pd.DataFrame.from_dict(json.loads(item[2])).sort_values(['G', 'A'], ascending=False) #mydf is stored in column #2
         lastTime = pd.DataFrame.from_dict(json.loads(item[3])) # lastTime is stored in column #3
         gamesSince = pd.DataFrame.from_dict(json.loads(item[4])) # gamesSince is stored in column #4
 
