@@ -80,7 +80,7 @@ def stamkostweets():
 
     for i, tweet in enumerate(cursorTweets):
         my_tweets[i] = {
-            'created_at': tweet[0],
+            'created_at': pd.to_datetime(tweet[0]).strftime('%a %b %-d, %Y'),
             'text': tweet[1],
             'author': tweet[2]
         }

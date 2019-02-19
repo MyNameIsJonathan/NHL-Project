@@ -927,6 +927,11 @@ games.to_sql(
     index=False,
     if_exists='replace')
 
+td.to_sql(
+    name='todaysDroughts',
+    con=engine,
+    index=False,
+    if_exists='replace')
 
 gsb.to_sql(
     name='gamesSinceBackup',
