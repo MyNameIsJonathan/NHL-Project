@@ -165,6 +165,7 @@ def saveTweetsinDB(tweets, engine):
         myseries = myseries.drop([i for i in myseries.index if not i in mycols])
         tweetdf = tweetdf.append(myseries)
 
+    # Make the created_at column a datetime.date dtype
     tweetdf['created_at'] = pd.to_datetime(tweetdf['created_at']).dt.date
 
     # Submit tweetdf to MySQL DB

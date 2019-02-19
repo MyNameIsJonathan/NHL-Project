@@ -706,6 +706,9 @@ def incorporateSpecificDaysStats(date, engine):
     # Reset the index column
     myDF = myDF.reset_index()
 
+    # Sort by goals then assists
+    myDF = myDF.sort_values(['G', 'A'])
+
     # Save myDF as the new stats table in MySQL
     myDF.to_sql(
         name='2018_2019_stats',
