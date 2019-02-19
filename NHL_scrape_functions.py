@@ -902,6 +902,7 @@ gsb = pd.read_pickle('/home/jonathan/NHL-Project/gamesSinceBackupDefault.pickle'
 ltb = pd.read_pickle('/home/jonathan/NHL-Project/lastTimeBackupDefault.pickle')
 statsb = pd.read_pickle('/home/jonathan/NHL-Project/statsBackupDefault.pickle')
 
+scp jonathan@45.33.16.89:/home/jonathan/myGames.pickle /Users/jonathanolson/GitHub/NHL-Project
 
 gs.to_sql(
     name='2018_2019_GamesSince',
