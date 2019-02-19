@@ -123,6 +123,7 @@ hr {
 
 #primary-container {
   width: auto;
+  max-width: none;
 }
 
 #main-nav-bar {
