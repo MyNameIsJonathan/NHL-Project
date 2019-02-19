@@ -417,15 +417,15 @@ def todaysPlayerDroughts(todaysGames, engine):
         myAvailablePlayers = todays_lastTime.loc[todays_lastTime[column].dt.date > null_date].index
         mySlice = todays_GamesSince.loc[myAvailablePlayers, :]
         myPlayer = mySlice.loc[mySlice[column] == mySlice[column].max()].index[0]
-        myDate = mySlice.loc[myPlayer, column]
+        myDate = todays_lastTime.loc[myPlayer, column].date().strftime('%a %b %-d, %Y')
 
-        todaysDroughts[column] = [myPlayer, todays_GamesSince.loc[myPlayer, column], str(myDate)]
+        todaysDroughts[column] = [myPlayer, int(todays_GamesSince.loc[myPlayer, column]), str(myDate)]
 
     #Save the dictionary, todaysDroughts, for uploading on website
     droughtsDF =  openMySQLTable('todaysDroughts', engine)
     newRow = pd.Series({
         'id': droughtsDF['id'].max() + 1,
-        'Date': today,
+        'Date': pd.to_datetime('today').date(),
         'todaysDroughts': todaysDroughts,
         'numberOfPlayersToday': numberOfPlayersToday})
     droughtsDF = droughtsDF.append(newRow, ignore_index=True)
