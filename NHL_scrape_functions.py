@@ -691,7 +691,7 @@ def incorporateSpecificDaysStats(date, engine):
     #Create main df for all day's games
     newDF = pd.concat([game for game in cleanGames.values()], sort=True)
     newDF = newDF.groupby(newDF.index).sum()
-    newDF['Backup_Date'] = None
+    # newDF['Backup_Date'] = None
     columnsToAdd = ['+/-', 'A', 'EV', 'G', 'GW', 'PIM', 'PP', 'PTS', 'S', 'SH', 'Shifts', 'TOI']
 
     #Combine myDF and newDF
