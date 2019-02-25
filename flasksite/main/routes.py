@@ -22,22 +22,54 @@ def home():
 @main.route("/nhl_stats")
 def nhl_stats():
 
-    # THIS IS OPENTODAYSHTML
+    # Create engine connection to DB
+    engine = nhl.nonFlaskCreateEngine()
 
-    # Open dict of today's HTML files
-    cursor = mysql.get_db().cursor()
+    # Select top scorers and return as DF
+    mydf = pd.read_sql_query(("SELECT * FROM 2018_2019_stats ORDER BY G DESC "
+    "LIMIT 10"), index_col='Player', con=engine)
+    mydf = mydf.reindex((['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH',
+    'GW', 'S', 'Shifts', 'TOI']), axis=1)
 
-    # Get the last row of the table, sorted by date. This means itll be today's
-    # html, unless there was an error, allowing it to fall back on yesterdays html
-    cursor.execute("SELECT * FROM dailyDataFrames ORDER BY date DESC LIMIT 1")
-    myHTML = cursor.fetchall()
+    # Select top 10 lastTime and return as DF
+    lastTime = pd.read_sql_query(("SELECT * FROM 2018_2019_LastTime ORDER BY G "
+    "DESC LIMIT 10"), index_col='Player', con=engine)
+    lastTime = lastTime.reindex((['Last Game Date', 'G', 'A', 'PTS', '+/-',
+    'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Shifts', 'TOI']), axis=1)
+    for column in lastTime.columns:
+        try:
+            lastTime[column] = pd.to_datetime(lastTime[column])
+        except ValueError:
+            pass
+
+    # Select top 10 gamesSince and return as DF
+    gamesSince = pd.read_sql_query(("SELECT * FROM 2018_2019_GamesSince ORDER "
+    "BY G DESC LIMIT 10"), index_col='Player', con=engine)
+    gamesSince = gamesSince.reindex((['G', 'A', 'PTS', 'Plus', 'Minus', 'PIM',
+    'EV', 'PP', 'SH', 'GW', 'S', 'Total Recorded Games']), axis=1)
+
+    # Create the link to the database
+    # cursor = mysql.get_db().cursor()
+
+    # Execute query for mydf
+    # cursor.execute("SELECT * FROM 2018_2019_stats ORDER BY G DESC LIMIT 10")
+    # mydf = cursor.fetchall()
+    # mydf = pd.DataFrame(mydf)
+
+    # Execute query for lastTime
+    # cursor.execute("SELECT * FROM 2018_2019_LastTime ORDER BY G DESC LIMIT 10")
+    # lastTime = cursor.fetchall()
+
+    # Execute query for gamesSince
+    # cursor.execute("SELECT * FROM 2018_2019_GamesSince ORDER BY G DESC LIMIT 10")
+    # gamesSince = cursor.fetchall()
 
     # Select each component from myHTML (index: value --> 0: id, 1: date, 2:
     #mydf, 3: lastTime, 4: gamesSince). Convert these dicts to DataFrames
-    for item in myHTML:
-        mydf = pd.DataFrame.from_dict(json.loads(item[2])).sort_values(['G', 'A'], ascending=False) #mydf is stored in column #2
-        lastTime = pd.DataFrame.from_dict(json.loads(item[3])) # lastTime is stored in column #3
-        gamesSince = pd.DataFrame.from_dict(json.loads(item[4])) # gamesSince is stored in column #4
+    # for item in myHTML:
+    #     mydf = pd.DataFrame.from_dict(json.loads(item[2])).sort_values(['G', 'A'], ascending=False) #mydf is stored in column #2
+    #     lastTime = pd.DataFrame.from_dict(json.loads(item[3])) # lastTime is stored in column #3
+    #     gamesSince = pd.DataFrame.from_dict(json.loads(item[4])) # gamesSince is stored in column #4
 
     # Convert DFs to html
     myDFHTML = mydf.head(10).to_html(classes=['table', 'stat-table'], index_names=False, justify='center')
