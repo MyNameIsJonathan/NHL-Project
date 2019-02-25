@@ -658,33 +658,29 @@ def updateSpecificGamesSince(date, engine):
 
 def incorporateSpecificDaysStats(date, engine):
 
-    #Load games TABLE; Contains clean games' DFs as dicts as strings
+    #Load games table; Contains clean games' DFs as dicts as strings
     sqlDF = pd.read_sql(f"SELECT * FROM games WHERE Date = '{date}'", con=engine)
 
-    # Convert dict strings to DFs
+    #Load in the existing myDF selecting 'Player' as the index column
+    myDF = openMySQLTable('2018_2019_stats', engine, myIndex='Player')
+
+    # Select columns to add
+    columnsToAdd = ['+/-', 'A', 'EV', 'G', 'GW', 'PIM', 'PP', 'PTS', 'S', 'SH', 'Shifts', 'TOI']
+
+    # Indicate how many games are incorporated
+    print('Adding {} games to myDF'.format(len(sqlDF)))
+
+    # Convert dict strings to DFs and add those to myDF
     cleanGames = {}
     for i in range(len(sqlDF)):
         homeTeam = sqlDF.loc[i, 'Home']
         gameDictString = sqlDF.loc[i, 'Game']
         gameDict = json.loads(gameDictString)
-        cleanGames[homeTeam] = pd.DataFrame.from_dict(gameDict, orient='columns').drop(columns='Team')
-        cleanGames[homeTeam]['Date'] = len(cleanGames[homeTeam]['Date']) * [date]
+        gameDF = pd.DataFrame.from_dict(gameDict, orient='columns').drop(columns='Team')
+        gameDF['Date'] = len(cleanGames[homeTeam]['Date']) * [date]
 
-    print('Adding {} games to myDF'.format(len(cleanGames)))
-
-    #Load in the existing myDF selecting 'Player' as the index column
-    myDF = pd.read_sql('2018_2019_stats', con=engine, index_col='Player')
-    if 'Backup_Date' in myDF.columns:
-        myDF = myDF.drop(columns=['Backup_Date'])
-
-    #Create main df for all day's games
-    newDF = pd.concat([game for game in cleanGames.values()], sort=True)
-    newDF = newDF.groupby(newDF.index).sum()
-    # newDF['Backup_Date'] = None
-    columnsToAdd = ['+/-', 'A', 'EV', 'G', 'GW', 'PIM', 'PP', 'PTS', 'S', 'SH', 'Shifts', 'TOI']
-
-    #Combine myDF and newDF
-    myDF[columnsToAdd] = myDF[columnsToAdd].add(newDF[columnsToAdd], fill_value=0)
+        # Add gameDF to myDF (stats)
+        myDF[columnsToAdd] = myDF[columnsToAdd].add(gameDF[columnsToAdd], fill_value=0)
 
     # Convert columns to int
     columns_to_int = ['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'EV', 'PP', 'SH', 'S', 'Shifts']
