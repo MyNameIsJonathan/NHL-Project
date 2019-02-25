@@ -150,11 +150,11 @@ def openMySQLTable(table_name, engine, myIndex='Player'):
         if myIndex is None:
             return pd.read_sql_table('2018_2019_LastTime', engine, parse_dates=(
             ['G', 'A', 'PTS', 'Plus', 'Minus', 'PIM', 'EV', 'PP', 'SH', 'GW',
-            'S', 'Last_Game_Date', 'Last Game Date']))
+            'S', 'Last_Game_Date', 'Last_Game_Date']))
         else:
             return pd.read_sql_table('2018_2019_LastTime', engine, parse_dates=(
             ['G', 'A', 'PTS', 'Plus', 'Minus', 'PIM', 'EV', 'PP', 'SH', 'GW',
-            'S', 'Last_Game_Date', 'Last Game Date'])).set_index(myIndex)
+            'S', 'Last_Game_Date', 'Last_Game_Date'])).set_index(myIndex)
             return
     elif table_name in myRegularTables:
         if myIndex is None:
@@ -371,10 +371,10 @@ def makeTodaysHTML(engine):
     'GW', 'S', 'Shifts', 'TOI']), axis=1)
 
     # Clean lastTime
-    lastTime = lastTime[lastTime['Last Game Date'].dt.date >= pd.to_datetime('2018-7-1', format="%Y-%m-%d").date()] # Select for players who've played in last 30 days only
+    lastTime = lastTime[lastTime['Last_Game_Date'].dt.date >= pd.to_datetime('2018-7-1', format="%Y-%m-%d").date()] # Select for players who've played in last 30 days only
     lastTime = lastTime[lastTime['G'].dt.date > pd.to_datetime('2000-10-03', format="%Y-%m-%d").date()] # Players who've never scored have last goal set as 2000/10/3. Remove these players
     lastTime = lastTime.sort_values(['G', 'A'])
-    lastTime = lastTime.reindex(['Last Game Date', 'G', 'A', 'PTS', 'Plus' 'Minus', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S'], axis=1)
+    lastTime = lastTime.reindex(['Last_Game_Date', 'G', 'A', 'PTS', 'Plus' 'Minus', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S'], axis=1)
 
     # Grab the players in this df, for slicing retired players from the gamesSince DF
     currentPlayers = lastTime.index
@@ -572,8 +572,8 @@ def updateSpecificDaysLastTime(date, engine):
         for column in cols:
             lastTime.loc[game_df[game_df[column] > 0].index, column] = game_date[0]
 
-        #Set last game date to current game's date
-        lastTime.loc[game_df.index, 'Last Game Date'] = game_date[0]
+        #Set Last_Game_Date to current game's date
+        lastTime.loc[game_df.index, 'Last_Game_Date'] = game_date[0]
 
         #Iterate through columns to edit +/- columns
         for column in pmCols:
