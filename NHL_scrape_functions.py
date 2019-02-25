@@ -166,7 +166,7 @@ def saveMySQLTable(myDF, dbName, engine, reset_index=True):
     if reset_index is True:
         myDF = myDF.reset_index()
     myDF.to_sql(
-        name='dbName',
+        name=dbName,
         con=engine,
         index=False,
         if_exists='replace')
