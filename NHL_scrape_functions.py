@@ -43,9 +43,9 @@ def resetToDay(engine, backupsEngine, date='2019-02-05'):
     # 1 - Revert games, gamesSince, and LastTime to former values, from backups
 
     # Instantiate the MySQL databases as pandas dataframes, for editing
-    gamesSinceBackup = openMySQLTable('gamesSinceBackup', backupsEngine)
-    lastTimeBackup = openMySQLTable('lastTimeBackup', backupsEngine)
-    statsBackup = openMySQLTable('statsBackup', backupsEngine)
+    gamesSinceBackup = openMySQLTable('gamesSinceBackup', backupsEngine, myIndex='Player')
+    lastTimeBackup = openMySQLTable('lastTimeBackup', backupsEngine, myIndex='Player')
+    statsBackup = openMySQLTable('statsBackup', backupsEngine, myIndex='Player')
 
     # Get the date thats =(or older than) the specified reset date
     myResetDate = getResetDate(backupsEngine, date)
@@ -63,7 +63,7 @@ def resetToDay(engine, backupsEngine, date='2019-02-05'):
     myDateRange = [day.date() for day in pd.date_range(myDate, today)]
 
     # No 'gamesBackup' needed, as the 'game' column only needs to be reset to 'None'
-    games = openMySQLTable('games', engine)
+    games = openMySQLTable('games', engine, myIndex=None)
 
     # Fill 'None' into games for specified date range
     mylength = len(games.loc[games['Date'].isin(myDateRange), 'Game'])
@@ -71,30 +71,10 @@ def resetToDay(engine, backupsEngine, date='2019-02-05'):
 
     # 3 - Save the resulting DataFrames in MySQL, replacing the old tables
 
-    gamesSince.to_sql(
-        name='2018_2019_GamesSince',
-        con=engine,
-        index=False,
-        if_exists='replace')
-
-    lastTime.to_sql(
-        name='2018_2019_LastTime',
-        con=engine,
-        index=False,
-        if_exists='replace')
-
-    stats.to_sql(
-        name='2018_2019_stats',
-        con=engine,
-        index=False,
-        if_exists='replace')
-
-    games.to_sql(
-        name='games',
-        con=engine,
-        index=False,
-        if_exists='replace')
-
+    saveMySQLTable(gamesSince, '2018_2019_GamesSince', engine, reset_index=True)
+    saveMySQLTable(lastTime, '2018_2019_LastTime', engine, reset_index=True)
+    saveMySQLTable(stats, '2018_2019_stats', engine, reset_index=True)
+    saveMySQLTable(games, 'games', engine, reset_index=False)
 
 '--------------- MySql Functions ---------------'
 
@@ -150,7 +130,7 @@ def getFirstUnscrapedDay(engine):
 
     print('Finding first unscraped day')
 
-    games = openMySQLTable('games', engine)
+    games = openMySQLTable('games', engine, myIndex=None)
     unscrapedDays = games.loc[games['Game'].isnull()]
     firstUnscrapedDay = unscrapedDays.loc[:, 'Date'].min().date()
 
@@ -158,42 +138,38 @@ def getFirstUnscrapedDay(engine):
 
     return firstUnscrapedDay
 
-def openTodaysDroughts(engine):
+def openMySQLTable(table_name, engine, myIndex='Player'):
 
-    print('Opening todaysDroughts DF')
-
-    today = pd.to_datetime('today').date()
-
-    todaysDroughts = engine.execute(f"SELECT * FROM todaysDroughts WHERE Date = '{today}'").fetchone()
-
-    print('todaysDroughts DF opened successfully')
-
-    return todaysDroughts
-
-def openMySQLTable(table_name, engine):
+    myRegularTables = (['2018_2019_GamesSince', '2018_2019_stats',
+    'gamesBackup','gamesSinceBackup', 'lastTimeBackup', 'statsBackup',
+    'todaysDroughts', 'dailyDataFrames', 'stamkosTweets'])
 
     if table_name == 'games':
         return pd.read_sql_table('games', engine, parse_dates=['Date'])
-    elif table_name == '2018_2019_GamesSince':
-        return pd.read_sql_table('2018_2019_GamesSince', engine)
     elif table_name == '2018_2019_LastTime':
-        return pd.read_sql_table('2018_2019_LastTime', engine, parse_dates=['G', 'A', 'PTS', 'Plus', 'Minus', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Last_Game_Date', 'Last Game Date'])
-    elif table_name == '2018_2019_stats':
-        return pd.read_sql_table('2018_2019_stats', engine)
-    elif table_name == 'gamesBackup':
-        return pd.read_sql_table('gamesBackup', engine)
-    elif table_name == 'gamesSinceBackup':
-        return pd.read_sql_table('gamesSinceBackup', engine)
-    elif table_name == 'lastTimeBackup':
-        return pd.read_sql_table('lastTimeBackup', engine)
-    elif table_name == 'statsBackup':
-        return pd.read_sql_table('statsBackup', engine)
-    elif table_name == 'todaysDroughts':
-        return pd.read_sql_table('todaysDroughts', engine)
-    elif table_name == 'dailyDataFrames':
-        return pd.read_sql_table('dailyDataFrames', engine)
-    elif table_name == 'stamkosTweets':
-        return pd.read_sql_table('stamkosTweets', engine)
+        if myIndex is None:
+            return pd.read_sql_table('2018_2019_LastTime', engine, parse_dates=(
+            ['G', 'A', 'PTS', 'Plus', 'Minus', 'PIM', 'EV', 'PP', 'SH', 'GW',
+            'S', 'Last_Game_Date', 'Last Game Date']))
+        else:
+            return pd.read_sql_table('2018_2019_LastTime', engine, parse_dates=(
+            ['G', 'A', 'PTS', 'Plus', 'Minus', 'PIM', 'EV', 'PP', 'SH', 'GW',
+            'S', 'Last_Game_Date', 'Last Game Date'])).set_index(myIndex)
+            return
+    elif table_name in myRegularTables:
+        if myIndex is None:
+            return pd.read_sql_table(table_name, engine)
+        else:
+            return pd.read_sql_table(table_name, engine).set_index(myIndex)
+
+def saveMySQLTable(myDF, dbName, engine, reset_index=True):
+    if reset_index is True:
+        myDF = myDF.reset_index()
+    myDF.to_sql(
+        name='dbName',
+        con=engine,
+        index=False,
+        if_exists='replace')
 
 '--------------- Single-Game-Specific Functions ---------------'
 
@@ -249,7 +225,8 @@ def getURLS(date):
 
 def scrapeGame(my_url, game_date, home_team_name, away_team_name):
 
-    """[Pulls stats from a single game, given the url (attained through getURLS), the date (also from getURLS), home and away teams]
+    """[Pulls stats from a single game, given the url (attained through getURLS)
+        the date (also from getURLS), home and away teams]
     Returns:
         [Pandas DataFrame] -- [a clean df that has the game's stats]
     """
@@ -257,7 +234,8 @@ def scrapeGame(my_url, game_date, home_team_name, away_team_name):
     # Read table from hockey-reference
     df_list = pd.read_html(my_url, header=1)
 
-    #Select only teams' stats DataFrames, as the penalty dataframe will not exist if there are no penalties, causing indexing issues otherwise
+    #Select only teams' stats DataFrames, as the penalty dataframe will not
+    # exist if there are no penalties, causing indexing issues otherwise
     myDFs = []
     for df in df_list:
         if 'G' in df.columns:
@@ -269,10 +247,11 @@ def scrapeGame(my_url, game_date, home_team_name, away_team_name):
     df_away['Team'] = away_team_name
     df_home['Team'] = home_team_name
 
-    #Combine the two teams' dataframes
+    # Combine the two teams' dataframes
     df = pd.concat([df_away, df_home], sort=True)
 
-    #Make a 'Date' column, which will eventually be used to represent the last time each player scored a goal
+    # Make a 'Date' column, which will eventually be used to represent the last
+    # time each player scored a goal
     df['Date'] = game_date
     df['Date'] = pd.to_datetime(df['Date'], format='%Y/%m/%d')
     df['Date'] = df['Date'].dt.date
@@ -287,7 +266,8 @@ def cleanGame(game_df):
     """ Cleans individual game data """
 
     # Delete columns that are only present in the datasets starting in 2014-2015 season
-    cols_to_drop = ['EV.1', 'PP.1', 'SH.1', 'S%', 'EV.2', 'PP.2', 'SH.2', 'Unnamed: 15', 'Unnamed: 16', 'Unnamed: 17']
+    cols_to_drop = (['EV.1', 'PP.1', 'SH.1', 'S%', 'EV.2', 'PP.2', 'SH.2',
+    'Unnamed: 15', 'Unnamed: 16', 'Unnamed: 17'])
     game_df = game_df.drop([column for column in cols_to_drop if column in game_df.columns], axis=1)
 
     # Rename columns for better readability
@@ -314,7 +294,7 @@ def findTodaysGames(engine):
 
     today = pd.to_datetime('today').date()
 
-    games = openMySQLTable('games', engine)
+    games = openMySQLTable('games', engine, myIndex=None)
 
     return games[games['Date'] == str(today)]
 
@@ -340,11 +320,11 @@ def todaysPlayerDroughts(todaysGames, engine):
     numberOfPlayersToday = len(players_playing_today)
 
     #Open yesterday's GamesSince df to see the games since each of today's players scored, etc.
-    GamesSince = openMySQLTable('2018_2019_GamesSince', engine).set_index('Player')
+    GamesSince = openMySQLTable('2018_2019_GamesSince', engine, myIndex='Player')
     todays_GamesSince = GamesSince.loc[players_playing_today, :]
 
     # Open yesterday's lastTimeDF
-    lastTime = openMySQLTable('2018_2019_LastTime', engine).set_index('Player')
+    lastTime = openMySQLTable('2018_2019_LastTime', engine, myIndex='Player')
     todays_lastTime = lastTime.loc[players_playing_today, :]
 
     #Save the top 5 players for each category of GamesSince, such as the 5 players who haven't scored in the most games
@@ -364,8 +344,8 @@ def todaysPlayerDroughts(todaysGames, engine):
 
         todaysDroughts[column] = [myPlayer, int(todays_GamesSince.loc[myPlayer, column]), str(myDate)]
 
-    #Save the dictionary, todaysDroughts, for uploading on website
-    droughtsDF =  openMySQLTable('todaysDroughts', engine)
+    # Append the new data to the todaysDroughts dataframe
+    droughtsDF =  openMySQLTable('todaysDroughts', engine, myIndex=None)
     newRow = pd.Series({
         'id': droughtsDF['id'].max() + 1,
         'Date': pd.to_datetime('today').date(),
@@ -373,23 +353,22 @@ def todaysPlayerDroughts(todaysGames, engine):
         'numberOfPlayersToday': numberOfPlayersToday})
     droughtsDF = droughtsDF.append(newRow, ignore_index=True)
 
-    droughtsDF.to_sql(
-        name='todaysDroughts',
-        con=engine,
-        index=False,
-        if_exists='replace')
+    # Save droughtsDF as 'todaysDroughts'. No need to reset index as the columns
+    # are : 'id', 'Date', 'todaysDroughts', 'numberOfPlayersToday'
+    saveMySQLTable(droughtsDF, 'todaysDroughts', engine, reset_index=False)
 
 def makeTodaysHTML(engine):
 
     # Load in the three main dataframes and select for current players, if necessary
-    stats = openMySQLTable('2018_2019_stats', engine).set_index('Player')
-    lastTime = openMySQLTable('2018_2019_LastTime', engine).set_index('Player')
-    gamesSince = openMySQLTable('2018_2019_GamesSince', engine).set_index('Player')
+    stats = openMySQLTable('2018_2019_stats', engine, myIndex='Player')
+    lastTime = openMySQLTable('2018_2019_LastTime', engine, myIndex='Player')
+    gamesSince = openMySQLTable('2018_2019_GamesSince', engine, myIndex='Player')
 
     # Clean myDF
     stats['TOI'] = stats['TOI'].astype(int)
     stats = stats.sort_values(['G', 'PTS'], ascending=False)
-    stats = stats.reindex(['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Shifts', 'TOI'], axis=1)
+    stats = stats.reindex((['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH',
+    'GW', 'S', 'Shifts', 'TOI']), axis=1)
 
     # Clean lastTime
     lastTime = lastTime[lastTime['Last Game Date'].dt.date >= pd.to_datetime('2018-7-1', format="%Y-%m-%d").date()] # Select for players who've played in last 30 days only
@@ -410,13 +389,15 @@ def makeTodaysHTML(engine):
     # Set pandas options
     pd.set_option('colheader_justify', 'center')
 
-    # Save the HTML strings in a dictionary, to be loaded on routes.py file for display. This prevents it from being calculated everytime the user is routed to "Today's Players"
+    # Save the HTML strings in a dictionary, to be loaded on routes.py file for
+    # display. This prevents it from being calculated everytime the user is
+    # routed to "Today's Players"
     statsJSON = stats.iloc[:10, :].to_json()
     lastTimeJSON = lastTime.iloc[:10, :].to_json()
     gamesSinceJSON = gamesSince.iloc[:10, :].to_json()
 
     # Save JSONs of the three dataframes in the MySQL DB table = dailyDataFrames;
-    dailyDataFrames = openMySQLTable('dailyDataFrames', engine)
+    dailyDataFrames = openMySQLTable('dailyDataFrames', engine, myIndex=None)
     newRow = pd.Series({
         'id': len(dailyDataFrames) + 1,
         'date': pd.to_datetime('today').date(),
@@ -426,18 +407,16 @@ def makeTodaysHTML(engine):
     dailyDataFrames = dailyDataFrames.append(newRow, ignore_index=True)
 
     # Save the DF to the MySQL database
-    dailyDataFrames.to_sql(
-        name='dailyDataFrames',
-        con=engine,
-        index=False,
-        if_exists='replace')
+    saveMySQLTable(dailyDataFrames, 'dailyDataFrames', engine, reset_index=False)
 
 def opentodaysHTML(engine):
 
-    # Get the last row of the table, sorted by date. This means itll be today's html, unless there was an error, allowing it to fall back on yesterdays html
+    # Get the last row of the table, sorted by date. This means itll be today's
+    # html, unless there was an error, allowing it to fall back on yest. html
     myHTML = engine.execute(f"SELECT * FROM dailyDataFrames ORDER BY date DESC LIMIT 1").fetchone()
 
-    # Select each component from myHTML (index: value --> 0: id, 1: date, 2: mydf, 3: lastTime, 4: gamesSince). Convert these dicts to DataFrames
+    # Select each component from myHTML (index: value --> 0: id, 1: date,
+    # 2: mydf, 3: lastTime, 4: gamesSince). Convert these dicts to DataFrames
     mydf = pd.DataFrame.from_dict(json.loads(myHTML['stats']))
     lastTime = pd.DataFrame.from_dict(json.loads(myHTML['lastTime']))
     gamesSince = pd.DataFrame.from_dict(json.loads(myHTML['gamesSince']))
@@ -454,7 +433,34 @@ def opentodaysHTML(engine):
 
     return todaysHTML
 
+def openTodaysDroughts(engine):
+
+    print('Opening todaysDroughts DF')
+
+    today = pd.to_datetime('today').date()
+
+    todaysDroughts = engine.execute(f"SELECT * FROM todaysDroughts WHERE Date = '{today}'").fetchone()
+
+    print('todaysDroughts DF opened successfully')
+
+    return todaysDroughts
+
 '--------------- Single-Day Scrape Functions ---------------'
+
+def scrapeSpecificDay(date, engine):
+
+    """ Scrape, clean, incorporate specific day's stats """
+
+    # Scrape URLs for the given date
+    myGames = scrapeSpecificDaysURLS(engine, date)
+    # Scrape the games from those URLs
+    rawGames = scrapeSpecificDaysGames(date, myGames)
+    # Clean the games' DFs
+    cleanSpecificDaysGames(date, rawGames, engine)
+    # Update the lastTime, gamesSince, and Overall Statistics tables in MySQL
+    updateSpecificDaysLastTime(date, engine)
+    updateSpecificGamesSince(date, engine)
+    incorporateSpecificDaysStats(date, engine)
 
 def scrapeSpecificDaysURLS(engine, date):
 
@@ -516,16 +522,13 @@ def cleanSpecificDaysGames(date, rawGames, engine):
     for homeTeam, game in rawGames.items():
         cleanGames[homeTeam]= cleanGame(game).to_json()
 
-    gamesDF = openMySQLTable('games', engine)
+    gamesDF = openMySQLTable('games', engine, myIndex=None)
 
     for homeTeam, game in cleanGames.items():
         gamesDF.loc[(gamesDF['Date'] == str(date)) & (gamesDF['Home'] == homeTeam), 'Game'] = str(game)
 
-    gamesDF.to_sql(
-        name='games',
-        con=engine,
-        index=False,
-        if_exists='replace')
+    # Save gamesDF to MySQL. No need to reset index
+    saveMySQLTable(gamesDF, 'games', engine, reset_index=False)
 
     print('Number of games cleaned  = {}'.format(len(cleanGames)))
 
@@ -534,9 +537,9 @@ def updateSpecificDaysLastTime(date, engine):
     print("Updating Last Time to reflect new stats' dates")
 
     #Load in last_time_df from the previous day, which will be copied and updated
-    lastTime = openMySQLTable('2018_2019_LastTime', engine).set_index('Player')
-    if 'Backup_Date' in lastTime.columns:
-        lastTime = lastTime.drop(columns=['Backup_Date'])
+    lastTime = openMySQLTable('2018_2019_LastTime', engine, myIndex='Player')
+    # if 'Backup_Date' in lastTime.columns:
+    #     lastTime = lastTime.drop(columns=['Backup_Date'])
 
     #Load games table; contains strings of cleaned games' DFs as dictionaries
     sqlDF = pd.read_sql(f"SELECT * FROM games WHERE Date = '{date}'", con=engine)
@@ -590,22 +593,15 @@ def updateSpecificDaysLastTime(date, engine):
     if lastTime.index.name != 'Player':
         lastTime.index.name = 'Player'
 
-    # Reset index of lastTime
-    lastTime = lastTime.reset_index()
-
-    #Save last_time_df
-    lastTime.to_sql(
-        name='2018_2019_LastTime',
-        con=engine,
-        index=False,
-        if_exists='replace')
+    #Save last_time_df. Reset index.
+    saveMySQLTable(lastTime, '2018_2019_LastTime', engine, reset_index=True)
 
 def updateSpecificGamesSince(date, engine):
 
     print("Updating GamesSince to reflect new stats from {}".format(date))
 
     #Load in GamesSince from the previous day, which will be copied and updated
-    GamesSince = openMySQLTable('2018_2019_GamesSince', engine).set_index('Player')
+    GamesSince = openMySQLTable('2018_2019_GamesSince', engine, myIndex='Player')
     if 'Backup_Date' in GamesSince.columns:
         GamesSince = GamesSince.drop(columns=['Backup_Date'])
 
@@ -655,15 +651,8 @@ def updateSpecificGamesSince(date, engine):
     if GamesSince.index.name != 'Player':
         GamesSince.index.name = 'Player'
 
-    #Reset index got GamesSince
-    GamesSince = GamesSince.reset_index()
-
-    #Save GamesSince
-    GamesSince.to_sql(
-        name='2018_2019_GamesSince',
-        con=engine,
-        index=False,
-        if_exists='replace')
+    #Save GamesSince. Reset index.
+    saveMySQLTable(GamesSince, '2018_2019_GamesSince', engine, reset_index=True)
 
     print('Finished updating GamesSince for {}'.format(date))
 
@@ -703,35 +692,13 @@ def incorporateSpecificDaysStats(date, engine):
         if column in myDF.columns:
             myDF[column] = myDF[column].astype(int)
 
-    # Reset the index column
-    myDF = myDF.reset_index()
-
     # Sort by goals then assists
     myDF = myDF.sort_values(['G', 'A'])
 
-    # Save myDF as the new stats table in MySQL
-    myDF.to_sql(
-        name='2018_2019_stats',
-        con=engine,
-        index=False,
-        if_exists='replace')
+    # Save myDF as the new stats table in MySQL. Reset index.
+    saveMySQLTable(myDF, '2018_2019_stats', engine, reset_index=True)
 
 '--------------- Aggregate Scraping, Updating Functions ---------------'
-
-def scrapeSpecificDay(date, engine):
-
-    """ Scrape, clean, incorporate specific day's stats """
-
-    # Scrape URLs for the given date
-    myGames = scrapeSpecificDaysURLS(engine, date)
-    # Scrape the games from those URLs
-    rawGames = scrapeSpecificDaysGames(date, myGames)
-    # Clean the games' DFs
-    cleanSpecificDaysGames(date, rawGames, engine)
-    # Update the lastTime, gamesSince, and Overall Statistics tables in MySQL
-    updateSpecificDaysLastTime(date, engine)
-    updateSpecificGamesSince(date, engine)
-    incorporateSpecificDaysStats(date, engine)
 
 def scrapeToToday(engine):
     """Scrape games day-by-day, up to current day
@@ -824,73 +791,30 @@ def KnuthMorrisPratt(pattern, text):
 
 ''' Helpful table backups
 
-gs = openMySQLTable('2018_2019_GamesSince', engine)
-lt = openMySQLTable('2018_2019_LastTime', engine)
-stats = openMySQLTable('2018_2019_stats', engine)
-games = openMySQLTable('games', engine)
+gs = openMySQLTable('2018_2019_GamesSince', engine, myIndex='Player')
+lt = openMySQLTable('2018_2019_LastTime', engine, myIndex='Player')
+stats = openMySQLTable('2018_2019_stats', engine, myIndex='Player')
+games = openMySQLTable('games', engine, myIndex=None)
 
-gsb = openMySQLTable('gamesSinceBackup', backupsEngine)
-ltb = openMySQLTable('lastTimeBackup', backupsEngine)
-statsb = openMySQLTable('statsBackup', backupsEngine)
+gsb = openMySQLTable('gamesSinceBackup', backupsEngine, myIndex='Player')
+ltb = openMySQLTable('lastTimeBackup', backupsEngine, myIndex='Player')
+statsb = openMySQLTable('statsBackup', backupsEngine, myIndex='Player')
 
 gs = pd.read_pickle('/home/jonathan/NHL-Project/gamesSinceDefault.pickle').reset_index()
 lt = pd.read_pickle('/home/jonathan/NHL-Project/lastTimeDefault.pickle').reset_index()
 stats = pd.read_pickle('/home/jonathan/NHL-Project/statsDefault.pickle').reset_index()
 games = pd.read_pickle('/home/jonathan/NHL-Project/gamesDefault.pickle')
 
+saveMySQLTable(gs, '2018_2019_GamesSince', engine, reset_index=False)
+saveMySQLTable(lt, '2018_2019_LastTime', engine, reset_index=False)
+saveMySQLTable(stats, '2018_2019_stats', engine, reset_index=False)
+saveMySQLTable(games, 'games', engine, reset_index=False)
+
 gsb = pd.read_pickle('/home/jonathan/NHL-Project/gamesSinceBackupDefault.pickle')
 ltb = pd.read_pickle('/home/jonathan/NHL-Project/lastTimeBackupDefault.pickle')
 statsb = pd.read_pickle('/home/jonathan/NHL-Project/statsBackupDefault.pickle')
 
 scp jonathan@45.33.16.89:/home/jonathan/myGames.pickle /Users/jonathanolson/GitHub/NHL-Project
-
-gs.to_sql(
-    name='2018_2019_GamesSince',
-    con=engine,
-    index=False,
-    if_exists='replace')
-
-lt.to_sql(
-    name='2018_2019_LastTime',
-    con=engine,
-    index=False,
-    if_exists='replace')
-
-stats.to_sql(
-    name='2018_2019_stats',
-    con=engine,
-    index=False,
-    if_exists='replace')
-
-games.to_sql(
-    name='games',
-    con=engine,
-    index=False,
-    if_exists='replace')
-
-td.to_sql(
-    name='todaysDroughts',
-    con=engine,
-    index=False,
-    if_exists='replace')
-
-gsb.to_sql(
-    name='gamesSinceBackup',
-    con=backupsEngine,
-    index=False,
-    if_exists='replace')
-
-ltb.to_sql(
-    name='lastTimeBackup',
-    con=backupsEngine,
-    index=False,
-    if_exists='replace')
-
-statsb.to_sql(
-    name='statsBackup',
-    con=backupsEngine,
-    index=False,
-    if_exists='replace')
 
 
 def backupTables():
@@ -925,29 +849,7 @@ def backupTables():
     lastTimeBackup = pd.concat([lastTimeBackup, lastTime])
     statsBackup = pd.concat([statsBackup, stats])
 
-    # Update backup tables in MySQL backups database
-    gamesBackup.to_sql(
-        name='gamesBackup',
-        con=backupsEngine,
-        index=False,
-        if_exists='replace')
-
-    gamesSinceBackup.to_sql(
-        name='gamesSinceBackup',
-        con=backupsEngine,
-        index=False,
-        if_exists='replace')
-
-    lastTimeBackup.to_sql(
-        name='lastTimeBackup',
-        con=backupsEngine,
-        index=False,
-        if_exists='replace')
-
-    statsBackup.to_sql(
-        name='statsBackup',
-        con=backupsEngine,
-        index=False,
-        if_exists='replace')
 
 '''
+
+stats =
