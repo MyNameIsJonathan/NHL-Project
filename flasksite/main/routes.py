@@ -32,7 +32,9 @@ def nhl_stats():
     'GW', 'S', 'Shifts', 'TOI']), axis=1)
 
     # Select top 10 lastTime and return as DF
-    lastTime = pd.read_sql_query(("SELECT * FROM 2018_2019_LastTime WHERE (G > '2000-10-04') AND (Last_Game_Date > '2018-08-01') ORDER BY G ASC, A ASC LIMIT 10"), index_col='Player', con=engine)
+    lastTime = pd.read_sql_query(("SELECT * FROM 2018_2019_LastTime WHERE (G > "
+    "'2000-10-04') AND (Last_Game_Date > '2018-08-01') ORDER BY G ASC, A ASC "
+    "LIMIT 10"), index_col='Player', con=engine)
     lastTime = lastTime.reindex((['Last_Game_Date', 'G', 'A', 'PTS', '+/-',
     'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Shifts', 'TOI']), axis=1)
     for column in lastTime.columns:
@@ -46,29 +48,6 @@ def nhl_stats():
     "BY G DESC, A DESC LIMIT 10"), index_col='Player', con=engine)
     gamesSince = gamesSince.reindex((['G', 'A', 'PTS', 'Plus', 'Minus', 'PIM',
     'EV', 'PP', 'SH', 'GW', 'S', 'Total Recorded Games']), axis=1)
-
-    # Create the link to the database
-    # cursor = mysql.get_db().cursor()
-
-    # Execute query for mydf
-    # cursor.execute("SELECT * FROM 2018_2019_stats ORDER BY G DESC LIMIT 10")
-    # mydf = cursor.fetchall()
-    # mydf = pd.DataFrame(mydf)
-
-    # Execute query for lastTime
-    # cursor.execute("SELECT * FROM 2018_2019_LastTime ORDER BY G DESC LIMIT 10")
-    # lastTime = cursor.fetchall()
-
-    # Execute query for gamesSince
-    # cursor.execute("SELECT * FROM 2018_2019_GamesSince ORDER BY G DESC LIMIT 10")
-    # gamesSince = cursor.fetchall()
-
-    # Select each component from myHTML (index: value --> 0: id, 1: date, 2:
-    #mydf, 3: lastTime, 4: gamesSince). Convert these dicts to DataFrames
-    # for item in myHTML:
-    #     mydf = pd.DataFrame.from_dict(json.loads(item[2])).sort_values(['G', 'A'], ascending=False) #mydf is stored in column #2
-    #     lastTime = pd.DataFrame.from_dict(json.loads(item[3])) # lastTime is stored in column #3
-    #     gamesSince = pd.DataFrame.from_dict(json.loads(item[4])) # gamesSince is stored in column #4
 
     # Convert DFs to html
     myDFHTML = mydf.head(10).to_html(classes=['table', 'stat-table'], index_names=False, justify='center')
