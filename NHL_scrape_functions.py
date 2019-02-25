@@ -677,7 +677,7 @@ def incorporateSpecificDaysStats(date, engine):
         gameDictString = sqlDF.loc[i, 'Game']
         gameDict = json.loads(gameDictString)
         gameDF = pd.DataFrame.from_dict(gameDict, orient='columns').drop(columns='Team')
-        gameDF['Date'] = len(cleanGames[homeTeam]['Date']) * [date]
+        # gameDF['Date'] = len(cleanGames[homeTeam]['Date']) * [date]
 
         # Add gameDF to myDF (stats)
         myDF[columnsToAdd] = myDF[columnsToAdd].add(gameDF[columnsToAdd], fill_value=0)
