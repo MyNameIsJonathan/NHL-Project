@@ -851,5 +851,3 @@ def backupTables():
 
 
 '''
-
-stats =
