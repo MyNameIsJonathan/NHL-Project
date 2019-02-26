@@ -12,7 +12,6 @@ from sqlalchemy import create_engine
 from flask import current_app
 from flasksite.config import Config
 
-
 '--------------- MySql Functions ---------------'
 
 def nonFlaskCreateEngine():
