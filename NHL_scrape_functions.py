@@ -126,7 +126,6 @@ def backupTables(engine):
 
     try:
         pd.read_pickle(f'/home/jonathan/NHL-Project/mysqlbackups/gs_{today}')
-        break
     except FileNotFoundError:
 
         gs = openMySQLTable('2018_2019_GamesSince', engine, myIndex='Player')
