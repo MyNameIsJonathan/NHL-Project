@@ -35,8 +35,8 @@ def nhl_stats():
     lastTime = pd.read_sql_query(("SELECT * FROM 2018_2019_LastTime WHERE (G > "
     "'2000-10-04') AND (Last_Game_Date > '2018-08-01') ORDER BY G ASC, A ASC "
     "LIMIT 10"), index_col='Player', con=engine)
-    lastTime = lastTime.reindex((['Last_Game_Date', 'G', 'A', 'PTS', '+/-',
-    'PIM', 'EV', 'PP', 'SH', 'GW', 'S', 'Shifts', 'TOI']), axis=1)
+    lastTime = lastTime.reindex((['Last_Game_Date', 'G', 'A', 'PTS','PIM', 'EV',
+    'Plus', 'Minus', 'PP', 'SH', 'GW', 'S']), axis=1)
     for column in lastTime.columns:
         try:
             lastTime[column] = pd.to_datetime(lastTime[column])
