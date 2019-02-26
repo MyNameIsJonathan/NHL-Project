@@ -51,7 +51,7 @@ h2.todays-players-heading {
 
 td {
   border: none;
-  text-align: center; 
+  text-align: center;
   vertical-align: middle;
   word-wrap: none;
   white-space: nowrap;
@@ -59,7 +59,7 @@ td {
 
 th {
   border: none;
-  text-align: center; 
+  text-align: center;
   vertical-align: middle;
   word-wrap: none;
   white-space: nowrap;
@@ -78,6 +78,10 @@ span {
 
 ul {
   padding: 0em;
+}
+
+main[role=main] {
+  max-width: 100%;
 }
 
 .text-muted {
@@ -115,6 +119,11 @@ tr:hover {
 hr {
   width: 80%;
   background-color: #CCCCCC;
+}
+
+#primary-container {
+  width: auto;
+  max-width: none;
 }
 
 #main-nav-bar {
@@ -250,7 +259,7 @@ hr {
   box-shadow: 0 0 8px 8px black inset;
 }
 
-.stamkos-div {  
+.stamkos-div {
   text-align: center;
   margin: 0px 0px 40px 0px;
 }
@@ -514,7 +523,7 @@ legend.border-bottom.mb-4 {
 }
 
 ::-webkit-scrollbar-thumb {
-	background-color: rgba(248, 218, 86, 0.712);	
+	background-color: rgba(248, 218, 86, 0.712);
 }
 
 strong {

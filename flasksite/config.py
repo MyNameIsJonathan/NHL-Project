@@ -5,14 +5,12 @@ with open("/etc/config.json") as config_file:
     config = json.load(config_file)
 
 class Config():
-    #Create a secret key in order to protect the site against arracks and similar
+    #Create a secret key in order to protect the site against attacks and similar
     SECRET_KEY = config.get("SECRET_KEY")
     SQLALCHEMY_DATABASE_URI = config.get("SQLALCHEMY_DATABASE_URI")
 
-    #Setup email system for password resets -- NOT CURRENTLY FUNCTIONAL
-    # MAIL_SERVER = 'smtp.googlemail.com'
-    # MAIL_PORT = 587
-    # MAIL_USE_TLS = True
-    # MAIL_USERNAME = os.environ.get('EMAIL_USER')
-    # MAIL_PASSWORD = os.environ.get('EMAIL_PASS')
-
+    MYSQL_DATABASE_DB = config.get("MYSQL_DATABASE")
+    MYSQL_DATABASE_PASSWORD = config.get("MYSQL_PASSWORD")
+    MYSQL_DATABASE_PORT = config.get("MYSQL_PORT")
+    MYSQL_DATABASE_HOST = config.get("MYSQL_HOST")
+    MYSQL_DATABASE_USER = config.get("MYSQL_USER")
