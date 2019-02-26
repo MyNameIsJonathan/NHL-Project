@@ -5,85 +5,29 @@ import pickle
 import requests
 import datetime
 import time
-import os
 import json
+import backupMaintainer as backups
 from bs4 import BeautifulSoup
-from My_Classes import LengthException
 from sqlalchemy import create_engine
 from flask import current_app
 from flasksite.config import Config
 
 
-def getResetDate(backupsEngine, desiredDate='2019-02-05'):
-
-    print(f'Resetting to {desiredDate}')
-
-    # Convert desiredDate to datetime.date
-    desiredDate = pd.to_datetime(desiredDate, format='%Y-%m-%d').date()
-
-    # Load in a table, find the list of backup dates
-    df = openMySQLTable('gamesSinceBackup', backupsEngine)
-    myDates = list(df['Backup_Date'].dt.date.unique())
-
-    # See if desiredDate is in the list; if not, find next latest date
-    if desiredDate in myDates:
-        return desiredDate
-    # If desiredDate is older than oldest available date, return oldest available date
-    elif desiredDate < min(myDates):
-        return min(myDates)
-    # Else find next oldest date, after desiredDate
-    else:
-        nextDate = (pd.to_datetime(desiredDate, format='%Y-%m-%d') - datetime.timedelta(days=1)).date()
-        while nextDate not in myDates:
-            nextDate -= datetime.timedelta(days=1)
-        return pd.Timestamp(nextDate)
-
-def resetToDay(engine, backupsEngine, date='2019-02-05'):
-
-    # 1 - Revert games, gamesSince, and LastTime to former values, from backups
-
-    # Instantiate the MySQL databases as pandas dataframes, for editing
-    gamesSinceBackup = openMySQLTable('gamesSinceBackup', backupsEngine, myIndex='Player')
-    lastTimeBackup = openMySQLTable('lastTimeBackup', backupsEngine, myIndex='Player')
-    statsBackup = openMySQLTable('statsBackup', backupsEngine, myIndex='Player')
-
-    # Get the date thats =(or older than) the specified reset date
-    myResetDate = getResetDate(backupsEngine, date)
-
-    # Slice backup DFs by myResetDate to get the reverted DFs
-    gamesSince = gamesSinceBackup.loc[gamesSinceBackup['Backup_Date'].dt.date == myResetDate]
-    lastTime = lastTimeBackup.loc[lastTimeBackup['Backup_Date'].dt.date == myResetDate]
-    stats = statsBackup.loc[statsBackup['Backup_Date'].dt.date == myResetDate]
-
-    # 2 - Reset 'game' column of games to None for dates between specified date and today
-
-    # Establish the date range, as strings
-    myDate = pd.to_datetime(date, format='%Y-%m-%d').date()
-    today = pd.to_datetime('today').date()
-    myDateRange = [day.date() for day in pd.date_range(myDate, today)]
-
-    # No 'gamesBackup' needed, as the 'game' column only needs to be reset to 'None'
-    games = openMySQLTable('games', engine, myIndex=None)
-
-    # Fill 'None' into games for specified date range
-    mylength = len(games.loc[games['Date'].isin(myDateRange), 'Game'])
-    games.loc[games['Date'].isin(myDateRange), 'Game'] = [None] * mylength
-
-    # 3 - Save the resulting DataFrames in MySQL, replacing the old tables
-
-    saveMySQLTable(gamesSince, '2018_2019_GamesSince', engine, reset_index=True)
-    saveMySQLTable(lastTime, '2018_2019_LastTime', engine, reset_index=True)
-    saveMySQLTable(stats, '2018_2019_stats', engine, reset_index=True)
-    saveMySQLTable(games, 'games', engine, reset_index=False)
-
 '--------------- MySql Functions ---------------'
 
 def nonFlaskCreateEngine():
 
-    """[ Opens a connection to the provided table in the NHL Stats MySQL Database]
+    """
+    Opens a connection to the provided table in the NHL Stats MySQL Database.
+
+    Args:
+        None
 
     Returns:
-        [ sqlalchemy.engine.base.Engine ] -- [ A connection to the NHL MySQL Database for the given table]
+        sqlalchemy.engine.base.Engine: A connection to the NHL MySQL Database for the given table
+
+    Raises:
+        None
     """
 
     myConfig = Config()
@@ -170,6 +114,30 @@ def saveMySQLTable(myDF, dbName, engine, reset_index=True):
         con=engine,
         index=False,
         if_exists='replace')
+
+def backupTables(engine):
+    """
+    [Saves the current MySQL NHL_Database tables as pickled pandas DFs]
+    [Input] - Engine connecting to MySQL NHL_Database via SQLAlchemy
+    [Output] - None
+    """
+
+    today = pd.to_datetime('today').date()
+
+    try:
+        pd.read_pickle(f'/home/jonathan/NHL-Project/mysqlbackups/gs_{today}')
+        break
+    except FileNotFoundError:
+
+        gs = openMySQLTable('2018_2019_GamesSince', engine, myIndex='Player')
+        lt = openMySQLTable('2018_2019_LastTime', engine, myIndex='Player')
+        stats = openMySQLTable('2018_2019_stats', engine, myIndex='Player')
+        games = openMySQLTable('games', engine, myIndex=None)
+
+        gs.to_pickle(f'/home/jonathan/NHL-Project/mysqlbackups/gs_{today}')
+        lt.to_pickle(f'/home/jonathan/NHL-Project/mysqlbackups/lt_{today}')
+        stats.to_pickle(f'/home/jonathan/NHL-Project/mysqlbackups/stats_{today}')
+        games.to_pickle(f'/home/jonathan/NHL-Project/mysqlbackups/games_{today}')
 
 '--------------- Single-Game-Specific Functions ---------------'
 
@@ -700,6 +668,12 @@ def scrapeToToday(engine):
     """Scrape games day-by-day, up to current day
     Accomodates previously-scraped days. Automatically finds last-scraped day"""
 
+    # Backup today's tables as pickle files before scraping
+    backupTables(engine)
+
+    # Remove unwanted backups
+    backups.cleanupBackups()
+
     #Find last scraped day; indicated by presence of that day's myDF
     date = getFirstUnscrapedDay(engine)
     today = pd.to_datetime('today').date()
@@ -792,10 +766,6 @@ lt = openMySQLTable('2018_2019_LastTime', engine, myIndex='Player')
 stats = openMySQLTable('2018_2019_stats', engine, myIndex='Player')
 games = openMySQLTable('games', engine, myIndex=None)
 
-gsb = openMySQLTable('gamesSinceBackup', backupsEngine, myIndex='Player')
-ltb = openMySQLTable('lastTimeBackup', backupsEngine, myIndex='Player')
-statsb = openMySQLTable('statsBackup', backupsEngine, myIndex='Player')
-
 gs = pd.read_pickle('/home/jonathan/NHL-Project/gamesSinceDefault.pickle').reset_index()
 lt = pd.read_pickle('/home/jonathan/NHL-Project/lastTimeDefault.pickle').reset_index()
 stats = pd.read_pickle('/home/jonathan/NHL-Project/statsDefault.pickle').reset_index()
@@ -805,45 +775,5 @@ saveMySQLTable(gs, '2018_2019_GamesSince', engine, reset_index=False)
 saveMySQLTable(lt, '2018_2019_LastTime', engine, reset_index=False)
 saveMySQLTable(stats, '2018_2019_stats', engine, reset_index=False)
 saveMySQLTable(games, 'games', engine, reset_index=False)
-
-gsb = pd.read_pickle('/home/jonathan/NHL-Project/gamesSinceBackupDefault.pickle')
-ltb = pd.read_pickle('/home/jonathan/NHL-Project/lastTimeBackupDefault.pickle')
-statsb = pd.read_pickle('/home/jonathan/NHL-Project/statsBackupDefault.pickle')
-
-scp jonathan@45.33.16.89:/home/jonathan/myGames.pickle /Users/jonathanolson/GitHub/NHL-Project
-
-
-def backupTables():
-
-    today = pd.to_datetime('today').date()
-
-    # Create engines: one for the 'backups' database, one for the current data database
-    backupsEngine = createEngine(database='backups')
-    engine = createEngine(database=None)
-
-    # Instantiate the current, active dataframes
-    games = openMySQLTable('games', engine)
-    gamesSince = openMySQLTable('2018_2019_GamesSince', engine)
-    lastTime = openMySQLTable('2018_2019_LastTime', engine)
-    stats = openMySQLTable('2018_2019_stats', engine)
-
-    # Instantiate the MySQL databases as pandas dataframes, for editing
-    gamesBackup = openMySQLTable('gamesBackup', backupsEngine)
-    gamesSinceBackup = openMySQLTable('gamesSinceBackup', backupsEngine)
-    lastTimeBackup = openMySQLTable('lastTimeBackup', backupsEngine)
-    statsBackup = openMySQLTable('statsBackup', backupsEngine)
-
-    # Add today's date in a new column, 'Backup_Date', to the current, active DFs
-    games['Backup_Date'] = today
-    gamesSince['Backup_Date'] = today
-    lastTime['Backup_Date'] = today
-    stats['Backup_Date'] = today
-
-    # Concat the current backups with the new rows from the current active DFs
-    gamesBackup = pd.concat([gamesBackup, games])
-    gamesSinceBackup = pd.concat([gamesSinceBackup, gamesSince])
-    lastTimeBackup = pd.concat([lastTimeBackup, lastTime])
-    statsBackup = pd.concat([statsBackup, stats])
-
 
 '''
