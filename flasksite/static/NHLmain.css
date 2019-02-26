@@ -383,6 +383,7 @@ hr {
 
 .spanning-flex-box {
   height: 125px;
+  width: 100%;
 }
 
 .rounded-circle.account-img {
