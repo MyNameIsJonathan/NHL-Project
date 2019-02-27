@@ -1,10 +1,10 @@
-# python3
+
 
 import ast
-from flask import render_template, request, Blueprint, send_from_directory
+import pandas as pd
+from flask import render_template, Blueprint
 from flasksite import mysql
 import NHL_scrape_functions as nhl
-import pandas as pd
 
 
 # Create a blueprint for the Flask site
@@ -61,43 +61,48 @@ def nhl_stats():
     gamesSinceHTML = gamesSince.head(10).to_html(
         classes=['table', 'stat-table'], index_names=False, justify='center')
 
+    # Close the connection to MySql
+    nhlengine.dispose()
+
     return render_template('nhl_stats.html', title='NHL Stats', myDF=myDFHTML,
                            lastTimeDF=lastTimeHTML, gamesSinceDF=gamesSinceHTML)
 
 @main.route("/todays_players")
 def todays_players():
 
-    # Open dict of todays drought leaders and int of number of players today
-    today = pd.to_datetime('today').date()
-    cursor = mysql.get_db().cursor()
-    cursor.execute("SELECT * FROM todaysDroughts WHERE Date = '%s'" % (today))
-    todaysDroughts = cursor.fetchone()
+    with mysql.get_db().cursor() as cursor:
 
-    # Row proxy is indexable; select the dictionary and number of players today
-    droughtsDict = ast.literal_eval(todaysDroughts[2])
-    numberOfPlayersToday = todaysDroughts[3]
+        # Open dict of todays drought leaders and int of number of players today
+        today = pd.to_datetime('today').date()
+        cursor.execute("SELECT * FROM todaysDroughts WHERE Date = '%s'" % (today))
+        todaysDroughts = cursor.fetchone()
 
-    return render_template('todays_players.html', title="Today's Players",
-                           todaysDroughts=droughtsDict,
-                           numberOfPlayersToday=numberOfPlayersToday)
+        # Row proxy is indexable; select the dictionary and number of players today
+        droughtsDict = ast.literal_eval(todaysDroughts[2])
+        numberOfPlayersToday = todaysDroughts[3]
+
+        return render_template('todays_players.html', title="Today's Players",
+                               todaysDroughts=droughtsDict,
+                               numberOfPlayersToday=numberOfPlayersToday)
 
 @main.route("/stamkostweets")
 def stamkostweets():
 
-    cursor = mysql.get_db().cursor()
 
-    #Open tweets mentioning stamkos from the last week
-    cursor.execute("SELECT * FROM stamkosTweets")
-    cursorTweets = cursor.fetchall()
+    with mysql.get_db().cursor() as cursor:
 
-    my_tweets = {}
+        #Open tweets mentioning stamkos from the last week
+        cursor.execute("SELECT * FROM stamkosTweets")
+        cursorTweets = cursor.fetchall()
 
-    for i, tweet in enumerate(cursorTweets):
-        my_tweets[i] = {
-            'created_at': pd.to_datetime(tweet[0]).strftime('%a %b %-d, %Y'),
-            'text': tweet[1],
-            'author': tweet[2]
-        }
+        my_tweets = {}
 
-    return render_template('stamkostweets.html', title='Stamkos Tweets',
-                           my_tweets=my_tweets, my_length=len(my_tweets))
+        for i, tweet in enumerate(cursorTweets):
+            my_tweets[i] = {
+                'created_at': pd.to_datetime(tweet[0]).strftime('%a %b %-d, %Y'),
+                'text': tweet[1],
+                'author': tweet[2]
+            }
+
+        return render_template('stamkostweets.html', title='Stamkos Tweets',
+                               my_tweets=my_tweets, my_length=len(my_tweets))

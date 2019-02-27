@@ -1,9 +1,7 @@
 from flasksite import db, login_manager #Goes into __init__.py file and imports db
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from datetime import datetime
 from flask_login import UserMixin
 from flask import current_app
-import os
 
 #The @ symbol indicates the following is a decorator
 @login_manager.user_loader
@@ -16,8 +14,9 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
     password = db.Column(db.String(60), nullable=False)
-    #backref allows us to get the user who created the post
-    #lazy defines when sqlalchemy loads the datafrom the database. True means it will load data as-needed in one go
+    # backref allows us to get the user who created the post
+    # lazy defines when sqlalchemy loads the datafrom the database. True means
+    # it will load data as-needed in one go
         #This allows us to use post attribute to get all of a user's posts
         #Not a column
     # posts = db.relationship('Post', backref='author', lazy=True)
@@ -31,11 +30,10 @@ class User(db.Model, UserMixin):
         s = Serializer(current_app.config['SECRET_KEY'])
         try:
             user_id = s.loads(token)['user_id']
-        except: 
+        except:
             return None
         return User.query.get(user_id)
 
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}', '{self.image_file}'"
-
