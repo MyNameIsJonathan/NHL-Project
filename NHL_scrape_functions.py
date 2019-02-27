@@ -38,7 +38,8 @@ def nonFlaskCreateEngine():
     MYSQL_HOST = myConfig.MYSQL_DATABASE_HOST
     MYSQL_USER = myConfig.MYSQL_DATABASE_USER
 
-    engine = create_engine(f'mysql+mysqldb://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}')
+    engine = create_engine((f'mysql+mysqldb://{MYSQL_USER}:{MYSQL_PASSWORD}@'
+                            f'{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}'))
 
     print('MySQL Connection Engine successfully created')
 
@@ -59,7 +60,8 @@ def createEngine(database=None):
     MYSQL_HOST = current_app.config['MYSQL_DATABASE_HOST']
     MYSQL_USER = current_app.config['MYSQL_DATABASE_USER']
 
-    engine = create_engine(f'mysql+mysqldb://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}')
+    engine = create_engine(f'mysql+mysqldb://{MYSQL_USER}:{MYSQL_PASSWORD}@'
+                           f'{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}')
 
     print('MySQL Connection Engine successfully created')
 
@@ -88,26 +90,26 @@ def getFirstUnscrapedDay(engine):
 def openMySQLTable(table_name, engine, myIndex='Player'):
 
     myRegularTables = (['2018_2019_GamesSince', '2018_2019_stats',
-    'gamesBackup','gamesSinceBackup', 'lastTimeBackup', 'statsBackup',
-    'todaysDroughts', 'dailyDataFrames', 'stamkosTweets'])
+                        'gamesBackup', 'gamesSinceBackup', 'lastTimeBackup',
+                        'statsBackup', 'todaysDroughts', 'dailyDataFrames',
+                        'stamkosTweets'])
 
     if table_name == 'games':
         return pd.read_sql_table('games', engine, parse_dates=['Date'])
     elif table_name == '2018_2019_LastTime':
         if myIndex is None:
             return pd.read_sql_table('2018_2019_LastTime', engine, parse_dates=(
-            ['G', 'A', 'PTS', 'Plus', 'Minus', 'PIM', 'EV', 'PP', 'SH', 'GW',
-            'S', 'Last_Game_Date', 'Last_Game_Date']))
+                ['G', 'A', 'PTS', 'Plus', 'Minus', 'PIM', 'EV', 'PP', 'SH',
+                 'GW', 'S', 'Last_Game_Date', 'Last_Game_Date']))
         else:
             return pd.read_sql_table('2018_2019_LastTime', engine, parse_dates=(
-            ['G', 'A', 'PTS', 'Plus', 'Minus', 'PIM', 'EV', 'PP', 'SH', 'GW',
-            'S', 'Last_Game_Date', 'Last_Game_Date'])).set_index(myIndex)
-            return
+                ['G', 'A', 'PTS', 'Plus', 'Minus', 'PIM', 'EV', 'PP', 'SH',
+                 'GW', 'S', 'Last_Game_Date', 'Last_Game_Date']))\
+                .set_index(myIndex)
     elif table_name in myRegularTables:
         if myIndex is None:
             return pd.read_sql_table(table_name, engine)
-        else:
-            return pd.read_sql_table(table_name, engine).set_index(myIndex)
+        return pd.read_sql_table(table_name, engine).set_index(myIndex)
 
 def saveMySQLTable(myDF, dbName, engine, reset_index=True):
     if reset_index is True:
@@ -164,13 +166,14 @@ def getURLS(date):
     print(f'Getting URLs for date: {date}')
 
     # Create the hockey-reference link for the day's games
-    url = 'https://www.hockey-reference.com/boxscores/index.fcgi?month={}&day={}&year={}'.format(date.month, date.day, date.year)
+    url = ('https://www.hockey-reference.com/boxscores/index.fcgi?'
+           f'month={date.month}&day={date.day}&year={date.year}')
 
     # Record team names for each game
     my_days_games = pd.read_html(url)
     my_home_teams = []
     my_away_teams = []
-    my_date = str(year) + '/' + str(month) + '/' + str(day)
+    my_date = str(date.year) + '/' + str(date.month) + '/' + str(date.day)
     my_game_dates = []
 
     # Iterate through returned list of dfs, to record home and away team names
@@ -244,7 +247,7 @@ def cleanGame(game_df):
 
     # Delete columns that are only present in the datasets starting in 2014-2015
     cols_to_drop = (['EV.1', 'PP.1', 'SH.1', 'S%', 'EV.2', 'PP.2', 'SH.2',
-    'Unnamed: 15', 'Unnamed: 16', 'Unnamed: 17'])
+                     'Unnamed: 15', 'Unnamed: 16', 'Unnamed: 17'])
     game_df = game_df.drop([column for column in cols_to_drop if column in game_df.columns], axis=1)
 
     # Rename columns for better readability
@@ -284,19 +287,23 @@ def todaysPlayerDroughts(todaysGames, engine):
     #Get the list of teams playing today
     teams_playing_today = list(todaysGames['Home'].unique()) + list(todaysGames['Away'].unique())
 
-    #Fill players_playing_today by iterating through the team-player dictionary from the file team_creation.py
-    NHL_teams_and_players = pd.read_pickle('/home/jonathan/NHL-Project/pickleFiles/Teams/NHL_teams_and_players.pickle')
+    # Fill players_playing_today by iterating through the team-player dictionary
+    # from the file team_creation.py
+    NHL_teams_and_players = pd.read_pickle(
+        ('/home/jonathan/NHL-Project/pickleFiles/Teams/'
+         'NHL_teams_and_players.pickle'))
 
-    #Instantiate a list of player names who play today and fill it
+    # Instantiate a list of player names who play today and fill it
     players_playing_today = []
     for team in teams_playing_today:
-        players_playing_today.extend([player.Name for player in NHL_teams_and_players[team]])
+        players_playing_today.extend(
+            [player.Name for player in NHL_teams_and_players[team]])
     players_playing_today = pd.Series(players_playing_today).unique()
 
-    #Save how many players are playing today
+    # Save how many players are playing today
     numberOfPlayersToday = len(players_playing_today)
 
-    #Open yesterday's GamesSince df to see the games since each of today's players scored, etc.
+    # Open yesterday's GamesSince df to see the games since each of today's players scored, etc.
     GamesSince = openMySQLTable('2018_2019_GamesSince', engine, myIndex='Player')
     todays_GamesSince = GamesSince.loc[players_playing_today, :]
 
@@ -304,14 +311,18 @@ def todaysPlayerDroughts(todaysGames, engine):
     lastTime = openMySQLTable('2018_2019_LastTime', engine, myIndex='Player')
     todays_lastTime = lastTime.loc[players_playing_today, :]
 
-    #Save the top 5 players for each category of GamesSince, such as the 5 players who haven't scored in the most games
+    # Save the top 5 players for each category of GamesSince, such as the 5
+    # players who haven't scored in the most games
     todaysDroughts = {}
 
     #Select all columns except Total Recorded Games
-    myColumns = ['G', 'A', 'PTS', 'Plus', 'Minus', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S']
+    myColumns = ['G', 'A', 'PTS', 'Plus', 'Minus', 'PIM', 'EV', 'PP', 'SH',
+                 'GW', 'S']
 
-    # Loop through columns to select oldest feat for each. Skip player if they've never accomplished selected feat within
-    # the dates of my dataset (my dataset spans 2000-10-4 and later, so date='2000-10-3')
+    # Loop through columns to select oldest feat for each. Skip player if
+    # they've never accomplished selected feat within
+    # the dates of my dataset (my dataset spans 2000-10-4 and later, so
+    # date='2000-10-3')
     null_date = pd.to_datetime('2000-10-3', format="%Y-%m-%d").date()
     for column in myColumns:
         myAvailablePlayers = todays_lastTime.loc[todays_lastTime[column].dt.date > null_date].index
@@ -319,10 +330,12 @@ def todaysPlayerDroughts(todaysGames, engine):
         myPlayer = mySlice.loc[mySlice[column] == mySlice[column].max()].index[0]
         myDate = todays_lastTime.loc[myPlayer, column].date().strftime('%a %b %-d, %Y')
 
-        todaysDroughts[column] = [myPlayer, int(todays_GamesSince.loc[myPlayer, column]), str(myDate)]
+        todaysDroughts[column] = [myPlayer,
+                                  int(todays_GamesSince.loc[myPlayer, column]),
+                                  str(myDate)]
 
     # Append the new data to the todaysDroughts dataframe
-    droughtsDF =  openMySQLTable('todaysDroughts', engine, myIndex=None)
+    droughtsDF = openMySQLTable('todaysDroughts', engine, myIndex=None)
     newRow = pd.Series({
         'id': droughtsDF['id'].max() + 1,
         'Date': pd.to_datetime('today').date(),
@@ -345,13 +358,19 @@ def makeTodaysHTML(engine):
     stats['TOI'] = stats['TOI'].astype(int)
     stats = stats.sort_values(['G', 'PTS'], ascending=False)
     stats = stats.reindex((['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH',
-    'GW', 'S', 'Shifts', 'TOI']), axis=1)
+                            'GW', 'S', 'Shifts', 'TOI']), axis=1)
 
     # Clean lastTime
-    lastTime = lastTime[lastTime['Last_Game_Date'].dt.date >= pd.to_datetime('2018-7-1', format="%Y-%m-%d").date()] # Select for players who've played in last 30 days only
-    lastTime = lastTime[lastTime['G'].dt.date > pd.to_datetime('2000-10-03', format="%Y-%m-%d").date()] # Players who've never scored have last goal set as 2000/10/3. Remove these players
+    # Select for players who've played in last 30 days only
+    lastTime = lastTime[lastTime['Last_Game_Date'].dt.date >= \
+        pd.to_datetime('2018-7-1', format="%Y-%m-%d").date()]
+    # Players who've never scored have last goal set as 2000/10/3. Remove these players
+    lastTime = lastTime[lastTime['G'].dt.date > \
+        pd.to_datetime('2000-10-03', format="%Y-%m-%d").date()]
     lastTime = lastTime.sort_values(['G', 'A'])
-    lastTime = lastTime.reindex(['Last_Game_Date', 'G', 'A', 'PTS', 'Plus' 'Minus', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S'], axis=1)
+    lastTime = lastTime.reindex(['Last_Game_Date', 'G', 'A', 'PTS', 'Plus',
+                                 'Minus', 'PIM', 'EV', 'PP', 'SH', 'GW', 'S'],
+                                axis=1)
 
     # Grab the players in this df, for slicing retired players from the gamesSince DF
     currentPlayers = lastTime.index
@@ -359,9 +378,15 @@ def makeTodaysHTML(engine):
     gamesSince = gamesSince.sort_values(['G', 'A'], ascending=False)
 
     # Replace date '2000-10-3' with 'Never'
-    stats = stats.replace(to_replace=pd.to_datetime('2000-10-3', format="%Y-%m-%d").date(), value='Never')
-    lastTime = lastTime.replace(to_replace=pd.to_datetime('2000-10-3', format="%Y-%m-%d").date(), value='Never')
-    gamesSince = gamesSince.replace(to_replace=pd.to_datetime('2000-10-3', format="%Y-%m-%d").date(), value='Never')
+    stats = stats.replace(
+        to_replace=pd.to_datetime('2000-10-3', format="%Y-%m-%d").date(),
+        value='Never')
+    lastTime = lastTime.replace(
+        to_replace=pd.to_datetime('2000-10-3', format="%Y-%m-%d").date(),
+        value='Never')
+    gamesSince = gamesSince.replace(
+        to_replace=pd.to_datetime('2000-10-3', format="%Y-%m-%d").date(),
+        value='Never')
 
     # Set pandas options
     pd.set_option('colheader_justify', 'center')
@@ -390,7 +415,8 @@ def opentodaysHTML(engine):
 
     # Get the last row of the table, sorted by date. This means itll be today's
     # html, unless there was an error, allowing it to fall back on yest. html
-    myHTML = engine.execute(f"SELECT * FROM dailyDataFrames ORDER BY date DESC LIMIT 1").fetchone()
+    myHTML = engine.execute(
+        f"SELECT * FROM dailyDataFrames ORDER BY date DESC LIMIT 1").fetchone()
 
     # Select each component from myHTML (index: value --> 0: id, 1: date,
     # 2: mydf, 3: lastTime, 4: gamesSince). Convert these dicts to DataFrames
@@ -399,9 +425,18 @@ def opentodaysHTML(engine):
     gamesSince = pd.DataFrame.from_dict(json.loads(myHTML['gamesSince']))
 
     # Convert DFs to html
-    myDFHTML = mydf.head(10).to_html(classes=['table', 'stat-table'], index_names=False, justify='center')
-    lastTimeHTML = lastTime.head(10).to_html(classes=['table', 'stat-table'], index_names=False, justify='center')
-    gamesSinceHTML = gamesSince.head(10).to_html(classes=['table', 'stat-table'], index_names=False, justify='center')
+    myDFHTML = mydf.head(10).to_html(
+        classes=['table', 'stat-table'],
+        index_names=False,
+        justify='center')
+    lastTimeHTML = lastTime.head(10).to_html(
+        classes=['table', 'stat-table'],
+        index_names=False,
+        justify='center')
+    gamesSinceHTML = gamesSince.head(10).to_html(
+        classes=['table', 'stat-table'],
+        index_names=False,
+        justify='center')
 
     todaysHTML = {
         'myDF': myDFHTML,
@@ -416,7 +451,8 @@ def openTodaysDroughts(engine):
 
     today = pd.to_datetime('today').date()
 
-    todaysDroughts = engine.execute(f"SELECT * FROM todaysDroughts WHERE Date = '{today}'").fetchone()
+    todaysDroughts = engine.execute(
+        f"SELECT * FROM todaysDroughts WHERE Date = '{today}'").fetchone()
 
     print('todaysDroughts DF opened successfully')
 
@@ -444,14 +480,14 @@ def scrapeSpecificDaysURLS(engine, date):
     """[scrapes all html links for the given date returning them as a pandas DF'.
     """
 
-    daysGames = pd.read_sql_query(f"SELECT * FROM games WHERE Date = '{date}'", con=engine)
+    daysGames = pd.read_sql_query(
+        f"SELECT * FROM games WHERE Date = '{date}'", con=engine)
 
     daysGames['Game Number'] = daysGames['Game Number'].astype(int)
 
     if len(daysGames) == 0:
         return 'No Games Found'
-    else:
-        return daysGames
+    return daysGames
 
 def scrapeSpecificDaysGames(date, myGames):
 
@@ -502,7 +538,9 @@ def cleanSpecificDaysGames(date, rawGames, engine):
     gamesDF = openMySQLTable('games', engine, myIndex=None)
 
     for homeTeam, game in cleanGames.items():
-        gamesDF.loc[(gamesDF['Date'] == str(date)) & (gamesDF['Home'] == homeTeam), 'Game'] = str(game)
+        gamesDF.loc[
+            (gamesDF['Date'] == str(date)) &
+            (gamesDF['Home'] == homeTeam), 'Game'] = str(game)
 
     # Save gamesDF to MySQL. No need to reset index
     saveMySQLTable(gamesDF, 'games', engine, reset_index=False)
@@ -540,8 +578,9 @@ def updateSpecificDaysLastTime(date, engine):
 
         #Create the new index, which is a union of the main one and the one from the specific game
         new_index = lastTime.index.union(game_df.index)
-        #Implement the new index, filling in empty values with the date '2000/10/4' (start of '00 season)
-        lastTime = lastTime.reindex(new_index, fill_value=datetime.date(2000,10,3))
+        #Implement the new index, filling in empty values with the date
+        # '2000/10/4' (start of '00 season)
+        lastTime = lastTime.reindex(new_index, fill_value=datetime.date(2000, 10, 3))
         #Collect the date of the game
         game_date = game_df['Date'].mode()
 
@@ -602,12 +641,14 @@ def updateSpecificGamesSince(date, engine):
     #Iterate through all games in cleanGames dictionary
     for team, game_df in cleanGames.items():
 
-        #Create the new index, which is a union of the main one and the one from the specific game
+        #Create the new index, which is a union of the main one and the one from
+        # the specific game
         new_index = GamesSince.index.union(game_df.index)
         #Implement the new index, filling in empty values with the value 0
         GamesSince = GamesSince.reindex(new_index, fill_value=0)
 
-        #Iterate through columns to 1 - reset counter to 0 for any stat change and 2 - increment counters for unchanged stats by 1
+        #Iterate through columns to 1 - reset counter to 0 for any stat change
+        # and 2 - increment counters for unchanged stats by 1
         for column in cols:
             GamesSince.loc[game_df[game_df[column] > 0].index, column] = 0
             GamesSince.loc[game_df[game_df[column] == 0].index, column] += 1
@@ -642,7 +683,8 @@ def incorporateSpecificDaysStats(date, engine):
     myDF = openMySQLTable('2018_2019_stats', engine, myIndex='Player')
 
     # Select columns to add
-    columnsToAdd = ['+/-', 'A', 'EV', 'G', 'GW', 'PIM', 'PP', 'PTS', 'S', 'SH', 'Shifts', 'TOI']
+    columnsToAdd = ['+/-', 'A', 'EV', 'G', 'GW', 'PIM', 'PP', 'PTS', 'S', 'SH',
+                    'Shifts', 'TOI']
 
     # Indicate how many games are incorporated
     print('Adding {} games to myDF'.format(len(sqlDF)))
@@ -660,7 +702,8 @@ def incorporateSpecificDaysStats(date, engine):
         myDF[columnsToAdd] = myDF[columnsToAdd].add(gameDF[columnsToAdd], fill_value=0)
 
     # Convert columns to int
-    columns_to_int = ['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW', 'EV', 'PP', 'SH', 'S', 'Shifts']
+    columns_to_int = ['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH', 'GW',
+                      'EV', 'PP', 'SH', 'S', 'Shifts']
     for column in columns_to_int:
         if column in myDF.columns:
             myDF[column] = myDF[column].astype(int)
@@ -761,8 +804,7 @@ def KnuthMorrisPratt(pattern, text):
 
     if len(result) == 0:
         return None
-    else:
-        return result
+    return result
 
 '----------------------------------------------------------'
 

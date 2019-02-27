@@ -1,4 +1,4 @@
-#To Start virtual environment for this project:
+# To Start virtual environment for this project:
 # source /Users/jonathanolson/Projects/Environments/nhl_flask/bin/activate
 
 import os
@@ -17,14 +17,16 @@ db = SQLAlchemy()
 mysql = MySQL()
 
 #Initialize our method for encrypting our submitted passwords
-bcrypt = Bcrypt() 
+bcrypt = Bcrypt()
 
 #Initialize the login manager
 login_manager = LoginManager()
 
-#Set login route for the login required 
-login_manager.login_view = ('users.login') #Pass the function name of the route. Same as we do with the url_for function
-login_manager.login_message_category = 'info' #Makes the alerts for required login a nice blue alert
+#Set login route for the login required
+login_manager.login_view = ('users.login') #Pass the function name of the route.
+# Same as we do with the url_for function
+login_manager.login_message_category = 'info' #Makes the alerts for required
+# login a nice blue alert
 
 
 mail = Mail()

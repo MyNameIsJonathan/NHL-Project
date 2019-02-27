@@ -16,7 +16,8 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user = User(username=form.username.data, email=form.email.data,
+        user = User(username=form.username.data,
+                    email=form.email.data,
                     password=hashed_password)
         db.session.add(user) #Create user instance
         db.session.commit() #Commit user to the database
@@ -39,7 +40,7 @@ def login():
             # the Remember Me box, that information is stored in form.remember
             next_page = request.args.get('next') #This allows us to redirect to
             # the intended page after being forced to login
-            #request.args is a dictionary, so using the method .get() returns
+            # request.args is a dictionary, so using the method .get() returns
             # the key if it is present but returns None if not. This means no
             # KeyError is raised if the key (next) is not in the dictionary
             return  redirect(next_page) if next_page else redirect(
