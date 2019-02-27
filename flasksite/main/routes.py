@@ -61,8 +61,6 @@ def nhl_stats():
     gamesSinceHTML = gamesSince.head(10).to_html(
         classes=['table', 'stat-table'], index_names=False, justify='center')
 
-    # Close the connection to MySql
-    nhlengine.dispose()
 
     return render_template('nhl_stats.html', title='NHL Stats', myDF=myDFHTML,
                            lastTimeDF=lastTimeHTML, gamesSinceDF=gamesSinceHTML)

@@ -126,7 +126,7 @@ def scrapeTweets():
                 # Filter out tweets that are retweeted (contain RT or are marked as retweeted)
                 # Filter out tweets that have a swear word contained in the list explicit_words; use Knuth-Morris-Prayy algorithm to improve speed
                 contains_swear = False
-                if (not tweet.retweeted) and ('RT @' not in tweet.text): # We dont want retweeted tweets, to prevent duplicates
+                if (not tweet.retweeted) and ('RT @' not in tweet.text) and (nhl.KnuthMorrisPratt('stamkos', tweet.text.lower())): # We dont want retweeted tweets, to prevent duplicates
                     for swear_word in explicit_words:
                         # Run KnuthMorrisPratt to search for presence of swear words in tweet text
                         # Runs in time O(|pattern| + |text|)
