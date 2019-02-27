@@ -1,4 +1,4 @@
-# Scrape the website https://www.hockey-reference.com for game-by-game stats
+# python3
 
 import pandas as pd
 import pickle
@@ -23,7 +23,8 @@ def nonFlaskCreateEngine():
         None
 
     Returns:
-        sqlalchemy.engine.base.Engine: A connection to the NHL MySQL Database for the given table
+        sqlalchemy.engine.base.Engine: A connection to the NHL MySQL Database
+        for the given table
 
     Raises:
         None
@@ -45,10 +46,11 @@ def nonFlaskCreateEngine():
 
 def createEngine(database=None):
 
-    """[ Opens a connection to the provided table in the NHL Stats MySQL Database]
+    """[ Opens a connection to the provided table in the NHL Stats MySQL DB]
 
     Returns:
-        [ sqlalchemy.engine.base.Engine ] -- [ A connection to the NHL MySQL Database for the given table]
+        [ sqlalchemy.engine.base.Engine ] -- [ A connection to the NHL MySQL
+                                               Database for the given table ]
     """
 
     MYSQL_DATABASE = current_app.config['MYSQL_DATABASE_DB']
@@ -65,10 +67,12 @@ def createEngine(database=None):
 
 def getFirstUnscrapedDay(engine):
 
-    """[ Uses the 'games' MySQL table to find the latest day whose games are not yet scraped]
+    """[ Uses the 'games' MySQL table to find the latest day whose games are
+         not yet scraped]
 
     Returns:
-        [ datetime.date ] -- [ Date of latest day whose games are not yet scraped ]
+        [ datetime.date ] -- [ Date of latest day whose games are not
+                               yet scraped ]
     """
 
     print('Finding first unscraped day')
@@ -141,14 +145,20 @@ def backupTables(engine):
 
 def getURLS(date):
 
-    """[Uses the given date to create the html links to www.hockey-reference.com for that day's games.
-        Scrapes that website and creates the link for each of the games on that day]
+    """[Uses the given date to create the html links to www.hockey-reference.com
+            for that day's games.
+        Scrapes that website and creates the link for each of the games
+            on that day]
 
     Returns:
-        [list] -- [boxscore_links : html links to the boxscores for each game of each day]
-        [list] -- [my_home_teams : list of home teams. The ith game's home team is in the ith position in this list]
-        [list] -- [my_away_teams : list of away teams. The ith game's away team is in the ith position in this list]
-        [list] -- [my_game_dates : dates for each game. ith game is in ith position in this list]
+        [list] -- [boxscore_links : html links to the boxscores for each game
+                    of each day]
+        [list] -- [my_home_teams : list of home teams. The ith game's home
+                    team is in the ith position in this list]
+        [list] -- [my_away_teams : list of away teams. The ith game's away
+                    team is in the ith position in this list]
+        [list] -- [my_game_dates : dates for each game. ith game is in ith
+                    position in this list]
     """
 
     print(f'Getting URLs for date: {date}')
@@ -186,7 +196,8 @@ def getURLS(date):
     boxscore_links = boxscore_links[5:-7]
     boxscore_links = ['https://' + link for link in boxscore_links]
 
-    # Return 1 - boxscore links, 2 - home team names, 3 - away team names, 4 - game dates
+    # Return 1 - boxscore links, 2 - home team names, 3 - away team names,
+    # 4 - game dates
     return (boxscore_links, my_home_teams, my_away_teams, my_game_dates)
 
 def scrapeGame(my_url, game_date, home_team_name, away_team_name):
@@ -231,7 +242,7 @@ def cleanGame(game_df):
 
     """ Cleans individual game data """
 
-    # Delete columns that are only present in the datasets starting in 2014-2015 season
+    # Delete columns that are only present in the datasets starting in 2014-2015
     cols_to_drop = (['EV.1', 'PP.1', 'SH.1', 'S%', 'EV.2', 'PP.2', 'SH.2',
     'Unnamed: 15', 'Unnamed: 16', 'Unnamed: 17'])
     game_df = game_df.drop([column for column in cols_to_drop if column in game_df.columns], axis=1)
