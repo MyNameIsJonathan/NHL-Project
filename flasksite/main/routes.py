@@ -23,18 +23,18 @@ def home():
 def nhl_stats():
 
     # Create engine connection to DB
-    engine = nhl.nonFlaskCreateEngine()
+    nhlengine = nhl.nonFlaskCreateEngine()
 
     # Select top scorers and return as DF
     mydf = pd.read_sql_query(("SELECT * FROM 2018_2019_stats ORDER BY G DESC, "
-    "A DESC LIMIT 10"), index_col='Player', con=engine)
+    "A DESC LIMIT 10"), index_col='Player', con=nhlengine)
     mydf = mydf.reindex((['G', 'A', 'PTS', '+/-', 'PIM', 'EV', 'PP', 'SH',
     'GW', 'S', 'Shifts', 'TOI']), axis=1)
 
     # Select top 10 lastTime and return as DF
     lastTime = pd.read_sql_query(("SELECT * FROM 2018_2019_LastTime WHERE (G > "
     "'2000-10-04') AND (Last_Game_Date > '2018-08-01') ORDER BY G ASC, A ASC "
-    "LIMIT 10"), index_col='Player', con=engine)
+    "LIMIT 10"), index_col='Player', con=nhlengine)
     lastTime = lastTime.reindex((['Last_Game_Date', 'G', 'A', 'PTS','PIM', 'EV',
     'Plus', 'Minus', 'PP', 'SH', 'GW', 'S']), axis=1)
     for column in lastTime.columns:
@@ -45,7 +45,7 @@ def nhl_stats():
 
     # Select top 10 gamesSince and return as DF
     gamesSince = pd.read_sql_query(("SELECT * FROM 2018_2019_GamesSince ORDER "
-    "BY G DESC, A DESC LIMIT 10"), index_col='Player', con=engine)
+    "BY G DESC, A DESC LIMIT 10"), index_col='Player', con=nhlengine)
     gamesSince = gamesSince.reindex((['G', 'A', 'PTS', 'Plus', 'Minus', 'PIM',
     'EV', 'PP', 'SH', 'GW', 'S', 'Total Recorded Games']), axis=1)
 
