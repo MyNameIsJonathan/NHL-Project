@@ -1,0 +1,4 @@
+# Ignore .pyc files
+*.pyc
+
+nhl_venv/*
