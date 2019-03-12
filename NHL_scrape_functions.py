@@ -32,14 +32,13 @@ def nonFlaskCreateEngine():
 
     myConfig = Config()
 
-    MYSQL_DATABASE = myConfig.MYSQL_DATABASE_DB
+    # MYSQL_DATABASE = myConfig.MYSQL_DATABASE_DB
     MYSQL_PASSWORD = myConfig.MYSQL_DATABASE_PASSWORD
-    MYSQL_PORT = myConfig.MYSQL_DATABASE_PORT
-    MYSQL_HOST = myConfig.MYSQL_DATABASE_HOST
-    MYSQL_USER = myConfig.MYSQL_DATABASE_USER
+    # MYSQL_PORT = myConfig.MYSQL_DATABASE_PORT
+    # MYSQL_HOST = myConfig.MYSQL_DATABASE_HOST
+    # MYSQL_USER = myConfig.MYSQL_DATABASE_USER
 
-    engine = create_engine((f'mysql+mysqldb://{MYSQL_USER}:{MYSQL_PASSWORD}@'
-                            f'{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}'))
+    engine = create_engine(f'mysql+pymysql://root:{MYSQL_PASSWORD}@db:3306/NHL_Database')
 
     print('MySQL Connection Engine successfully created')
 
@@ -54,16 +53,18 @@ def createEngine(database=None):
                                                Database for the given table ]
     """
 
-    MYSQL_DATABASE = current_app.config['MYSQL_DATABASE_DB']
+    # MYSQL_DATABASE = current_app.config['MYSQL_DATABASE_DB']
     MYSQL_PASSWORD = current_app.config['MYSQL_DATABASE_PASSWORD']
-    MYSQL_PORT = current_app.config['MYSQL_DATABASE_PORT']
-    MYSQL_HOST = current_app.config['MYSQL_DATABASE_HOST']
-    MYSQL_USER = current_app.config['MYSQL_DATABASE_USER']
+    # MYSQL_PORT = current_app.config['MYSQL_DATABASE_PORT']
+    # MYSQL_HOST = current_app.config['MYSQL_DATABASE_HOST']
+    # MYSQL_USER = current_app.config['MYSQL_DATABASE_USER']
 
-    engine = create_engine(f'mysql+mysqldb://{MYSQL_USER}:{MYSQL_PASSWORD}@'
-                           f'{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}')
+    # engine = create_engine(f'mysql+mysqldb://{MYSQL_USER}:{MYSQL_PASSWORD}@'
+    #                        f'{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}')
 
-    print('MySQL Connection Engine successfully created')
+    engine = create_engine(f'mysql+pymysql://root:{MYSQL_PASSWORD}@db:3306/NHL_Database')
+
+    # print('MySQL Connection Engine successfully created')
 
     return engine
 
@@ -130,7 +131,7 @@ def backupTables(engine):
     today = pd.to_datetime('today').date()
 
     try:
-        pd.read_pickle(f'/home/jonathan/NHL-Project/mysqlbackups/gs_{today}')
+        pd.read_pickle(f'/NHL-Project/mysqlbackups/gs_{today}')
     except FileNotFoundError:
 
         gs = openMySQLTable('2018_2019_GamesSince', engine, myIndex='Player')
@@ -138,10 +139,10 @@ def backupTables(engine):
         stats = openMySQLTable('2018_2019_stats', engine, myIndex='Player')
         games = openMySQLTable('games', engine, myIndex=None)
 
-        gs.to_pickle(f'/home/jonathan/NHL-Project/mysqlbackups/gs_{today}')
-        lt.to_pickle(f'/home/jonathan/NHL-Project/mysqlbackups/lt_{today}')
-        stats.to_pickle(f'/home/jonathan/NHL-Project/mysqlbackups/stats_{today}')
-        games.to_pickle(f'/home/jonathan/NHL-Project/mysqlbackups/games_{today}')
+        gs.to_pickle(f'/NHL-Project/mysqlbackups/gs_{today}')
+        lt.to_pickle(f'/NHL-Project/mysqlbackups/lt_{today}')
+        stats.to_pickle(f'/NHL-Project/mysqlbackups/stats_{today}')
+        games.to_pickle(f'/NHL-Project/mysqlbackups/games_{today}')
 
 '--------------- Single-Game-Specific Functions ---------------'
 
@@ -290,7 +291,7 @@ def todaysPlayerDroughts(todaysGames, engine):
     # Fill players_playing_today by iterating through the team-player dictionary
     # from the file team_creation.py
     NHL_teams_and_players = pd.read_pickle(
-        ('/home/jonathan/NHL-Project/pickleFiles/Teams/'
+        ('/NHL-Project/pickleFiles/Teams/'
          'NHL_teams_and_players.pickle'))
 
     # Instantiate a list of player names who play today and fill it
@@ -817,10 +818,10 @@ lt = openMySQLTable('2018_2019_LastTime', engine, myIndex='Player')
 stats = openMySQLTable('2018_2019_stats', engine, myIndex='Player')
 games = openMySQLTable('games', engine, myIndex=None)
 
-gs = pd.read_pickle('/home/jonathan/NHL-Project/gamesSinceDefault.pickle').reset_index()
-lt = pd.read_pickle('/home/jonathan/NHL-Project/lastTimeDefault.pickle').reset_index()
-stats = pd.read_pickle('/home/jonathan/NHL-Project/statsDefault.pickle').reset_index()
-games = pd.read_pickle('/home/jonathan/NHL-Project/gamesDefault.pickle')
+gs = pd.read_pickle('/NHL-Project/gamesSinceDefault.pickle').reset_index()
+lt = pd.read_pickle('/NHL-Project/lastTimeDefault.pickle').reset_index()
+stats = pd.read_pickle('/NHL-Project/statsDefault.pickle').reset_index()
+games = pd.read_pickle('/NHL-Project/gamesDefault.pickle')
 
 saveMySQLTable(gs, '2018_2019_GamesSince', engine, reset_index=False)
 saveMySQLTable(lt, '2018_2019_LastTime', engine, reset_index=False)

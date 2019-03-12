@@ -1,0 +1,35 @@
+
+version: '3.7'
+networks:
+  default:
+    external:
+      name: nhlflasknetwork
+services:
+  db:
+    image: nhlmariadb2
+    ports:
+      - "3306:3306"
+    volumes:
+      - type: bind # TODO -- Make this a volume mount for production
+        source: /Users/jonathanolson/GitHub/NHL-Project
+        target: /NHL-Project
+      - type: volume
+        source: mynhldb
+        target: /var/lib/mysql
+  web:
+    image: ubuntuflask2
+    ports:
+      - "5000:5000"
+    volumes:
+      - type: bind # TODO -- Make this a volume mount for production
+        source: /Users/jonathanolson/GitHub/NHL-Project
+        target: /NHL-Project
+    environment:
+      - MYSQL_PASSWORD=$MYSQL_PASSWORD
+      - SECRET_KEY=$SECRET_KEY
+    links:
+      - db
+    command: bash -c "pip3 install -r NHL-Project/newvenvRequirements.txt && python3 NHL-Project/flaskrun.py"
+volumes:
+  mynhldb:
+    external: true
