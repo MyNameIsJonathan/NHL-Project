@@ -2,3 +2,5 @@
 *.pyc
 
 nhl_venv/*
+
+.DS_Store

@@ -1,6 +1,6 @@
 import os
-import json
 
+# TODO -- Use config file or remove this code. Look for best way to pass mysql information
 # with open("/etc/config.json") as config_file:
 #     config = json.load(config_file)
 

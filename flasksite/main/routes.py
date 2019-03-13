@@ -74,17 +74,15 @@ def todays_players():
     # Open dict of todays drought leaders and int of number of players today.
     today = pd.to_datetime('today').date()
     droughtsFound = False
-    # Loop through last 10 days to find available todaysDroughts
+    # Loop through days to find last available input in todaysDroughts
     while droughtsFound is False: # If yields no rows, find last available row
         todaysDroughts = nhlengine.execute("SELECT * FROM todaysDroughts WHERE Date = '%s' LIMIT 1" % (today))
-        for i in todaysDroughts:
+        for row in todaysDroughts:
             droughtsFound = True
+            droughtsDict = ast.literal_eval(row[2])
+            numberOfPlayersToday = row[3]
+            break
         today -= pd.Timedelta(days=1)
-
-    # ResultProxy does not support indexing; select the dictionary and number of players today through iteration
-    for row in todaysDroughts:
-        droughtsDict = ast.literal_eval(row[2])
-        numberOfPlayersToday = row[3]
 
     return render_template('todays_players.html', title="Today's Players",
                            todaysDroughts=droughtsDict,
