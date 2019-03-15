@@ -29,8 +29,8 @@ services:
     environment:
       - MYSQL_PASSWORD=$MYSQL_PASSWORD
       - SECRET_KEY=$SECRET_KEY
-    links:
-      - db
+    depends_on:
+      - db # Tells docker that "web" can start once "db" is started and running
     command: bash -c "pip3 install -r NHL-Project/newvenvRequirements.txt && python3 NHL-Project/flaskrun.py"
   server:
     image: nginx
@@ -41,19 +41,25 @@ services:
       - type: bind # TODO -- Make this a volume mount for production
         source: /Users/jonathanolson/GitHub/NHL-Project/flasksite/static/favicon.ico
         target: /usr/share/nginx/html/favicon.ico
+      - ./conf.d:/etc/nginx/sites-enabled/flasksite
     ports:
      - "8080:80"
     environment:
      - NGINX_PORT=80
     command: /bin/bash -c "exec nginx -g 'daemon off;'"
   gunicornservice:
-    image: mygunicorn
+    image: ubuntugunicorn
     volumes:
       - type: bind # TODO -- Make this a volume mount for production
         source: /Users/jonathanolson/GitHub/NHL-Project
         target: /NHL-Project
     working_dir: /NHL-Project
-    command: /bin/sh -c "apk add py3-setuptools && pip3 install -r newvenvRequirements.txt && gunicorn -w 5 flaskrun:app"
+    ports:
+      - "8000:8000"
+    environment:
+      - MYSQL_PASSWORD=$MYSQL_PASSWORD
+    command:
+      /bin/bash -c "gunicorn -w 5 flaskrun:app -b 0.0.0.0:8000"
 volumes:
   mynhldb:
     external: true
