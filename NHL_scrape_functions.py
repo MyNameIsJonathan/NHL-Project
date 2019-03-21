@@ -32,19 +32,21 @@ def nonFlaskCreateEngine():
 
     myConfig = Config()
 
-    # MYSQL_DATABASE = myConfig.MYSQL_DATABASE_DB
+    MYSQL_DATABASE = myConfig.MYSQL_DATABASE_DB
     MYSQL_PASSWORD = myConfig.MYSQL_DATABASE_PASSWORD
-    # MYSQL_PORT = myConfig.MYSQL_DATABASE_PORT
-    # MYSQL_HOST = myConfig.MYSQL_DATABASE_HOST
-    # MYSQL_USER = myConfig.MYSQL_DATABASE_USER
+    MYSQL_PORT = myConfig.MYSQL_DATABASE_PORT
+    MYSQL_HOST = myConfig.MYSQL_DATABASE_HOST
+    MYSQL_USER = myConfig.MYSQL_DATABASE_USER
 
-    engine = create_engine(f'mysql+pymysql://root:{MYSQL_PASSWORD}@db:3306/NHL_Database')
+    myURL = (f'mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}')
+
+    engine = create_engine(myURL)
 
     print('MySQL Connection Engine successfully created')
 
     return engine
 
-def createEngine(database=None):
+def createEngine():
 
     """[ Opens a connection to the provided table in the NHL Stats MySQL DB]
 
@@ -53,16 +55,16 @@ def createEngine(database=None):
                                                Database for the given table ]
     """
 
-    # MYSQL_DATABASE = current_app.config['MYSQL_DATABASE_DB']
-    MYSQL_PASSWORD = current_app.config['MYSQL_DATABASE_PASSWORD']
-    # MYSQL_PORT = current_app.config['MYSQL_DATABASE_PORT']
-    # MYSQL_HOST = current_app.config['MYSQL_DATABASE_HOST']
-    # MYSQL_USER = current_app.config['MYSQL_DATABASE_USER']
+    myConfig = Config()
 
-    # engine = create_engine(f'mysql+mysqldb://{MYSQL_USER}:{MYSQL_PASSWORD}@'
-    #                        f'{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}')
+    MYSQL_DATABASE = myConfig.MYSQL_DATABASE_DB
+    MYSQL_PASSWORD = myConfig.MYSQL_DATABASE_PASSWORD
+    MYSQL_PORT = myConfig.MYSQL_DATABASE_PORT
+    MYSQL_HOST = myConfig.MYSQL_DATABASE_HOST
+    MYSQL_USER = myConfig.MYSQL_DATABASE_USER
 
-    engine = create_engine(f'mysql+pymysql://root:{MYSQL_PASSWORD}@db:3306/NHL_Database')
+    engine = create_engine((f'mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@'
+                            '{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}'))
 
     # print('MySQL Connection Engine successfully created')
 
@@ -808,24 +810,3 @@ def KnuthMorrisPratt(pattern, text):
     return result
 
 '----------------------------------------------------------'
-
-
-
-''' Helpful table backups
-
-gs = openMySQLTable('2018_2019_GamesSince', engine, myIndex='Player')
-lt = openMySQLTable('2018_2019_LastTime', engine, myIndex='Player')
-stats = openMySQLTable('2018_2019_stats', engine, myIndex='Player')
-games = openMySQLTable('games', engine, myIndex=None)
-
-gs = pd.read_pickle('/NHL-Project/gamesSinceDefault.pickle').reset_index()
-lt = pd.read_pickle('/NHL-Project/lastTimeDefault.pickle').reset_index()
-stats = pd.read_pickle('/NHL-Project/statsDefault.pickle').reset_index()
-games = pd.read_pickle('/NHL-Project/gamesDefault.pickle')
-
-saveMySQLTable(gs, '2018_2019_GamesSince', engine, reset_index=False)
-saveMySQLTable(lt, '2018_2019_LastTime', engine, reset_index=False)
-saveMySQLTable(stats, '2018_2019_stats', engine, reset_index=False)
-saveMySQLTable(games, 'games', engine, reset_index=False)
-
-'''

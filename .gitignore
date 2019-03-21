@@ -4,3 +4,5 @@
 nhl_venv/*
 
 .DS_Store
+
+myConfig.json
