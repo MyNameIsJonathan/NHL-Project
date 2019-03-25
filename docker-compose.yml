@@ -6,7 +6,7 @@ networks:
 services:
   db:
     restart: always
-    image: nhlmariadb2
+    image: jonathanguy/mymariadb
     ports:
       - "3306:3306"
     volumes:
@@ -24,7 +24,7 @@ services:
       - MYSQL_PASSWORD_FILE=/etc/mySecrets/mysql_user_password_file
   web:
     restart: always
-    image: ubuntuflask2
+    image: jonathanguy/myflask
     ports:
       - "5000:5000"
     volumes:
@@ -37,13 +37,12 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD_FILE=/etc/mySecrets/mysql_root_password_file
       - MYSQL_USER_FILE=/etc/mySecrets/mysql_user_file
-      # - MYSQL_PASSWORD=$MYSQL_PASSWORD
       - MYSQL_PASSWORD_FILE=/etc/mySecrets/mysql_user_password_file
     depends_on:
       - db # Tells docker that "web" can start once "db" is started and running
     command: bash -c "python3 NHL-Project/flaskrun.py"
   server:
-    image: nginx
+    image: jonathanguy/mynginx
     volumes:
       - type: bind # TODO -- Make this a volume mount for production
         source: /Users/jonathanolson/GitHub/NHL-Project/flasksite/templates
@@ -58,7 +57,7 @@ services:
      - NGINX_PORT=80
     command: /bin/bash -c "exec nginx -g 'daemon off;'"
   gunicornservice:
-    image: ubuntugunicorn
+    image: jonathanguy/mygunicorn
     volumes:
       - type: bind # TODO -- Make this a volume mount for production
         source: /Users/jonathanolson/GitHub/NHL-Project
