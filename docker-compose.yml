@@ -10,8 +10,8 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - type: bind # TODO -- Make this a volume mount for production
-        source: /Users/jonathanolson/GitHub/NHL-Project
+      - type: volume
+        source: myCode
         target: /NHL-Project
       - type: volume
         source: mynhldb
@@ -28,8 +28,8 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - type: bind # TODO -- Make this a volume mount for production
-        source: /Users/jonathanolson/GitHub/NHL-Project
+      - type: volume
+        source: myCode
         target: /NHL-Project
       - type: volume
         source: myConfig
@@ -45,10 +45,10 @@ services:
     image: jonathanguy/mynginx
     volumes:
       - type: bind # TODO -- Make this a volume mount for production
-        source: /Users/jonathanolson/GitHub/NHL-Project/flasksite/templates
+        source: /home/jonathan/NHL-Project/flasksite/templates
         target: /usr/share/nginx/html
       - type: bind # TODO -- Make this a volume mount for production
-        source: /Users/jonathanolson/GitHub/NHL-Project/flasksite/static/favicon.ico
+        source: /home/jonathan/NHL-Project/flasksite/static/favicon.ico
         target: /usr/share/nginx/html/favicon.ico
       - ./conf.d:/etc/nginx/sites-enabled/flasksite
     ports:
@@ -59,12 +59,12 @@ services:
   gunicornservice:
     image: jonathanguy/mygunicorn
     volumes:
-      - type: bind # TODO -- Make this a volume mount for production
-        source: /Users/jonathanolson/GitHub/NHL-Project
+      - type: volume
+        source: myCode
         target: /NHL-Project
       - type: volume
         source: myConfig
-        target: /etc/mySecrets # Here, we will have the file /etc/mySecrets/config.py
+        target: /etc/mySecrets
     working_dir: /NHL-Project
     ports:
       - "8000:8000"
