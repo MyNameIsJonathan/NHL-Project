@@ -26,7 +26,7 @@ services:
     restart: always
     image: jonathanguy/myflask
     ports:
-      - "5000:5000"
+      - "5001:5000"
     volumes:
       - type: bind
         source: /home/jonathan/NHL-Project
@@ -69,7 +69,7 @@ services:
     ports:
       - "8000:8000"
     command:
-      /bin/bash -c "gunicorn -w 5 flaskrun:app -b 0.0.0.0:8000"
+      /bin/bash -c "rmdir /etc/nginx/sites-enabled/flasksite && mv /etc/nginx/sites-enabled/flasksitefile /etc/nginx/sites-enabled/flasksite && gunicorn -w 5 flaskrun:app -b 0.0.0.0:5000"
 volumes:
   mynhldb:
     external: true
