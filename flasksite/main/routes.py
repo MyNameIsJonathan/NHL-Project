@@ -1,5 +1,3 @@
-
-
 import ast
 import pandas as pd
 from flask import render_template, Blueprint
@@ -68,39 +66,43 @@ def nhl_stats():
 @main.route("/todays_players")
 def todays_players():
 
-    with mysql.get_db().cursor() as cursor:
+    # Create engine
+    nhlengine = nhl.nonFlaskCreateEngine()
 
-        # Open dict of todays drought leaders and int of number of players today
-        today = pd.to_datetime('today').date()
-        cursor.execute("SELECT * FROM todaysDroughts WHERE Date = '%s'" % (today))
-        todaysDroughts = cursor.fetchone()
+    # Open dict of todays drought leaders and int of number of players today.
+    today = pd.to_datetime('today').date()
+    droughtsFound = False
+    # Loop through days to find last available input in todaysDroughts
+    while droughtsFound is False: # If yields no rows, find last available row
+        todaysDroughts = nhlengine.execute("SELECT * FROM todaysDroughts WHERE Date = '%s' LIMIT 1" % (today))
+        for row in todaysDroughts:
+            droughtsFound = True
+            droughtsDict = ast.literal_eval(row[2])
+            numberOfPlayersToday = row[3]
+            break
+        today -= pd.Timedelta(days=1)
 
-        # Row proxy is indexable; select the dictionary and number of players today
-        droughtsDict = ast.literal_eval(todaysDroughts[2])
-        numberOfPlayersToday = todaysDroughts[3]
-
-        return render_template('todays_players.html', title="Today's Players",
-                               todaysDroughts=droughtsDict,
-                               numberOfPlayersToday=numberOfPlayersToday)
+    return render_template('todays_players.html', title="Today's Players",
+                           todaysDroughts=droughtsDict,
+                           numberOfPlayersToday=numberOfPlayersToday)
 
 @main.route("/stamkostweets")
 def stamkostweets():
 
+    # Create engine
+    nhlengine = nhl.nonFlaskCreateEngine()
 
-    with mysql.get_db().cursor() as cursor:
+    #Open tweets mentioning stamkos from the last week
+    myTweets = nhlengine.execute("SELECT * FROM stamkosTweets")
 
-        #Open tweets mentioning stamkos from the last week
-        cursor.execute("SELECT * FROM stamkosTweets")
-        cursorTweets = cursor.fetchall()
+    my_tweets = {}
 
-        my_tweets = {}
+    for i, tweet in enumerate(myTweets):
+        my_tweets[i] = {
+            'created_at': pd.to_datetime(tweet[0]).strftime('%a %b %-d, %Y'),
+            'text': tweet[1],
+            'author': tweet[2]
+        }
 
-        for i, tweet in enumerate(cursorTweets):
-            my_tweets[i] = {
-                'created_at': pd.to_datetime(tweet[0]).strftime('%a %b %-d, %Y'),
-                'text': tweet[1],
-                'author': tweet[2]
-            }
-
-        return render_template('stamkostweets.html', title='Stamkos Tweets',
-                               my_tweets=my_tweets, my_length=len(my_tweets))
+    return render_template('stamkostweets.html', title='Stamkos Tweets',
+                           my_tweets=my_tweets, my_length=len(my_tweets))
