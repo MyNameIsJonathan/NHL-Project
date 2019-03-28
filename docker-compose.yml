@@ -50,7 +50,6 @@ services:
       - type: bind # TODO -- Make this a volume mount for production
         source: /home/jonathan/NHL-Project/flasksite/static/favicon.ico
         target: /usr/share/nginx/html/favicon.ico
-      - ./conf.d:/etc/nginx/sites-enabled/flasksite
     ports:
      - "8080:80"
     environment:
