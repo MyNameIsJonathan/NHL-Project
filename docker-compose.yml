@@ -11,7 +11,7 @@ services:
       - "3306:3306"
     volumes:
       - type: bind
-        source: /NHL-Project
+        source: /home/jonathan/NHL-Project
         target: /NHL-Project
       - type: volume
         source: mynhldb
@@ -29,7 +29,7 @@ services:
       - "5000:5000"
     volumes:
       - type: bind
-        source: /NHL-Project
+        source: /home/jonathan/NHL-Project
         target: /NHL-Project
       - type: volume
         source: myConfig
@@ -60,7 +60,7 @@ services:
     image: jonathanguy/mygunicorn
     volumes:
       - type: bind
-        source: /NHL-Project
+        source: /home/jonathan/NHL-Project
         target: /NHL-Project
       - type: volume
         source: myConfig
