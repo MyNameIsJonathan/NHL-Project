@@ -10,8 +10,8 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - type: volume
-        source: myCode
+      - type: bind
+        source: /NHL-Project
         target: /NHL-Project
       - type: volume
         source: mynhldb
@@ -28,8 +28,8 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - type: volume
-        source: myCode
+      - type: bind
+        source: /NHL-Project
         target: /NHL-Project
       - type: volume
         source: myConfig
@@ -59,8 +59,8 @@ services:
   gunicornservice:
     image: jonathanguy/mygunicorn
     volumes:
-      - type: volume
-        source: myCode
+      - type: bind
+        source: /NHL-Project
         target: /NHL-Project
       - type: volume
         source: myConfig
