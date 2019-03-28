@@ -55,20 +55,22 @@ services:
      - "8080:80"
     environment:
      - NGINX_PORT=80
-    command: /bin/bash -c "rmdir /etc/nginx/sites-enabled/flasksite && mv /etc/nginx/sites-enabled/flasksitefile /etc/nginx/sites-enabled/flasksite && exec nginx -g 'daemon off;'"
+    command: /bin/bash -c "exec nginx -g 'daemon off;'"
   gunicornservice:
-    image: jonathanguy/mygunicorn
+    image: nginx:1.15.10
     volumes:
       - type: bind
         source: /home/jonathan/NHL-Project
         target: /NHL-Project
+      - type: bind
+        source: /home/jonathan/NHL-Project/my_sites-enabled
       - type: volume
         source: myConfig
         target: /etc/mySecrets
     working_dir: /NHL-Project
     ports:
       - "8000:8000"
-    command:
+    command: >
       /bin/bash -c "gunicorn -w 5 flaskrun:app -b 0.0.0.0:5000"
 volumes:
   mynhldb:
