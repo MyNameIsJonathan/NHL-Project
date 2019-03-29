@@ -67,7 +67,7 @@ services:
     working_dir: /NHL-Project
     ports:
       - "8000:8000"
-    command: /bin/bash -c "gunicorn -w 5 flaskrun:app -b 0.0.0.0:5000"
+    command: /bin/bash -c "gunicorn -w 5 flaskrun:app -b 0.0.0.0:8000"
 volumes:
   mynhldb:
     external: true
