@@ -42,7 +42,7 @@ services:
       - db # Tells docker that "web" can start once "db" is started and running
     command: bash -c "python3 NHL-Project/flaskrun.py"
   server:
-    image: nginx:1.15.10
+    image: nginxtrial
     volumes:
       - type: bind # TODO -- Make this a volume mount for production
         source: /home/jonathan/NHL-Project/flasksite/templates
