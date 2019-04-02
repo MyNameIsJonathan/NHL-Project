@@ -46,9 +46,6 @@ services:
     depends_on:
       - web
     volumes:
-      - type: bind
-        source: /home/jonathan/NHL-Project/myconfig.conf
-        target: /etc/nginx/conf.d/default.conf
       - type: bind # TODO -- Make this a volume mount for production
         source: /home/jonathan/NHL-Project/flasksite/templates
         target: /usr/share/nginx/html
