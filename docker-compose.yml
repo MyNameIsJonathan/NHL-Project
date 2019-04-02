@@ -43,6 +43,7 @@ services:
     command: bash -c "python3 NHL-Project/flaskrun.py"
   server:
     image: jonathanguy/mynginx
+    depends_on: web
     volumes:
       - type: bind
         source: /home/jonathan/NHL-Project/myconfig.conf
@@ -60,6 +61,7 @@ services:
     command: /bin/bash -c "exec nginx -g 'daemon off;'"
   gunicornservice:
     image: jonathanguy/mygunicorn
+    depends_on: server
     volumes:
       - type: bind
         source: /home/jonathan/NHL-Project
