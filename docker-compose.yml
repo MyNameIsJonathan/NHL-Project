@@ -29,6 +29,9 @@ services:
       - "5000:5000"
     volumes:
       - type: bind
+        source: /home/jonathan/NHL-Project/myconfig.conf
+        target: /etc/nginx/conf.d/default.conf
+      - type: bind
         source: /home/jonathan/NHL-Project
         target: /NHL-Project
       - type: volume
@@ -44,12 +47,6 @@ services:
   server:
     image: nginxtrial
     volumes:
-      - type: bind # TODO -- if this works, copy entire folder over, commit as image
-        source: /etc/letsencrypt
-        target: /etc/letsencrypt
-      - type: bind # TODO -- if this works, copy entire folder over, commit as image
-        source: /etc/nginx
-        target: /etc/nginx
       - type: bind # TODO -- Make this a volume mount for production
         source: /home/jonathan/NHL-Project/flasksite/templates
         target: /usr/share/nginx/html
