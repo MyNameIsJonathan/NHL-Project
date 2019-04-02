@@ -29,6 +29,9 @@ services:
       - "5000:5000"
     volumes:
       - type: bind
+        source: /home/jonathan/NHL-Project/myNginx/sites-enabled
+        target: /etc/nginx/sites-enabled
+      - type: bind
         source: /home/jonathan/NHL-Project
         target: /NHL-Project
       - type: volume
