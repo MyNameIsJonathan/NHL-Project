@@ -59,7 +59,7 @@ services:
      - "80:80"
     environment:
      - NGINX_PORT=80
-    command: /bin/bash -c "chown -R nginx /usr/share/nginx/html && exec nginx -g 'daemon off;'"
+    command: /bin/bash -c "chown -R server /usr/share/nginx/html && exec nginx -g 'daemon off;'"
   gunicornservice:
     image: jonathanguy/mygunicorn
     depends_on:
