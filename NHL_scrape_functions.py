@@ -1,7 +1,4 @@
-# python3
-
 import pandas as pd
-import pickle
 import requests
 import datetime
 import time
@@ -23,8 +20,8 @@ def nonFlaskCreateEngine():
         None
 
     Returns:
-        sqlalchemy.engine.base.Engine: A connection to the NHL MySQL Database
-        for the given table
+        sqlalchemy.engine.base.Engine - A connection to the NHL MySQL Database
+                                        for the given table
 
     Raises:
         None
@@ -45,13 +42,20 @@ def nonFlaskCreateEngine():
 
     return engine
 
-def createEngine(database=None):
+def createEngine():
 
-    """[ Opens a connection to the provided table in the NHL Stats MySQL DB]
+    """
+    Opens a connection to the provided table in the NHL Stats MySQL DB
+
+    Args:
+    None
 
     Returns:
-        [ sqlalchemy.engine.base.Engine ] -- [ A connection to the NHL MySQL
-                                               Database for the given table ]
+    sqlalchemy.engine.base.Engine - An SQLAlchemy engine connection to the
+                                    current_app's database
+
+    Raises:
+    None
     """
 
     MYSQL_DATABASE = current_app.config['MYSQL_DATABASE_DB']
@@ -69,25 +73,46 @@ def createEngine(database=None):
 
 def getFirstUnscrapedDay(engine):
 
-    """[ Uses the 'games' MySQL table to find the latest day whose games are
-         not yet scraped]
+    """
+    Uses the 'games' MySQL table to find the latest day whose games are
+    not yet scraped
+
+    Args:
+    engine: sqlalchemy.engine.base.Engine - SQLAlchemy engine connection to
+                                            NHL_Database MySQL database
 
     Returns:
-        [ datetime.date ] -- [ Date of latest day whose games are not
-                               yet scraped ]
-    """
+    datetime.date - Date of latest day whose games are not
+                    yet scraped
 
-    print('Finding first unscraped day')
+    Raises:
+    None
+    """
 
     games = openMySQLTable('games', engine, myIndex=None)
     unscrapedDays = games.loc[games['Game'].isnull()]
     firstUnscrapedDay = unscrapedDays.loc[:, 'Date'].min().date()
 
-    print(f'First unscraped day successfully found: {firstUnscrapedDay}')
-
     return firstUnscrapedDay
 
 def openMySQLTable(table_name, engine, myIndex='Player'):
+
+    """
+    Opens MySQL table, using provided SQLAlchemy engine. Formats output based
+    on which table is specified
+
+    Args:
+    table_name: String - Name of table to return
+    engine: sqlalchemy.engine.base.Engine - SQLAlchemy engine connection to
+                                            NHL_Database MySQL database
+    myIndex: String - Specifies index to set in returned pandas dataframe
+
+    Returns:
+    A Pandas DataFrame of the specified table, with the index set to 'Player'
+
+    Raises:
+    None
+    """
 
     myRegularTables = (['2018_2019_GamesSince', '2018_2019_stats',
                         'gamesBackup', 'gamesSinceBackup', 'lastTimeBackup',
@@ -112,6 +137,29 @@ def openMySQLTable(table_name, engine, myIndex='Player'):
         return pd.read_sql_table(table_name, engine).set_index(myIndex)
 
 def saveMySQLTable(myDF, dbName, engine, reset_index=True):
+
+    """
+    Saves MySQL table after resetting index, if necessary. This prevents losing
+    the index in event of loading the table without specifying the index,
+    thereby losing the index.
+
+    Args:
+    myDF: Pandas DataFrame - A dataframe to save
+    dbName: String - Name of the dataframe. Almost always "NHL_Database"
+    engine: sqlalchemy.engine.base.Engine - SQLAlchemy engine connection to
+                                            NHL_Database MySQL database
+    reset_index: Boolean - Instructs save method to reset/not reset index.
+                           Resetting index returns sequential list [0, 1, 2...]
+                           to index and returns column of player names to normal
+                           column.
+
+    Returns:
+    None
+
+    Raises:
+    None
+    """
+
     if reset_index is True:
         myDF = myDF.reset_index()
     myDF.to_sql(
@@ -121,18 +169,29 @@ def saveMySQLTable(myDF, dbName, engine, reset_index=True):
         if_exists='replace')
 
 def backupTables(engine):
+
     """
-    [Saves the current MySQL NHL_Database tables as pickled pandas DFs]
-    [Input] - Engine connecting to MySQL NHL_Database via SQLAlchemy
-    [Output] - None
+    Saves the current MySQL NHL_Database tables as pickled pandas DFs. Looks
+    for Pickle files labeled with todays date. Upon finding none, saves
+    dataframes as pickle files labeled with today's date.
+
+    Args:
+    engine: sqlalchemy.engine.base.Engine - SQLAlchemy engine connection to
+                                            NHL_Database MySQL database
+
+    Returns:
+    None
+
+    Raises:
+    None
     """
 
     today = pd.to_datetime('today').date()
 
     try:
         pd.read_pickle(f'/home/jonathan/NHL-Project/mysqlbackups/gs_{today}')
-    except FileNotFoundError:
 
+    except FileNotFoundError:
         gs = openMySQLTable('2018_2019_GamesSince', engine, myIndex='Player')
         lt = openMySQLTable('2018_2019_LastTime', engine, myIndex='Player')
         stats = openMySQLTable('2018_2019_stats', engine, myIndex='Player')
@@ -147,20 +206,27 @@ def backupTables(engine):
 
 def getURLS(date):
 
-    """[Uses the given date to create the html links to www.hockey-reference.com
-            for that day's games.
-        Scrapes that website and creates the link for each of the games
-            on that day]
+    """
+    Uses the given date to create the html links to www.hockey-reference.com
+    for that day's games. Scrapes that website and creates the link for each of
+    the games on that day
+
+    Args:
+    date: datetime.date - A specific date
 
     Returns:
+    Tuple: Tuple - A tuple of lists
+
         [list] -- [boxscore_links : html links to the boxscores for each game
-                    of each day]
+                   of each day]
         [list] -- [my_home_teams : list of home teams. The ith game's home
-                    team is in the ith position in this list]
+                   team is in the ith position in this list]
         [list] -- [my_away_teams : list of away teams. The ith game's away
-                    team is in the ith position in this list]
+                   team is in the ith position in this list]
         [list] -- [my_game_dates : dates for each game. ith game is in ith
-                    position in this list]
+                   position in this list]
+    Raises:
+    KeyError: Raises an exception.
     """
 
     print(f'Getting URLs for date: {date}')
@@ -199,22 +265,32 @@ def getURLS(date):
     boxscore_links = boxscore_links[5:-7]
     boxscore_links = ['https://' + link for link in boxscore_links]
 
-    # Return 1 - boxscore links, 2 - home team names, 3 - away team names,
-    # 4 - game dates
     return (boxscore_links, my_home_teams, my_away_teams, my_game_dates)
 
 def scrapeGame(my_url, game_date, home_team_name, away_team_name):
 
-    """[Pulls stats from a single game, given the url (attained through getURLS)
-        the date (also from getURLS), home and away teams]
+    """
+    Pulls stats from a single game, given the url (attained through getURLS)
+    the date (also from getURLS), home and away teams
+
+    Args:
+    my_url: String - URl for the specific game (identified by home team and date)
+    game_date: String - Date of the game
+    home_team_name: String - Name of the home team
+    away_team_name: String - Name of the away team
+
     Returns:
-        [Pandas DataFrame] -- [a clean df that has the game's stats]
+    df: pandas.DataFrame - a data-cleaned dataframe that has the game's stats
+
+    Raises:
+    None
+
     """
 
     # Read table from hockey-reference
     df_list = pd.read_html(my_url, header=1)
 
-    #Select only teams' stats DataFrames, as the penalty dataframe will not
+    # Select only teams' stats DataFrames, as the penalty dataframe will not
     # exist if there are no penalties, causing indexing issues otherwise
     myDFs = []
     for df in df_list:
@@ -243,7 +319,20 @@ def scrapeGame(my_url, game_date, home_team_name, away_team_name):
 
 def cleanGame(game_df):
 
-    """ Cleans individual game data """
+    """
+    Cleans individual game data. Drops superfluous columns, renames columns,
+    round floats, etc.
+
+    Args:
+    game_df: pandas.DataFrame - The Pandas DataFrame of game data that needs
+                                to be cleaned
+
+    Returns:
+    game_df: pandas.DataFrame - The same DataFrame, cleaned.
+
+    Raises:
+    None
+    """
 
     # Delete columns that are only present in the datasets starting in 2014-2015
     cols_to_drop = (['EV.1', 'PP.1', 'SH.1', 'S%', 'EV.2', 'PP.2', 'SH.2',
@@ -270,7 +359,21 @@ def cleanGame(game_df):
 '--------------- Todays Games Functions ---------------'
 
 def findTodaysGames(engine):
-    """Get today's date and create url, date string, and scrape data"""
+
+    """
+    Get today's date and create url, date string, and scrape data
+
+    Args:
+    engine: sqlalchemy.engine.base.Engine - SQLAlchemy engine connection to
+                                            NHL_Database MySQL database
+
+    Returns:
+    games: pandas.DataFrame - A slice of the 'games' DataFrame, where the 'Date'
+    column is today's date
+
+    Raises:
+    None
+    """
 
     today = pd.to_datetime('today').date()
 
@@ -279,10 +382,22 @@ def findTodaysGames(engine):
     return games[games['Date'] == str(today)]
 
 def todaysPlayerDroughts(todaysGames, engine):
-    """Get stats for players who play today
-    Input: my_date; type: string; format: "yyyy-mm-dd" """
 
-    today = pd.to_datetime('today').date()
+    """
+    Get stats for players who play today. Saves this information in the MySQL
+    table 'todaysDroughts' as a single column
+
+    Args:
+    todaysGames: Type - This is the first param.
+    engine: sqlalchemy.engine.base.Engine - SQLAlchemy engine connection to
+                                            NHL_Database MySQL database
+
+    Returns:
+    None
+
+    Raises:
+    None
+    """
 
     #Get the list of teams playing today
     teams_playing_today = list(todaysGames['Home'].unique()) + list(todaysGames['Away'].unique())
@@ -349,6 +464,22 @@ def todaysPlayerDroughts(todaysGames, engine):
 
 def makeTodaysHTML(engine):
 
+    """
+    Make the HTML tables from the pandas Dataframes (originally MySQL table
+    entries) to be displayed on the website. Saves this information in the MySQL
+    table 'dailyDataFrames' as a new row
+
+    Args:
+    engine: sqlalchemy.engine.base.Engine - SQLAlchemy engine connection to
+                                            NHL_Database MySQL database
+
+    Returns:
+    None
+
+    Raises:
+    None
+    """
+
     # Load in the three main dataframes and select for current players, if necessary
     stats = openMySQLTable('2018_2019_stats', engine, myIndex='Player')
     lastTime = openMySQLTable('2018_2019_LastTime', engine, myIndex='Player')
@@ -413,6 +544,25 @@ def makeTodaysHTML(engine):
 
 def opentodaysHTML(engine):
 
+    """
+     Retrieve the HTML for the Pandas DataFrames made using the function
+     makeTodaysHTML(). Retrieves the top ten rows of the three DataFrames:
+     1 - myDFHTML - Cumulative NHL stats
+     2 - lastTimeHTML - Date of last accomplishment DataFrame
+     3 - gamesSinceHTML - Number of games since DataFrame
+
+    Args:
+    engine: sqlalchemy.engine.base.Engine - SQLAlchemy engine connection to
+                                            NHL_Database MySQL database
+
+     Returns:
+     todaysHTML: Dict - A dictionary of the three aforementioned DataFrames as
+                        HTML
+
+     Raises:
+     None
+     """
+
     # Get the last row of the table, sorted by date. This means itll be today's
     # html, unless there was an error, allowing it to fall back on yest. html
     myHTML = engine.execute(
@@ -447,6 +597,21 @@ def opentodaysHTML(engine):
 
 def openTodaysDroughts(engine):
 
+    """
+    Retrieves a single row from the MySQL table 'todaysDroughts', where the date
+    equals today's date.
+
+    Args:
+    engine: sqlalchemy.engine.base.Engine - SQLAlchemy engine connection to
+                                            NHL_Database MySQL database
+
+     Returns:
+     todaysDroughts - SQLAlchemy engine row proxy
+
+     Raises:
+     None
+     """
+
     print('Opening todaysDroughts DF')
 
     today = pd.to_datetime('today').date()
@@ -462,12 +627,25 @@ def openTodaysDroughts(engine):
 
 def scrapeSpecificDay(date, engine):
 
-    """ Scrape, clean, incorporate specific day's stats """
+    """
+    Scrape, clean, incorporate specific day's stats. This is a
+
+    Args:
+    date: datetime.date
+    engine: sqlalchemy.engine.base.Engine - SQLAlchemy engine connection to
+                                            NHL_Database MySQL database
+
+    Returns:
+    None
+
+    Raises:
+    None
+    """
 
     # Scrape URLs for the given date
     myGames = scrapeSpecificDaysURLS(engine, date)
     # Scrape the games from those URLs
-    rawGames = scrapeSpecificDaysGames(date, myGames)
+    rawGames = scrapeSpecificDaysGames(myGames)
     # Clean the games' DFs
     cleanSpecificDaysGames(date, rawGames, engine)
     # Update the lastTime, gamesSince, and Overall Statistics tables in MySQL
@@ -477,7 +655,20 @@ def scrapeSpecificDay(date, engine):
 
 def scrapeSpecificDaysURLS(engine, date):
 
-    """[scrapes all html links for the given date returning them as a pandas DF'.
+    """
+    Scrapes all html links for the given date
+
+    Args:
+        date: datetime.date
+        engine: sqlalchemy.engine.base.Engine - SQLAlchemy engine connection to
+                                                NHL_Database MySQL database
+
+    Returns:
+        daysGames: pandas.DataFrame - A Pandas DataFrame where
+                                      the 'Date' column equals today's date
+
+    Raises:
+        None
     """
 
     daysGames = pd.read_sql_query(
@@ -489,7 +680,23 @@ def scrapeSpecificDaysURLS(engine, date):
         return 'No Games Found'
     return daysGames
 
-def scrapeSpecificDaysGames(date, myGames):
+def scrapeSpecificDaysGames(myGames):
+
+    """
+     Takes pandas series of URLs to scrape game data from hockeyreference.com
+
+     Args:
+        myGames: pandas.DataFrame - A Pandas DataFrame where
+                                    the 'Date' column equals today's date
+
+     Returns:
+     	rawGames: dictionary - A dictionary linking games to their Dataframes
+            keys = home team name (string)
+            values = game dataframe returned from function scrapeGame
+
+     Raises:
+     	None
+     """
 
     #Create rawGames dict to store scraped games
     rawGames = {}
@@ -520,13 +727,30 @@ def scrapeSpecificDaysGames(date, myGames):
             print("Scraped 75% of total games")
         time.sleep(1)
 
-
     print('Number of games scraped = {}'.format(len(rawGames)))
 
     # Return the uncleaned/raw game dataframes in the dict rawGames
     return rawGames
 
 def cleanSpecificDaysGames(date, rawGames, engine):
+
+    """
+     Cleans game dataframes. Removes unwanted columns, renames columns, etc.
+
+     Args:
+        date: datetime.date
+        rawGames: dictionary - A dictionary linking games to their Dataframes
+            keys = home team name (string)
+            values = game dataframe returned from function scrapeGame
+        engine: sqlalchemy.engine.base.Engine - SQLAlchemy engine connection to
+                                                NHL_Database MySQL database
+
+     Returns:
+     	None -- Saves cleaned games to 'games' table in MySQL db NHL_Database
+
+     Raises:
+     	None
+     """
 
     cleanGames = {}
 
@@ -548,6 +772,23 @@ def cleanSpecificDaysGames(date, rawGames, engine):
     print('Number of games cleaned  = {}'.format(len(cleanGames)))
 
 def updateSpecificDaysLastTime(date, engine):
+
+    """
+     Updates MySQL table '2018_2019_LastTime' with the date of the last time
+        each player accomplished each feat (scored a goal, registered an assist,
+         etc.)
+
+     Args:
+        date: datetime.date
+        engine: sqlalchemy.engine.base.Engine - SQLAlchemy engine connection to
+                                                NHL_Database MySQL database
+
+     Returns:
+     	None -- saves data to MySQL table '2018_2019_LastTime'
+
+     Raises:
+     	None
+     """
 
     print("Updating Last Time to reflect new stats' dates")
 
@@ -614,6 +855,23 @@ def updateSpecificDaysLastTime(date, engine):
 
 def updateSpecificGamesSince(date, engine):
 
+    """
+    Updates MySQL table '2018_2019_GamesSince' with the number of games played
+        since each player accomplished each feat (scored a goal, registered an
+        assist, etc.)
+
+     Args:
+        date: datetime.date
+        engine: sqlalchemy.engine.base.Engine - SQLAlchemy engine connection to
+                                                NHL_Database MySQL database
+
+     Returns:
+     	None -- saves data to MySQL table '2018_2019_GamesSince'
+
+     Raises:
+     	None
+     """
+
     print("Updating GamesSince to reflect new stats from {}".format(date))
 
     #Load in GamesSince from the previous day, which will be copied and updated
@@ -676,6 +934,22 @@ def updateSpecificGamesSince(date, engine):
 
 def incorporateSpecificDaysStats(date, engine):
 
+    """
+     Updates the cumulative statistics for each NHL player from games played on
+        the specified date. These data are stored in the table '2018_2019_stats'
+
+     Args:
+        date: datetime.date
+        engine: sqlalchemy.engine.base.Engine - SQLAlchemy engine connection to
+                                                NHL_Database MySQL database
+
+     Returns:
+     	None -- saves data to MySQL table '2018_2019_stats'
+
+     Raises:
+     	None
+     """
+
     #Load games table; Contains clean games' DFs as dicts as strings
     sqlDF = pd.read_sql(f"SELECT * FROM games WHERE Date = '{date}'", con=engine)
 
@@ -717,8 +991,22 @@ def incorporateSpecificDaysStats(date, engine):
 '--------------- Aggregate Scraping, Updating Functions ---------------'
 
 def scrapeToToday(engine):
-    """Scrape games day-by-day, up to current day
-    Accomodates previously-scraped days. Automatically finds last-scraped day"""
+
+    """
+     Scrape games day-by-day, up to current day. Accomodates previously-scraped
+        days. Automatically finds last-scraped day. This is the all-encompassing
+        function for scraping, cleaning, and storing NHL data.
+
+     Args:
+        engine: sqlalchemy.engine.base.Engine - SQLAlchemy engine connection to
+                                                NHL_Database MySQL database
+
+     Returns:
+     	None
+
+     Raises:
+     	None
+     """
 
     # Backup today's tables as pickle files before scraping
     backupTables(engine)
@@ -751,19 +1039,41 @@ def scrapeToToday(engine):
 '--------------- Algorithms ---------------'
 
 def KnuthMorrisPratt(pattern, text):
+
     """
+    Finds all the occurrences of the pattern in the text
+        and return a list of all positions in the text
+        where the pattern starts in the text.
 
-    Find all the occurrences of the pattern in the text
-    and return a list of all positions in the text
-    where the pattern starts in the text.
+    Args:
+     	param1: Type - This is the first param.
+     	param2: Type - This is a second param.
 
-    Returns None if pattern not found in text, else returns
-    the 0-based indices of where the pattern begins within the text
+    Returns:
+     	None - If pattern (swear word) not found in tweet text
+        Int - integer index of where the pattern (swear word) begins in the text
 
+    Raises:
+     	KeyError: Raises an exception.
     """
 
     def computePrefix(P):
-        """Calcuates the prefixes for the Knuth-Morris-Pratt Algorithm, below """
+
+        """
+         Calcuates the prefixes for the Knuth-Morris-Pratt Algorithm, below
+
+         Args:
+         	P: string - The pattern (string) to search for within the text
+
+         Returns:
+         	S: array - an array that indicates the maximum border for all
+                       substrings P[0:i]
+
+         Raises:
+         	None
+         """
+
+        """ """
         # Create an array, s, that will store the border len for each string, ending at index i
         s = [0] * len(P)
 
@@ -804,6 +1114,7 @@ def KnuthMorrisPratt(pattern, text):
 
     if len(result) == 0:
         return None
+
     return result
 
 '----------------------------------------------------------'
