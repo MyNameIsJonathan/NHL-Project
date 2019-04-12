@@ -52,6 +52,9 @@ services:
       - type: bind # TODO -- Make this a volume mount for production
         source: /home/jonathan/NHL-Project/flasksite/static/favicon.ico
         target: /usr/share/nginx/html/favicon.ico
+      - type: bind
+        source: /home/jonathan/NHL-Project/conf/conf.d
+        target: /etc/nginx/nginx.conf
     ports:
      - "80:80"
     environment:
@@ -68,10 +71,10 @@ services:
       - type: volume
         source: myConfig
         target: /etc/mySecrets
-    working_dir: /NHL-Project
     ports:
       - "8000:8000"
     command: /bin/bash -c "gunicorn -w 5 flaskrun:app -b 0.0.0.0:8000"
+    working_dir: /NHL-Project
 volumes:
   mynhldb:
     external: true
