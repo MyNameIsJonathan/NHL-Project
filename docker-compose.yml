@@ -55,6 +55,9 @@ services:
       - type: bind
         source: /home/jonathan/NHL-Project/conf/conf.d
         target: /etc/nginx/nginx.conf
+      - type: bind
+        source: /home/jonathan/NHL-Project
+        target: /NHL-Project
     ports:
      - "80:80"
     environment:
