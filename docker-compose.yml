@@ -14,7 +14,7 @@ services:
         source: /home/jonathan/NHL-Project
         target: /NHL-Project
       - type: volume
-        source: mynhldb
+        source: mynhldb2
         target: /var/lib/mysql
       - type: volume
         source: myConfig
@@ -44,7 +44,7 @@ services:
   server:
     build: ./myNginx
     depends_on:
-      - web
+      - gunicornservice
     volumes:
       - type: bind # TODO -- Make this a volume mount for production
         source: /home/jonathan/NHL-Project/flasksite/templates
@@ -66,7 +66,7 @@ services:
   gunicornservice:
     image: jonathanguy/mygunicorn
     depends_on:
-      - server
+      - web
     volumes:
       - type: bind
         source: /home/jonathan/NHL-Project
@@ -79,7 +79,7 @@ services:
     command: /bin/bash -c "gunicorn -w 5 flaskrun:app -b 0.0.0.0:8000"
     working_dir: /NHL-Project
 volumes:
-  mynhldb:
+  mynhldb2:
     external: true
   myConfig:
     external: true
