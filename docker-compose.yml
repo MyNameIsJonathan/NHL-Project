@@ -8,7 +8,7 @@ services:
     restart: always
     image: jonathanguy/mymariadb
     ports:
-      - "3306:3306"
+      - "127.0.0.1:3306:3306"
     volumes:
       - type: volume
         source: mynhldb2
@@ -20,7 +20,7 @@ services:
     restart: always
     image: jonathanguy/myflask
     ports:
-      - "5000:5000"
+      - "127.0.0.1:5000:5000"
     volumes:
       - type: bind
         source: /home/jonathan/NHL-Project
@@ -34,7 +34,6 @@ services:
       - MYSQL_PASSWORD_FILE=/etc/mySecrets/mysql_user_password_file
     depends_on:
       - db # Tells docker that "web" can start once "db" is started and running
-    command: bash -c "python3 NHL-Project/flaskrun.py"
   server:
     build: ./myNginx
     depends_on:
@@ -47,7 +46,7 @@ services:
         source: /etc/letsencrypt
         target: /etc/letsencrypt
     ports:
-     - "80:80"
+     - "127.0.0.1:80:80"
      - "443:443"
     environment:
      - NGINX_PORT=80
@@ -64,7 +63,7 @@ services:
         source: myConfig
         target: /etc/mySecrets
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     command: /bin/bash -c "gunicorn -w 5 flaskrun:app -b 0.0.0.0:8000"
     working_dir: /NHL-Project
 volumes:
