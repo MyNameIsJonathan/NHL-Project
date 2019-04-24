@@ -14,7 +14,7 @@ from flasksite.config import Config
 db = SQLAlchemy()
 
 # Initialize database for stats
-mysql = MySQL()
+# mysql = MySQL()
 
 #Initialize our method for encrypting our submitted passwords
 bcrypt = Bcrypt()
@@ -36,7 +36,7 @@ def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    mysql.init_app(app)
+#    mysql.init_app(app)
     db.init_app(app)
     bcrypt.init_app(app)
     login_manager.init_app(app)
