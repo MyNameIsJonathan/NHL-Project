@@ -10,15 +10,9 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - type: bind
-        source: /home/jonathan/NHL-Project
-        target: /NHL-Project
       - type: volume
         source: mynhldb2
         target: /var/lib/mysql
-      - type: volume
-        source: myConfig
-        target: /etc/mySecrets # Here, we will have the file /etc/mySecrets/config.py
     environment:
       - MYSQL_USER_FILE=/etc/mySecrets/mysql_user_file
       - MYSQL_PASSWORD_FILE=/etc/mySecrets/mysql_user_password_file
@@ -46,18 +40,9 @@ services:
     depends_on:
       - gunicornservice
     volumes:
-      - type: bind # TODO -- Make this a volume mount for production
-        source: /home/jonathan/NHL-Project/flasksite/templates
-        target: /usr/share/nginx/html
-      - type: bind # TODO -- Make this a volume mount for production
-        source: /home/jonathan/NHL-Project/flasksite/static/favicon.ico
-        target: /usr/share/nginx/html/favicon.ico
       - type: bind
         source: /home/jonathan/NHL-Project/conf/conf.d
         target: /etc/nginx/nginx.conf
-      - type: bind
-        source: /home/jonathan/NHL-Project
-        target: /NHL-Project
       - type: bind
         source: /etc/letsencrypt
         target: /etc/letsencrypt
@@ -86,6 +71,4 @@ volumes:
   mynhldb2:
     external: true
   myConfig:
-    external: true
-  myCode:
     external: true
