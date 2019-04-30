@@ -1,0 +1,17 @@
+# Ignore .pyc files
+*.pyc
+
+nhl_venv/*
+
+.DS_Store
+
+myConfig.json
+
+flasksite/errors/__pycache__/
+flasksite/main/__pycache__/
+flasksite/site.db
+flasksite/users/__pycache__/
+mysqlbackups/
+newvenv/
+pickleFiles/
+site.db

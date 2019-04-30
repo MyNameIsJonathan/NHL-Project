@@ -1,7 +1,7 @@
 import os
 import json
 
-with open("/etc/config.json") as config_file:
+with open("/etc/mySecrets/myConfig.json") as config_file:
     config = json.load(config_file)
 
 class Config():
@@ -14,3 +14,9 @@ class Config():
     MYSQL_DATABASE_PORT = config.get("MYSQL_PORT")
     MYSQL_DATABASE_HOST = config.get("MYSQL_HOST")
     MYSQL_DATABASE_USER = config.get("MYSQL_USER")
+
+    # For Tweepy
+    my_consumer_key = config.get("my_consumer_key")
+    my_consumer_secret = config.get("my_consumer_secret")
+    my_access_token = config.get("my_access_token")
+    my_access_token_secret = config.get("my_access_token_secret")

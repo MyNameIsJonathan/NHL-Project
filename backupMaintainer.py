@@ -34,12 +34,12 @@ def cleanupBackups():
     myDatesToKeep = pd.date_range(start=oneWeekAgo, end=today)
 
     # Get the filenames of all pickled backups in the folder
-    allBackups = glob("/home/jonathan/NHL-Project/mysqlbackups/*.pickle")
+    allBackups = glob("/NHL-Project/mysqlbackups/*.pickle")
 
     # Keep only wanted backups
     backupsToKeep = []
     for i in allBackups:
-        myDate = pd.to_datetime(i, format="/home/jonathan/NHL-Project/mysqlbackups/backup_%Y-%m-%d.pickle").date()
+        myDate = pd.to_datetime(i, format="/NHL-Project/mysqlbackups/backup_%Y-%m-%d.pickle").date()
         if (myDate in myDatesToKeep) or (myDate.day == 1) or (myDate.day == 15):
             backupsToKeep.append(i)
 
