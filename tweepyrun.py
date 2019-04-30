@@ -100,10 +100,12 @@ def scrapeTweets():
         'whore']
 
     # Get keys and tokens for twitter scrape via tweepy. These are saved in local environment
-    my_consumer_key = os.environ['my_consumer_key']
-    my_consumer_secret = os.environ['my_consumer_secret']
-    my_access_token = os.environ['my_access_token']
-    my_access_token_secret = os.environ['my_access_token_secret']
+    myConfig = Config()
+
+    my_consumer_key = myConfig.my_consumer_key
+    my_consumer_secret = myConfig.my_consumer_secret
+    my_access_token = myConfig.my_access_token
+    my_access_token_secret = myConfig.my_access_token_secret
 
     # Use tokens and keys for authorization for twitter access
     auth = tweepy.OAuthHandler(my_consumer_key, my_consumer_secret)

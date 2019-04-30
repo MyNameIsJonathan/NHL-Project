@@ -1,7 +1,7 @@
 import ast
 import pandas as pd
 from flask import render_template, Blueprint
-from flasksite import mysql
+# from flasksite import mysql
 import NHL_scrape_functions as nhl
 
 
