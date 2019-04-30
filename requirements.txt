@@ -19,7 +19,7 @@ html5lib==1.0.1
 idna==2.7
 ipython-genutils==0.2.0
 itsdangerous==1.1.0
-Jinja2==2.10
+Jinja2==2.10.1
 jsonschema==2.6.0
 jupyter-core==4.4.0
 lxml==4.3.0
@@ -44,7 +44,7 @@ six==1.11.0
 SQLAlchemy==1.2.14
 traitlets==4.3.2
 tweepy==3.7.0
-urllib3==1.24.1
+urllib3==1.24.2
 webencodings==0.5.1
 Werkzeug==0.14.1
 WTForms==2.2.1
