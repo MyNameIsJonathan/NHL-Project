@@ -36,6 +36,7 @@ services:
       - db # Tells docker that "web" can start once "db" is started and running
   server:
     build: ./myNginx
+    restart: always
     depends_on:
       - gunicornservice
     volumes:
@@ -53,6 +54,7 @@ services:
     command: /bin/bash -c "chown -R nginx /usr/share/nginx/html && exec nginx -g 'daemon off;'"
   gunicornservice:
     image: jonathanguy/mygunicorn
+    restart: always
     depends_on:
       - web
     volumes:
