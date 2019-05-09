@@ -11,6 +11,7 @@ flasksite/errors/__pycache__/
 flasksite/main/__pycache__/
 flasksite/site.db
 flasksite/users/__pycache__/
+flasksite/static/profile_pics/
 mysqlbackups/
 newvenv/
 pickleFiles/

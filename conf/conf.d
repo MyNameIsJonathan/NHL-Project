@@ -8,7 +8,7 @@ http {
 
     server {
         listen 80;
-        server_name jonathanolson.us;
+        server_name gunicornservice;
 
         location / {
 	    root /NHL-Project/flasksite/static;
