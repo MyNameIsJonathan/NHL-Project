@@ -8,6 +8,7 @@
 </div>
 
 <br>
+<p>Subscribe to JonathanOlson.us to receive intermittent news, updates, and more!</p>
 <br>
 
 <hr>
@@ -28,8 +29,7 @@
       <br>
         <label class="form-control-label" for="last_name">Last Name</label>
       <br>
-	      <input class="form-control form-control-lg" type="text" data-recurly="last_name">
-      <br>
+        <input class="form-control form-control-lg" type="text" data-recurly="last_name">
         <div data-recurly="card"></div>
       <form id="recurly-js-sample-combined-card-form" class="ng-pristine ng-valid form-control form-control-lg" __bizdiag="531777931" __biza="WJ__">
         <div data-recurly="card">
@@ -85,14 +85,22 @@
   publicKey: 'ewr1-LcPWTh1YMo8cAhlir0Z0Vg',
   fields: {
 
+    // affects all fields
+    all: {
+      style: {
+        fontFamily: 'Roboto'
+      }
+    },
+
     // affects the combined card field
     card: {
       displayIcon: true,
       style: {
+	fontWeight: '100',
         fontSize: '1em',
-        fontColor: 'rgba(248, 218, 86, 0.712)',
+        fontColor: '#cccccc',
         placeholder: {
-          color: 'rgba(248, 218, 86, 0.712) !important',
+          color: '#cccccc !important',
           fontWeight: 'bold',
           content: {
             number: 'Card number',
