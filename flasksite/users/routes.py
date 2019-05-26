@@ -1,4 +1,5 @@
 import recurly
+import uuid
 from flask import render_template, url_for, flash, redirect, request, Blueprint
 from flask_login import login_user, current_user, logout_user, login_required
 from flasksite import db, bcrypt
@@ -90,7 +91,7 @@ def subscribe():
     return render_template('subscribe.html', title='Subscribe')
 
 # POST route to handle a new subscription form
-@app.route("/api/subscriptions/new", methods=['POST'])
+@users.route("/api/subscriptions/new", methods=['POST'])
 def new_subscription():
 
     # We'll wrap this in a try to catch any API
@@ -103,22 +104,20 @@ def new_subscription():
         account.last_name = 'Example'
         account.save()
 
-    # Create the scubscription using minimal
-    # information: plan_code, account_code, currency and
-    # the token we generated on the frontend
+        # Create the scubscription using minimal
+        # information: plan_code, account_code, currency and
+        # the token we generated on the frontend
         subscription = recurly.Subscription(
             plan_code='testplanname',
             currency='USD',
             account=recurly.Account(
                 account_code=uuid.uuid1(),
                 billing_info=recurly.BillingInfo(
-                    token_id=request.form['recurly-token']
-                    )
-                )
-            )
-
+                    token_id=request.form['recurly-token'])))
+    except:
+        pass
     # The subscription has been created and we can redirect
     # to a confirmation page
-    subscription.save()
+    # subscription.save()
     flash('You have been successfully subscribed to the Basic Plan!', 'success')
     return redirect(url_for('users.account'))
