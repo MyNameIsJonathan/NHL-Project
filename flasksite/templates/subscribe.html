@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<!-- Add JS configuration for recurly -->
+<script type="text/javascript">
+  recurly.configure({
+  publicKey: 'ewr1-LcPWTh1YMo8cAhlir0Z0Vg',
+  fields: {
+
+    // affects the combined card field
+    card: {
+      displayIcon: true,
+      style: {
+        fontSize: '1em',
+        placeholder: {
+          color: 'gray !important',
+          fontWeight: 'bold',
+          content: {
+            number: 'Card number',
+            cvv: 'CVC'
+          }
+        },
+        invalid: {
+          fontColor: 'red'
+        }
+      }
+    },
+
+    // affects individual card field types
+    number: {
+      // Custom target selector
+      selector: '#recurly-number',
+      // Format the card number
+      format: true
+    },
+    month: {
+      // Display a month select on mobile devices
+      inputType: 'mobileSelect',
+      style: {
+        placeholder: {
+          content: 'MM'
+        }
+      }
+    },
+    year: {
+      style: {
+        placeholder: {
+          content: 'YYYY'
+        }
+      }
+    },
+    cvv: {}
+  }
+});
+</script>
+
+<!-- Create a Credit Card Submission form -->
+<!-- Copied from https://dev.recurly.com/docs/recurly-js-getting-started -->
+<form>
+  <input type="text" data-recurly="first_name">
+  <input type="text" data-recurly="last_name">
+  <div data-recurly="card"></div>
+  <input type="hidden" name="recurly-token" data-recurly="token">
+  <input type="text" data-recurly="address1">
+  <input type="text" data-recurly="address2">
+  <input type="text" data-recurly="city">
+  <input type="text" data-recurly="state">
+  <input type="text" data-recurly="postal_code">
+  <input type="text" data-recurly="country">
+  <input type="text" data-recurly="phone">
+  <button>Submit</button>
+</form>
+
+
+{% endblock content %}

@@ -75,7 +75,9 @@ def account():
     return render_template('account.html', title='Account',
                            image_file=image_file, form=form)
 
-
+@users.route("/subscribe", methods=['GET'])
+def subscribe():
+    return render_template('subscribe.html', title='Subscribe')
 
 @users.route("/reset_password", methods=['GET', 'POST'])
 def reset_request():
