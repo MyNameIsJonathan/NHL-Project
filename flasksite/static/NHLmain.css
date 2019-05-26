@@ -43,6 +43,7 @@ h1 {
 
 h2 {
   text-align: center;
+  font-size: 2.5em;
 }
 
 h2.todays-players-heading {
@@ -124,6 +125,10 @@ hr {
 #primary-container {
   width: auto;
   max-width: none;
+}
+
+#subscribe {
+  font-size: 1.3rem;
 }
 
 #main-nav-bar {
