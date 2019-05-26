@@ -70,8 +70,23 @@
         <input type="hidden" name="recurly-token" data-recurly="token">
         </div>
     </div>
-  </div>
   <div class="form-group", id="subscribe">
+    <script type="text/javascript">
+      $('form').on('submit', function (event) {
+        var form = this;
+        event.preventDefault();
+        recurly.token(form, function (err, token) {
+          if (err) {
+            // handle error using err.code and err.fields
+          } else {
+            // recurly.js has filled in the 'token' field, so now we can submit the
+            // form to your server; alternatively, you can access token.id and do
+            // any processing you wish
+            form.submit();
+          }
+        });
+      });
+    </script>
       <button class="btn btn-outline-warning">Subscribe</button>
   </div>
 </form>
