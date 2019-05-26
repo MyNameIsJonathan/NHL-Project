@@ -1,59 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<!-- Add JS configuration for recurly -->
-<script type="text/javascript">
-  recurly.configure({
-  publicKey: 'ewr1-LcPWTh1YMo8cAhlir0Z0Vg',
-  fields: {
-
-    // affects the combined card field
-    card: {
-      displayIcon: true,
-      style: {
-        fontSize: '1em',
-        placeholder: {
-          color: 'gray !important',
-          fontWeight: 'bold',
-          content: {
-            number: 'Card number',
-            cvv: 'CVC'
-          }
-        },
-        invalid: {
-          fontColor: 'red'
-        }
-      }
-    },
-
-    // affects individual card field types
-    number: {
-      // Custom target selector
-      selector: '#recurly-number',
-      // Format the card number
-      format: true
-    },
-    month: {
-      // Display a month select on mobile devices
-      inputType: 'mobileSelect',
-      style: {
-        placeholder: {
-          content: 'MM'
-        }
-      }
-    },
-    year: {
-      style: {
-        placeholder: {
-          content: 'YYYY'
-        }
-      }
-    },
-    cvv: {}
-  }
-});
-</script>
-
 <br>
 
 <div class="container">
@@ -131,5 +78,58 @@
   </div>
   <button class="btn btn-outline-warning" id="subscribe">Submit</button>
 </form>
+
+<!-- Add JS configuration for recurly -->
+<script type="text/javascript">
+  recurly.configure({
+  publicKey: 'ewr1-LcPWTh1YMo8cAhlir0Z0Vg',
+  fields: {
+
+    // affects the combined card field
+    card: {
+      displayIcon: true,
+      style: {
+        fontSize: '1em',
+        placeholder: {
+          color: 'gray !important',
+          fontWeight: 'bold',
+          content: {
+            number: 'Card number',
+            cvv: 'CVC'
+          }
+        },
+        invalid: {
+          fontColor: 'red'
+        }
+      }
+    },
+
+    // affects individual card field types
+    number: {
+      // Custom target selector
+      selector: '#recurly-number',
+      // Format the card number
+      format: true
+    },
+    month: {
+      // Display a month select on mobile devices
+      inputType: 'mobileSelect',
+      style: {
+        placeholder: {
+          content: 'MM'
+        }
+      }
+    },
+    year: {
+      style: {
+        placeholder: {
+          content: 'YYYY'
+        }
+      }
+    },
+    cvv: {}
+  }
+});
+</script>
 
 {% endblock content %}
