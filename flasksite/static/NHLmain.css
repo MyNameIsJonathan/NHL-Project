@@ -426,10 +426,11 @@ hr {
 .recurly-box {
   color: #cccccc;
   height: auto;
-  display: flex;
+  display: inline-block;
   justify-content: space-around;
   text-align: center;
-  width: 25em;
+  width: 45%;
+  min-width: 25em;
   border-spacing: 4px;
   align-items: center;
   margin: 10px 5px;
