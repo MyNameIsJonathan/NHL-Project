@@ -30,11 +30,10 @@
         <label class="form-control-label" for="last_name">Last Name</label>
       <br>
         <input class="form-control form-control-lg" type="text" data-recurly="last_name">
+      <br>
         <div data-recurly="card"></div>
-      <form id="recurly-js-sample-combined-card-form" class="ng-pristine ng-valid form-control form-control-lg" __bizdiag="531777931" __biza="WJ__">
-        <div data-recurly="card">
+        <input type="hidden" name="recurly-token" data-recurly="token">
         </div>
-      </form>>
     </div>
     <br>
     <div class="recurly-box">
@@ -76,7 +75,9 @@
       <br>
     </div>
   </div>
-  <button class="btn btn-outline-warning" id="subscribe">Submit</button>
+  <div class="form-group", id="subscribe">
+      <input class="btn btn-outline-warning" id="subscribe" name="submit" type="submit" value="Subscribe">
+  </div>
 </form>
 
 <!-- Add JS configuration for recurly -->

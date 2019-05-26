@@ -1,3 +1,4 @@
+import recurly
 from flask import render_template, url_for, flash, redirect, request, Blueprint
 from flask_login import login_user, current_user, logout_user, login_required
 from flasksite import db, bcrypt
@@ -5,7 +6,16 @@ from flasksite.models import User
 from flasksite.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
                                    RequestResetForm, ResetPasswordForm)
 from flasksite.users.utils import save_picture, send_reset_email
+from flasksite.config import Config
 
+# Establish recurly information
+myConfig = Config()
+recurly.SUBDOMAIN = myConfig.RECURLY_SUBDOMAIN
+recurly.API_KEY = myConfig.RECURLY_API_KEY
+recurly.DEFAULT_CURRENCY = 'USD'
+
+
+# Instantiate the blueprint
 users = Blueprint('users', __name__)
 
 
@@ -79,34 +89,36 @@ def account():
 def subscribe():
     return render_template('subscribe.html', title='Subscribe')
 
-@users.route("/reset_password", methods=['GET', 'POST'])
-def reset_request():
-    if current_user.is_authenticated:
-        return redirect(url_for('main.home'))
-    form = RequestResetForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
-        send_reset_email(user)
-        flash('An instructional email has been sent to reset your password.',
-              'info')
-        return redirect(url_for('users.login'))
-    return render_template('reset_request.html', title='Reset Password',
-                           form=form)
+# POST route to handle a new subscription form
+@app.route("/api/subscriptions/new", methods=['POST'])
+def new_subscription():
 
+    # We'll wrap this in a try to catch any API
+    # errors that may occur
+    try:
 
-@users.route("/reset_password/<token>", methods=['GET', 'POST'])
-def reset_token(token):
-    if current_user.is_authenticated:
-        return redirect(url_for('main.home'))
-    user = User.verify_reset_token(token)
-    if user is None:
-        flash('That is an invalid or expired token', 'warning')
-        return redirect(url_for('users.reset_request'))
-    else:
-        form = ResetPasswordForm()
-    if form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user.password = hashed_password
-        db.session.commit() #Commit user to the database
-        flash('Your password has been updated!', 'success')
-        return redirect(url_for('users.login'))
+        account = recurly.Account(account_code='1')
+        account.email = 'verena@example.com'
+        account.first_name = 'Verena'
+        account.last_name = 'Example'
+        account.save()
+
+    # Create the scubscription using minimal
+    # information: plan_code, account_code, currency and
+    # the token we generated on the frontend
+        subscription = recurly.Subscription(
+            plan_code='testplanname',
+            currency='USD',
+            account=recurly.Account(
+                account_code=uuid.uuid1(),
+                billing_info=recurly.BillingInfo(
+                    token_id=request.form['recurly-token']
+                    )
+                )
+            )
+
+    # The subscription has been created and we can redirect
+    # to a confirmation page
+    subscription.save()
+    flash('You have been successfully subscribed to the Basic Plan!', 'success')
+    return redirect(url_for('users.account'))

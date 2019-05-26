@@ -22,3 +22,7 @@ class Config():
     my_consumer_secret = config.get("my_consumer_secret")
     my_access_token = config.get("my_access_token")
     my_access_token_secret = config.get("my_access_token_secret")
+
+    # For recurly
+    RECURLY_API_KEY = config.get("RECURLY_API_KEY")
+    RECURLY_SUBDOMAIN = config.get("RECURLY_SUBDOMAIN")
