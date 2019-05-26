@@ -423,6 +423,18 @@ hr {
   font-size: 1em;
 }
 
+.recurly-box {
+  color: #cccccc;
+  height: auto;
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+  width: 25em;
+  border-spacing: 4px;
+  align-items: center;
+  margin: 10px 5px;
+}
+
 .tweet-container {
   display: flex;
   flex-direction: row;

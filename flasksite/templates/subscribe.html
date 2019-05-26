@@ -68,46 +68,63 @@
 
 <!-- Create a Credit Card Submission form -->
 <!-- Copied from https://dev.recurly.com/docs/recurly-js-getting-started -->
-<div class="container">
-  <form>
-    <div class="container">
+<form>
+  <div class="tweet-container">
+    <div class="recurly-box">
       <br>
         <label class="form-control-label" for="first_name">First Name</label>
+      <br>
         <input class="form-control form-control-lg" type="text" data-recurly="first_name">
       <br>
+      <br>
         <label class="form-control-label" for="last_name">Last Name</label>
-        <input class="form-control form-control-lg" type="text" data-recurly="last_name">
-    </div>
+      <br>
+	<input class="form-control form-control-lg" type="text" data-recurly="last_name">
     <br>
-    <div class="container">
       <div data-recurly="card"></div>
       <input type="hidden" name="recurly-token" data-recurly="token">
-    </div>
+    <div/>
     <br>
-    <div class="">
+    <div class="recurly-box">
         <label class="form-control-label" for="address1">Address</label>
+      <br/>
         <input class="form-control form-control-lg" type="text" data-recurly="address1">
+      <br/>
       <br>
         <label class="form-control-label" for="address2">Address (cont.)</label>
+      <br>
         <input class="form-control form-control-lg" type="text" data-recurly="address2">
+      <br> 
       <br>
         <label class="form-control-label" for="city">City</label>
+      <br>
         <input class="form-control form-control-lg" type="text" data-recurly="city">
       <br>
+      <br>
         <label class="form-control-label" for="state">State</label>
+      <br>
         <input class="form-control form-control-lg" type="text" data-recurly="state">
       <br>
+      <br>
         <label class="form-control-label" for="postal_code">Postal Code</label>
+      <br>
         <input class="form-control form-control-lg" type="text" data-recurly="postal_code">
       <br>
+      <br>
         <label class="form-control-label" for="country">Country</label>
+      <br>
         <input class="form-control form-control-lg" type="text" data-recurly="country">
       <br>
+      <br>
         <label class="form-control-label" for="phone">Phone</label>
+      <br>
         <input class="form-control form-control-lg" type="text" data-recurly="phone">
+      <br>
+      <br>
+      <br>
     </div>
-    <button>Submit</button>
-  </form>
-</div>
+    <button class="btn btn-outline-warning" id="subscribe">Submit</button>
+  <div/>
+</form>
 
 {% endblock content %}
