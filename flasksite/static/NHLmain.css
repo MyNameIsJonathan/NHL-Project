@@ -442,6 +442,11 @@ hr {
   border-width: 1px;
   border-color: #FFFFFF;
   margin: 20px;
+  height: 2.9em !important;
+}
+
+#cc-box {
+  padding: 30px 0px;
 }
 
 .tweet-container {

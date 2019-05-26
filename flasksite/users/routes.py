@@ -10,10 +10,10 @@ from flasksite.users.utils import save_picture, send_reset_email
 from flasksite.config import Config
 
 # Establish recurly information
-myConfig = Config()
-recurly.SUBDOMAIN = myConfig.RECURLY_SUBDOMAIN
-recurly.API_KEY = myConfig.RECURLY_API_KEY
-recurly.DEFAULT_CURRENCY = 'USD'
+# myConfig = Config()
+# recurly.SUBDOMAIN = myConfig.RECURLY_SUBDOMAIN
+# recurly.API_KEY = myConfig.RECURLY_API_KEY
+# recurly.DEFAULT_CURRENCY = 'USD'
 
 
 # Instantiate the blueprint
@@ -118,6 +118,6 @@ def new_subscription():
         pass
     # The subscription has been created and we can redirect
     # to a confirmation page
-    # subscription.save()
+    subscription.save()
     flash('You have been successfully subscribed to the Basic Plan!', 'success')
     return redirect(url_for('users.account'))

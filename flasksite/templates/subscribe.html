@@ -31,12 +31,7 @@
       <br>
         <input class="form-control form-control-lg" type="text" data-recurly="last_name">
       <br>
-        <div data-recurly="card"></div>
-        <input type="hidden" name="recurly-token" data-recurly="token">
-        </div>
-    </div>
-    <br>
-    <div class="recurly-box">
+      <br>
         <label class="form-control-label" for="address1">Address</label>
       <br/>
         <input class="form-control form-control-lg" type="text" data-recurly="address1">
@@ -71,12 +66,13 @@
       <br>
         <input class="form-control form-control-lg" type="text" data-recurly="phone">
       <br>
-      <br>
-      <br>
+        <div data-recurly="card" id="cc-box"></div>
+        <input type="hidden" name="recurly-token" data-recurly="token">
+        </div>
     </div>
   </div>
   <div class="form-group", id="subscribe">
-      <input class="btn btn-outline-warning" id="subscribe" name="submit" type="submit" value="Subscribe">
+      <button class="btn btn-outline-warning">Subscribe</button>
   </div>
 </form>
 
@@ -98,7 +94,7 @@
       displayIcon: true,
       style: {
 	fontWeight: '100',
-        fontSize: '1em',
+        fontSize: '1.3rem',
         fontColor: '#cccccc',
         placeholder: {
           color: '#cccccc !important',
