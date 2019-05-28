@@ -86,7 +86,7 @@ def account():
     return render_template('account.html', title='Account',
                            image_file=image_file, form=form)
 
-@users.route("/subscribe", methods=['GET'])
+@users.route("/subscribe", methods=['GET', 'POST'])
 def subscribe():
     return render_template('subscribe.html', title='Subscribe')
 
