@@ -21,7 +21,7 @@
 <h2>Create Billing Account</h2>
 <p class="text-muted">Accounts, Payments via Recurly</p>
 <section>
-  <form method="post" action="/api/accounts/new">
+  <form method="post" action="{{ url_for('main.home') }}">
     <div>
       <div data-recurly="card"></div>
     </div>
@@ -37,16 +37,14 @@
     </div>
 
     <div>
-      <label class="form-control-label" for="address1">Address</label>
+      <label class="form-control-label" for="address1">Street Address</label>
       <input class="form-control form-control-lg" type="text" data-recurly="address1" id="address1" name="address1">
     </div>
 
     <div>
       <label class="form-control-label" for="city">City</label>
       <input class="form-control form-control-lg" type="text" data-recurly="city" id="city" name="city">
-    </div>
 
-    <div>
       <label class="form-control-label" for="state">State</label>
       <input class="form-control form-control-lg" type="text" data-recurly="state" id="state" name="state">
     </div>
@@ -54,9 +52,7 @@
     <div>
       <label class="form-control-label" for="country">Country</label>
       <input class="form-control form-control-lg" type="text" data-recurly="country" id="country" name="country">
-    </div>
 
-    <div>
       <label class="form-control-label" for="postal_code">Postal Code</label>
       <input class="form-control form-control-lg" type="text" data-recurly="postal_code" id="postal_code" name="postal-code">
     </div>
