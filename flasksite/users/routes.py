@@ -124,7 +124,7 @@ def new_subscription():
 
 # POST route to handle a new account form
 # From: https://github.com/recurly/recurly-js-examples/blob/master/api/python/app.py#L50-62
-@app.route("/api/accounts/new", methods=['POST'])
+@users.route("/api/accounts/new", methods=['POST'])
 def new_recurly_account():
   try:
     account = recurly.Account(
