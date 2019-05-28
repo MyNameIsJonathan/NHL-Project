@@ -100,8 +100,8 @@ def new_subscription():
 
         account = recurly.Account(account_code='1')
         account.email = 'verena@example.com'
-        account.first_name = 'Verena'
-        account.last_name = 'Example'
+        account.first_name = form.first_name
+        account.last_name = form.last_name
         account.save()
 
         # Create the scubscription using minimal
@@ -121,3 +121,19 @@ def new_subscription():
     subscription.save()
     flash('You have been successfully subscribed to the Basic Plan!', 'success')
     return redirect(url_for('users.account'))
+
+# POST route to handle a new account form
+# From: https://github.com/recurly/recurly-js-examples/blob/master/api/python/app.py#L50-62
+@app.route("/api/accounts/new", methods=['POST'])
+def new_recurly_account():
+  try:
+    account = recurly.Account(
+      account_code = uuid.uuid1(),
+      billing_info = recurly.BillingInfo(
+        token_id = request.form['recurly-token']
+      )
+    )
+    account.save()
+    return redirect('SUCCESS_URL')
+  except recurly.ValidationError as errors:
+    error_redirect(compose_errors(errors))
