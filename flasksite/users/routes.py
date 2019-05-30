@@ -10,10 +10,10 @@ from flasksite.users.utils import save_picture, send_reset_email
 from flasksite.config import Config
 
 # Establish recurly information
-# myConfig = Config()
-# recurly.SUBDOMAIN = myConfig.RECURLY_SUBDOMAIN
-# recurly.API_KEY = myConfig.RECURLY_API_KEY
-# recurly.DEFAULT_CURRENCY = 'USD'
+myConfig = Config()
+recurly.SUBDOMAIN = myConfig.RECURLY_SUBDOMAIN
+recurly.API_KEY = myConfig.RECURLY_API_KEY
+recurly.DEFAULT_CURRENCY = 'USD'
 
 
 # Instantiate the blueprint
@@ -136,4 +136,6 @@ def new_recurly_account():
     account.save()
     return redirect('SUCCESS_URL')
   except recurly.ValidationError as errors:
-    error_redirect(compose_errors(errors))
+    flash('Encountered VlidatinError!')
+    print(f'currency selected: {account.billing_info.currency}')
+    return errors

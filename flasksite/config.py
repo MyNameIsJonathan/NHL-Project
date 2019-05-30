@@ -24,5 +24,6 @@ class Config():
     my_access_token_secret = config.get("my_access_token_secret")
 
     # For recurly
-    RECURLY_API_KEY = config.get("RECURLY_API_KEY")
-    RECURLY_SUBDOMAIN = config.get("RECURLY_SUBDOMAIN")
+    RECURLY_API_KEY = config.get("recurly_API_KEY")
+    RECURLY_SUBDOMAIN = config.get("recurly_SUBDOMAIN")
+    RECURLY_DEFAULT_CURRENCY = config.get("recurly_DEFAULT_CURRENCY")

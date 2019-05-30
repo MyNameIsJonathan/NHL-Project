@@ -1,12 +1,18 @@
 import ast
 import pandas as pd
 from flask import render_template, Blueprint
-# from flasksite import mysql
 import NHL_scrape_functions as nhl
-
+import recurly
+from flasksite.config import Config
 
 # Create a blueprint for the Flask site
 main = Blueprint('main', __name__)
+
+# Establish recurly information
+myConfig = Config()
+recurly.SUBDOMAIN = myConfig.RECURLY_SUBDOMAIN
+recurly.API_KEY = myConfig.RECURLY_API_KEY
+recurly.DEFAULT_CURRENCY = myConfig.RECURLY_DEFAULT_CURRENCY
 
 # Instantiate the route decorators for Flask
 @main.route("/")
@@ -108,6 +114,6 @@ def stamkostweets():
                            my_tweets=my_tweets, my_length=len(my_tweets))
 
 
-@main.route("/create_new_recurly_account")
+@main.route("/create_recurly_account")
 def create_recurly_account():
-    return render_template('create_recurly_account.html'
+    return render_template('create_recurly_account.html')
