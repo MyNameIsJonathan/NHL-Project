@@ -106,3 +106,8 @@ def stamkostweets():
 
     return render_template('stamkostweets.html', title='Stamkos Tweets',
                            my_tweets=my_tweets, my_length=len(my_tweets))
+
+
+@main.route("/create_new_recurly_account")
+def create_recurly_account():
+    return render_template('create_recurly_account.html'
