@@ -12,7 +12,7 @@ main = Blueprint('main', __name__)
 myConfig = Config()
 recurly.SUBDOMAIN = myConfig.RECURLY_SUBDOMAIN
 recurly.API_KEY = myConfig.RECURLY_API_KEY
-recurly.DEFAULT_CURRENCY = myConfig.RECURLY_DEFAULT_CURRENCY
+recurly.DEFAULT_CURRENCY = 'USD'
 
 # Instantiate the route decorators for Flask
 @main.route("/")

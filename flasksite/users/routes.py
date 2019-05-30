@@ -100,8 +100,8 @@ def new_subscription():
 
         account = recurly.Account(account_code='1')
         account.email = 'verena@example.com'
-        account.first_name = form.first_name
-        account.last_name = form.last_name
+        account.first_name = 'UPDATE default first name'
+        account.last_name = 'UPDATE default last name'
         account.save()
 
         # Create the scubscription using minimal
@@ -126,16 +126,15 @@ def new_subscription():
 # From: https://github.com/recurly/recurly-js-examples/blob/master/api/python/app.py#L50-62
 @users.route("/api/accounts/new", methods=['POST'])
 def new_recurly_account():
-  try:
-    account = recurly.Account(
-      account_code = uuid.uuid1(),
-      billing_info = recurly.BillingInfo(
-        token_id = request.form['recurly-token']
-      )
-    )
-    account.save()
-    return redirect('SUCCESS_URL')
-  except recurly.ValidationError as errors:
-    flash('Encountered VlidatinError!')
-    print(f'currency selected: {account.billing_info.currency}')
-    return errors
+    try:
+        new_account = recurly.Account(
+            account_code=uuid.uuid1(),
+            billing_info=recurly.BillingInfo(
+                token_id=request.form['recurly-token']
+                )
+            )
+        new_account.save()
+        flash('Account created successfully!')
+        return redirect('/home')
+    except recurly.ValidationError:
+        return 'ValidationError'
