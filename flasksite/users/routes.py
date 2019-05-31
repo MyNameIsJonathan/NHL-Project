@@ -1,5 +1,6 @@
 import recurly
 import uuid
+import time
 from flask import render_template, url_for, flash, redirect, request, Blueprint
 from flask_login import login_user, current_user, logout_user, login_required
 from flasksite import db, bcrypt
@@ -93,7 +94,8 @@ def subscribe():
     # If user is not logged in, have them login or register
     if not current_user.is_authenticated:
         flash('Please login or register to create an account first!', 'danger')
-        return
+        time.sleep(1)
+        return redirect(url_for('users.login'))
 
     return render_template('subscribe.html', title='Subscribe')
 
