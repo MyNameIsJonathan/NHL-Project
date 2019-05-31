@@ -445,7 +445,7 @@ hr {
   height: 2.9em !important;
 }
 
-.recurly-hosted-field-input {
+#recurly-hosted-field-input {
   max-width: 40rem;
 }
 
