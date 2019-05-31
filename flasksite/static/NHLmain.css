@@ -335,6 +335,7 @@ hr {
 .form-control-label {
   font-size: 1.35rem;
   font-weight: 100;
+  text-align: right;
 }
 
 .picture-upload-box {
@@ -445,7 +446,7 @@ hr {
   height: 2.9em !important;
 }
 
-#recurly-hosted-field-input {
+.recurly-hosted-field-card {
   max-width: 40rem;
 }
 
