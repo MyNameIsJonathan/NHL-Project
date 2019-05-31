@@ -464,6 +464,14 @@ hr {
   justify-content: center;
 }
 
+.recurly-labels {
+  align-content: right;
+}
+
+.recurly-inputs {
+  align-content: left;
+}
+
 #cc-box {
   padding: 30px 0px;
 }
