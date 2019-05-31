@@ -129,6 +129,7 @@ hr {
 
 #subscribe {
   font-size: 1.3rem;
+  margin: 20px;
 }
 
 #main-nav-bar {
@@ -435,6 +436,14 @@ hr {
   border-spacing: 4px;
   align-items: center;
   margin: 10px 5px;
+}
+
+.recurly-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
 }
 
 .recurly-hosted-field {
