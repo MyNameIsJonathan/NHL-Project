@@ -112,7 +112,7 @@ def new_subscription():
     # errors that may occur
     try:
 
-        user_account_code = fa.create_account_code(account.id)
+        user_account_code = fa.create_account_code(current_user.id)
 
         # Create the scubscription using minimal
         # information: plan_code, account_code, currency and
@@ -143,7 +143,7 @@ def new_recurly_account():
         return redirect(url_for('users.login'))
 
     # Create user's account_code from hidden hash library
-    user_account_code = fa.create_account_code(account.id)
+    user_account_code = fa.create_account_code(current_user.id)
 
     try:
         new_account = recurly.Account(
