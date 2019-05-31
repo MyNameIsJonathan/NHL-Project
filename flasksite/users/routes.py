@@ -89,12 +89,22 @@ def account():
 
 @users.route("/subscribe", methods=['GET', 'POST'])
 def subscribe():
+
+    # If user is not logged in, have them login or register
+    if not current_user.is_authenticated:
+        flash('Please login or register to create an account first!', 'danger')
+        return
+
     return render_template('subscribe.html', title='Subscribe')
 
 # POST route to handle a new subscription form
 @users.route("/api/subscriptions/new", methods=['POST'])
-@login_required
 def new_subscription():
+
+    # If user is not logged in, have them login or register
+    if not current_user.is_authenticated:
+        flash('Please login or register to create an account first!', 'danger')
+        return
 
     # We'll wrap this in a try to catch any API
     # errors that may occur
@@ -123,8 +133,12 @@ def new_subscription():
 # POST route to handle a new account form
 # From: https://github.com/recurly/recurly-js-examples/blob/master/api/python/app.py#L50-62
 @users.route("/api/accounts/new", methods=['POST'])
-@login_required
 def new_recurly_account():
+
+    # If user is not logged in, have them login or register
+    if not current_user.is_authenticated:
+        flash('Please login or register to create an account first!', 'danger')
+        return
 
     # Create user's account_code from hidden hash library
     user_account_code = fa.create_account_code(account.id)
