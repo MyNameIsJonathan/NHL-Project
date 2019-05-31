@@ -336,7 +336,7 @@ hr {
 .form-control-label {
   font-size: 1.35rem;
   font-weight: 100;
-  text-align: left;
+  text-align: right;
 }
 
 .picture-upload-box {
