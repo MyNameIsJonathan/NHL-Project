@@ -153,8 +153,8 @@ def new_recurly_account():
                 )
             )
         new_account.save()
-        flash('Account created successfully!')
+        flash('Account created successfully!', 'success')
         return redirect(url_for('users.new_subscription'))
     except recurly.ValidationError:
-        flash('ValidationError! Please try again shortly.')
+        flash('ValidationError! Please try again shortly.', 'danger')
         return 'ValidationError'
