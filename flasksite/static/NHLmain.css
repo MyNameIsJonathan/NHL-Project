@@ -596,14 +596,14 @@ strong {
 .box-small {
   width: 8rem;
   max-width: 45%;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 
 
 .box-large {
   width: 20rem;
   max-width: 95%;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 
 @media screen and (min-width: 683px) {
