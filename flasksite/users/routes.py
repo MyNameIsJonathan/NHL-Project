@@ -8,6 +8,7 @@ from flasksite.users.forms import (RegistrationForm, LoginForm, UpdateAccountFor
                                    RequestResetForm, ResetPasswordForm)
 from flasksite.users.utils import save_picture, send_reset_email
 from flasksite.config import Config
+import flaskAccessories as fa
 
 # Establish recurly information
 myConfig = Config()
@@ -92,17 +93,14 @@ def subscribe():
 
 # POST route to handle a new subscription form
 @users.route("/api/subscriptions/new", methods=['POST'])
+@login_required
 def new_subscription():
 
     # We'll wrap this in a try to catch any API
     # errors that may occur
     try:
 
-        account = recurly.Account(account_code='1')
-        account.email = 'verena@example.com'
-        account.first_name = 'UPDATE default first name'
-        account.last_name = 'UPDATE default last name'
-        account.save()
+        user_account_code = fa.create_account_code(account.id)
 
         # Create the scubscription using minimal
         # information: plan_code, account_code, currency and
@@ -111,7 +109,7 @@ def new_subscription():
             plan_code='testplanname',
             currency='USD',
             account=recurly.Account(
-                account_code=uuid.uuid1(),
+                account_code=user_account_code,
                 billing_info=recurly.BillingInfo(
                     token_id=request.form['recurly-token'])))
     except:
@@ -125,16 +123,22 @@ def new_subscription():
 # POST route to handle a new account form
 # From: https://github.com/recurly/recurly-js-examples/blob/master/api/python/app.py#L50-62
 @users.route("/api/accounts/new", methods=['POST'])
+@login_required
 def new_recurly_account():
+
+    # Create user's account_code from hidden hash library
+    user_account_code = fa.create_account_code(account.id)
+
     try:
         new_account = recurly.Account(
-            account_code=uuid.uuid1(),
+            account_code=user_account_code,
             billing_info=recurly.BillingInfo(
                 token_id=request.form['recurly-token']
                 )
             )
         new_account.save()
         flash('Account created successfully!')
-        return redirect('/home')
+        return redirect(url_for('users.new_subscription'))
     except recurly.ValidationError:
+        flash('ValidationError! Please try again shortly.')
         return 'ValidationError'

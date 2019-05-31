@@ -16,3 +16,8 @@ mysqlbackups/
 newvenv/
 pickleFiles/
 site.db
+env/
+
+flaskAccessories.py
+
+*.DS_Store
