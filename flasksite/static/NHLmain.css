@@ -589,6 +589,17 @@ strong {
   border-radius: 5px;
 }
 
+.box-small {
+  width: 8rem;
+  max-width: 45%;
+}
+
+
+.box-large {
+  width: 20rem;
+  max-width: 95%;
+}
+
 @media screen and (min-width: 683px) {
   #main-nav-bar {
     font-size: .4em;

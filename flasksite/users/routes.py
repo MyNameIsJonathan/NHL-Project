@@ -125,7 +125,8 @@ def new_subscription():
                 billing_info=recurly.BillingInfo(
                     token_id=request.form['recurly-token'])))
     except:
-        pass
+        flash(('Sorry, our servers experienced an issue creating your'
+                'subscription. Please try again later!'), 'danger')
     # The subscription has been created and we can redirect to a confirmation page
     subscription.save()
     flash('You have been successfully subscribed to the Basic Plan!', 'success')
