@@ -106,7 +106,7 @@ def new_subscription():
     # If user is not logged in, have them login or register
     if not current_user.is_authenticated:
         flash('Please login or register to create an account first!', 'danger')
-        return
+        return redirect(url_for('users.login'))
 
     # We'll wrap this in a try to catch any API
     # errors that may occur
@@ -126,11 +126,10 @@ def new_subscription():
                     token_id=request.form['recurly-token'])))
     except:
         pass
-    # The subscription has been created and we can redirect
-    # to a confirmation page
+    # The subscription has been created and we can redirect to a confirmation page
     subscription.save()
     flash('You have been successfully subscribed to the Basic Plan!', 'success')
-    return redirect(url_for('users.account'))
+    return redirect(url_for('main.home'))
 
 # POST route to handle a new account form
 # From: https://github.com/recurly/recurly-js-examples/blob/master/api/python/app.py#L50-62
@@ -154,7 +153,7 @@ def new_recurly_account():
             )
         new_account.save()
         flash('Account created successfully!', 'success')
-        return redirect(url_for('users.new_subscription'))
+        return redirect(url_for('users.subscribe'))
     except recurly.ValidationError:
         flash('ValidationError! Please try again shortly.', 'danger')
         return 'ValidationError'
