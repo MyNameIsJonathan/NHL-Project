@@ -140,7 +140,7 @@ def new_recurly_account():
     # If user is not logged in, have them login or register
     if not current_user.is_authenticated:
         flash('Please login or register to create an account first!', 'danger')
-        return
+        return redirect(url_for('users.login'))
 
     # Create user's account_code from hidden hash library
     user_account_code = fa.create_account_code(account.id)
