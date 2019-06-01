@@ -1,7 +1,7 @@
 import recurly
 import uuid
 import time
-from flask import render_template, url_for, flash, redirect, request, Blueprint, error_redirect
+from flask import render_template, url_for, flash, redirect, request, Blueprint
 from flask_login import login_user, current_user, logout_user, login_required
 from flasksite import db, bcrypt
 from flasksite.models import User
@@ -177,6 +177,6 @@ def update_account(account_code):
         current_account.save()
         return redirect(url_for('main.home'))
     except recurly.NotFoundError as error:
-        error_redirect(error.message)
+        flash('NotFoundError!')
     except recurly.ValidationError:
         flash('ValidationError!')
