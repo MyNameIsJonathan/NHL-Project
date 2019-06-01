@@ -356,6 +356,7 @@ hr {
 
 .form-control-file {
   display: inline-block;
+  background-color: transparent;
   font-weight: 100;
   font-size: 1rem;
   flex-direction: column;
@@ -375,7 +376,6 @@ hr {
   border-color: #FFFFFF;
   border-style: solid;
   max-width: 95%;
-  background-color: #D3D3D3;
 }
 
 .media {
@@ -467,8 +467,10 @@ hr {
 
 .recurly-section {
   display: flex;
-  justify-content: center;
+  align-items: flex-start;
+  align-content: flex-start;
   flex-direction: column;
+  flex-grow: 1;
   width: 50%;
 }
 
@@ -580,6 +582,7 @@ legend.border-bottom.mb-4 {
   padding-bottom: .5rem;
   font-size: 2rem;
   font-weight: 200;
+  width: 95%;
 }
 
 ::-webkit-scrollbar-track {

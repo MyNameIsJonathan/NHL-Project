@@ -73,20 +73,26 @@
                 </div>
             </form>
           </div>
-        </div>
-      </div>
-
         <!-- Here's the recurly account info (right column) -->
         <div class="recurly-section">
-            <form method="POST" action="/api/accounts/{{  current_user_id)  }}">
-              <label for="plan">Plan</label>
-              <select id="plan" data-recurly="plan" class="" name="planselect">
-                <option value="bronzeplan">Bronze Plan</option>
-                <option value="silverplan">Silver Plan</option>
-                <option value="goldplan">Gold Plan</option>
-              </select>
-            </form>
+          <legend class="border-bottom mb-4">Subscription Info</legend>
+            <form method="POST" action="/api/accounts/{{  current_user_id  }}">
+              <label class="form-control-label" for="plan">Plan</label>
+
+                <div class="dropdown">
+                  <button class="btn btn-warning dropdown-toggle" type="button" id="subscriptionselect" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Choose Plan
+                   </button>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                    <button class="dropdown-item" type="button" value="bronzeplan">Bronze Plan</button>
+                    <button class="dropdown-item" type="button" value="silverplan">Silver Plan</button>
+                    <button class="dropdown-item" type="button"value="goldplan">Gold Plan</button>
+                  </div>
+                </div>
+            </div>
+          </form>
           </div>
+      </div>
         </div>
       </div>
 {% endblock content %}
