@@ -1,3 +1,4 @@
+
 {% extends "layout.html" %}
 {% block content %}
 
@@ -16,24 +17,27 @@
 <br>
 <br>
 
-<section class="recurly-section">
+<section class="recurly-container-outer">
   <form method="post" action="/api/accounts/new">
 
-        <div>
+        <div id="cc-container">
           <div data-recurly="card"></div>
         </div>
 
-        <div>
+
+    <div class="recurly-container-inner">
+
+        <div class="recurly-section">
           <label class="form-control-label box-large" for="first_name">First Name</label>
           <label class="form-control-label box-large" for="last_name">Last Name</label>
           <label class="form-control-label box-large" for="address1">Address</label>
-          <label class="form-control-label box-small" for="city">City</label>
-          <label class="form-control-label box-small" for="state">State</label>
-          <label class="form-control-label box-small" for="country">Country</label>
-          <label class="form-control-label box-small" for="postal_code">Postal Code</label>
+          <label class="form-control-label box-large" for="city">City</label>
+          <label class="form-control-label box-large" for="state">State</label>
+          <label class="form-control-label box-large" for="country">Country</label>
+          <label class="form-control-label box-large" for="postal_code">Postal Code</label>
         </div>
 
-        <div>
+        <div class="recurly-section">
           <input class="form-control form-control-lg box-large" type="text" data-recurly="first_name" id="first_name" name="first-name">
           <input class="form-control form-control-lg box-large" type="text" data-recurly="last_name" id="last_name" name="last-name">
           <input class="form-control form-control-lg box-large" type="text" data-recurly="address1" id="address1" name="address1">
@@ -42,7 +46,7 @@
           <input class="form-control form-control-lg box-small" type="text" data-recurly="country" id="country" name="country">
           <input class="form-control form-control-lg box-small" type="text" data-recurly="postal_code" id="postal_code" name="postal-code">
         </div>
-
+      </div>
     <button class="btn btn-outline-warning" id="subscribe">Create Account</button>
     <input type="hidden" data-recurly="token" name="recurly-token">
   </form>

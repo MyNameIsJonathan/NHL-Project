@@ -1,5 +1,5 @@
 
-
+	
 body:before {
   content: '';
   position: fixed;
@@ -19,6 +19,10 @@ body:before {
 body {
   color: #CCCCCC;
   min-width: 320px;
+}
+
+form {
+  width: 100%;
 }
 
 * {
@@ -438,16 +442,17 @@ hr {
   margin: 10px 5px;
 }
 
-.recurly-container {
+.recurly-container-outer {
   width: 80%;
   margin-left: 10%;
   margin-right: 10%;
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-content: center;
-  align-items: center;
+}
+
+.recurly-container-inner {
+  width: 100%;
+  display: flex;
 }
 
 .recurly-hosted-field {
@@ -462,6 +467,8 @@ hr {
 .recurly-section {
   display: flex;
   justify-content: center;
+  flex-direction: column;
+  width: 50%;
 }
 
 .recurly-labels {
@@ -470,6 +477,11 @@ hr {
 
 .recurly-inputs {
   align-content: left;
+}
+
+#cc-container {
+  width: 100%;
+  margin-bottom: 20px;
 }
 
 #cc-box {
@@ -620,13 +632,24 @@ strong {
   width: 8rem;
   max-width: 45%;
   margin-bottom: 10px;
+  height: 45px;
 }
-
 
 .box-large {
   width: 20rem;
   max-width: 95%;
   margin-bottom: 10px;
+  height: 45px;
+}
+
+.form-control-label.box-large {
+  width: 100%;
+  line-height: 45px;
+}
+
+.form-control-label.box-small {
+  width: 100%;
+  line-height: 45px;
 }
 
 @media screen and (min-width: 683px) {
