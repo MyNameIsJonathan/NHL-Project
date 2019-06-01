@@ -79,16 +79,15 @@
             <form method="POST" action="/api/accounts/{{  current_user_id  }}">
               <label class="form-control-label" for="plan">Plan</label>
 
-                <div class="dropdown">
-                  <button class="btn btn-warning dropdown-toggle" type="button" id="subscriptionselect" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Choose Plan
-                   </button>
-                  <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
-                    <button class="dropdown-item" type="button" value="bronzeplan">Bronze Plan</button>
-                    <button class="dropdown-item" type="button" value="silverplan">Silver Plan</button>
-                    <button class="dropdown-item" type="button"value="goldplan">Gold Plan</button>
-                  </div>
+                <div class="form-group">
+                  <label for="exampleFormControlSelect2">Example multiple select</label>
+                  <select multiple class="form-control" id="exampleFormControlSelect2">
+                    <option>Bronze Plan</option>
+                    <option>Silver Plan</option>
+                    <option>Gold Plan</option>
+                  </select>
                 </div>
+
                 <input class="btn btn-outline-info" id="submit" name="submit" type="submit" value="Update">
               </form>
             </div>
