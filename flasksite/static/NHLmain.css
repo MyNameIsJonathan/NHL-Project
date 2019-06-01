@@ -203,6 +203,10 @@ hr {
   height: auto;
 }
 
+.dropdown {
+  margin-bottom: 25px;
+}
+
 .home-credits {
   font-size: 2.7em;
 }
