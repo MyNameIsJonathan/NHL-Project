@@ -15,9 +15,10 @@
         <!-- Here's the outer container to create two side-by-side column divs -->
 
         <div class="two-column-container-outer">
+          <div class="two-column-container-inner">
 
           <!-- Here's the jonathanolson.us account info (left column) -->
-          <div class="two-column-container-inner">
+            <div class="recurly-section">
 
               <form method="POST" action="" enctype="multipart/form-data">
                   {{ form.hidden_tag() }}
@@ -73,9 +74,10 @@
             </form>
           </div>
         </div>
+      </div>
 
         <!-- Here's the recurly account info (right column) -->
-        <div class="two-column-container-inner">
+        <div class="recurly-section">
             <form method="POST" action="/api/accounts/{{  current_user_id)  }}">
               <label for="plan">Plan</label>
               <select id="plan" data-recurly="plan" class="" name="planselect">
@@ -84,6 +86,7 @@
                 <option value="goldplan">Gold Plan</option>
               </select>
             </form>
+          </div>
         </div>
-        </div>
+      </div>
 {% endblock content %}
