@@ -74,8 +74,8 @@ def logout():
 @login_required
 def account():
     form = UpdateAccountForm()
-    if form.validate_on_submit(): #Edit the entries into the db for the email
-                                  # and usernames submitted to be changed
+    if form.validate_on_submit():  # Edit the entries into the db for the email
+                                   # and usernames submitted to be changed
         if form.picture.data:
             picture_file = save_picture(form.picture.data)
             current_user.image_file = picture_file
@@ -84,7 +84,7 @@ def account():
         db.session.commit()
         flash('Your account has been updated!', 'success')
         return redirect(url_for('users.account'))
-    elif request.method == 'GET': #Autofill entry cells with current username and email
+    elif request.method == 'GET':  # Autofill entry cells with current username and email
         form.username.data = current_user.username
         form.email.data = current_user.email
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
@@ -92,29 +92,15 @@ def account():
     # Get the current_user's id to allow editing the user's recurly information
     current_user_id = fa.create_account_code(current_user.id)
 
+    # Get the user's recurly account
+    try:
+        user = recurly.Account.get(current_user_id)
+    except recurly.NotFoundError:
+        user = None
+
     return render_template('account.html', title='Account',
                            image_file=image_file, form=form,
-                           current_user_id=current_user_id)
-
-
-
-
-@users.route("/create_recurly_account")
-def create_recurly_account():
-    return render_template('create_recurly_account.html')
-
-@users.route("/subscribe", methods=['GET', 'POST'])
-def subscribe():
-
-    # If user is not logged in, have them login or register
-    if not current_user.is_authenticated:
-        flash('Please login or register to create an account first!', 'danger')
-        time.sleep(1)
-        return redirect(url_for('users.login'))
-
-    return render_template('subscribe.html', title='Subscribe')
-
-
+                           user=user)
 
 
 # POST route to handle a new account form
@@ -138,11 +124,11 @@ def new_recurly_account():
                 )
             )
         new_account.save()
-        flash('Account created successfully!', 'success')
-        return redirect(url_for('users.subscribe'))
+        flash('Billing information saved successfully!', 'success')
+        return redirect(url_for('main.home'))
     except recurly.ValidationError:
         flash('ValidationError! Please try again shortly.', 'danger')
-        return 'ValidationError'
+        return redirect(url_for('main.home'))
 
 # PUT route to handle an account update form
 @users.route("/api/accounts/<account_code>", methods=['PUT'])

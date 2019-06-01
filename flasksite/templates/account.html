@@ -74,27 +74,127 @@
             </form>
           </div>
         <!-- Here's the recurly account info (right column) -->
-        <div class="recurly-section">
-          <legend class="border-bottom mb-4">Subscription Info</legend>
-            <form method="POST" action="/api/accounts/{{  current_user_id  }}">
-              <label class="form-control-label" for="plan">Plan</label>
 
-                <div class="dropdown">
-                  <button class="btn btn-warning dropdown-toggle" type="button" id="subscriptionselect" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Choose Plan
-                   </button>
-                  <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
-                    <button class="dropdown-item" type="button" value="bronzeplan">Bronze Plan</button>
-                    <button class="dropdown-item" type="button" value="silverplan">Silver Plan</button>
-                    <button class="dropdown-item" type="button"value="goldplan">Gold Plan</button>
+        {% if user %}
+
+          {% if user.has_live_subscription  %}
+
+          <!-- If the user has a subscription, render edit_subscription html -->
+
+            <div class="recurly-section">
+              <legend class="border-bottom mb-4">Subscription Info</legend>
+                <form method="POST" action="/api/accounts/{{  current_user_id  }}">
+                  <label class="form-control-label" for="plan">Plan</label>
+
+                    <div class="dropdown">
+                      <button class="btn btn-warning dropdown-toggle" type="button" id="subscriptionselect" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Choose Plan
+                       </button>
+                      <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+
+                        <!-- Only show options to cancel plan or choose a plan different than the current plan -->
+
+                        {% if {{ current_user.plan_code != bronzeplan }} %}
+                        <button class="dropdown-item" type="button" value="bronzeplan">Bronze Plan</button>
+                        {% endif %}
+                        {% if {{ current_user.plan_code != silverplan }} %}
+                        <button class="dropdown-item" type="button" value="silverplan">Silver Plan</button>
+                        {% endif %}
+                        {% if {{ current_user.plan_code != goldplan }} %}
+                        <button class="dropdown-item" type="button" value="goldplan">Gold Plan</button>
+                        {% endif %}
+
+                        <button class="dropdown-item" type="button" value="goldplan">Gold Plan</button>
+
+                      </div>
+                    </div>
+                    <input class="btn btn-outline-info" id="submit" name="submit" type="submit" value="Update">
+                  </form>
+                </div>
+
+          {% else %}
+
+          <!-- If the user has NO subscription, render new_subscription html -->
+
+            <section class="two-column-container-outer">
+              <form method="post" action="/api/accounts/new">
+
+                    <div id="cc-container">
+                      <div data-recurly="card"></div>
+                    </div>
+
+
+                <div class="two-column-container-inner">
+
+                    <div class="recurly-section">
+                      <label class="form-control-label box-large" for="first_name">First Name</label>
+                      <label class="form-control-label box-large" for="last_name">Last Name</label>
+                      <label class="form-control-label box-large" for="address1">Address</label>
+                      <label class="form-control-label box-large" for="city">City</label>
+                      <label class="form-control-label box-large" for="state">State</label>
+                      <label class="form-control-label box-large" for="country">Country</label>
+                      <label class="form-control-label box-large" for="postal_code">Postal Code</label>
+                    </div>
+
+                    <div class="recurly-section">
+                      <input class="form-control form-control-lg box-large" type="text" data-recurly="first_name" id="first_name" name="first-name">
+                      <input class="form-control form-control-lg box-large" type="text" data-recurly="last_name" id="last_name" name="last-name">
+                      <input class="form-control form-control-lg box-large" type="text" data-recurly="address1" id="address1" name="address1">
+                      <input class="form-control form-control-lg box-small" type="text" data-recurly="city" id="city" name="city">
+                      <input class="form-control form-control-lg box-small" type="text" data-recurly="state" id="state" name="state">
+                      <input class="form-control form-control-lg box-small" type="text" data-recurly="country" id="country" name="country">
+                      <input class="form-control form-control-lg box-small" type="text" data-recurly="postal_code" id="postal_code" name="postal-code">
+                    </div>
+                  </div>
+                <button class="btn btn-outline-warning" id="subscribe">Create Account</button>
+                <input type="hidden" data-recurly="token" name="recurly-token">
+              </form>
+            </section>
+
+          {% endif %}
+
+        {% else %}
+
+          <section class="two-column-container-outer">
+            <form method="post" action="/api/accounts/new">
+
+                  <div id="cc-container">
+                    <div data-recurly="card"></div>
+                  </div>
+
+
+              <div class="two-column-container-inner">
+
+                  <div class="recurly-section">
+                    <label class="form-control-label box-large" for="first_name">First Name</label>
+                    <label class="form-control-label box-large" for="last_name">Last Name</label>
+                    <label class="form-control-label box-large" for="address1">Address</label>
+                    <label class="form-control-label box-large" for="city">City</label>
+                    <label class="form-control-label box-large" for="state">State</label>
+                    <label class="form-control-label box-large" for="country">Country</label>
+                    <label class="form-control-label box-large" for="postal_code">Postal Code</label>
+                  </div>
+
+                  <div class="recurly-section">
+                    <input class="form-control form-control-lg box-large" type="text" data-recurly="first_name" id="first_name" name="first-name">
+                    <input class="form-control form-control-lg box-large" type="text" data-recurly="last_name" id="last_name" name="last-name">
+                    <input class="form-control form-control-lg box-large" type="text" data-recurly="address1" id="address1" name="address1">
+                    <input class="form-control form-control-lg box-small" type="text" data-recurly="city" id="city" name="city">
+                    <input class="form-control form-control-lg box-small" type="text" data-recurly="state" id="state" name="state">
+                    <input class="form-control form-control-lg box-small" type="text" data-recurly="country" id="country" name="country">
+                    <input class="form-control form-control-lg box-small" type="text" data-recurly="postal_code" id="postal_code" name="postal-code">
                   </div>
                 </div>
-                <input class="btn btn-outline-info" id="submit" name="submit" type="submit" value="Update">
-              </form>
-            </div>
-          </div>
+              <button class="btn btn-outline-warning" id="subscribe">Create Account</button>
+              <input type="hidden" data-recurly="token" name="recurly-token">
+            </form>
+          </section>
+
+        {% endif %}
+
       </div>
-        </div>
+      </div>
+      </div>
       </div>
 
       <script>
