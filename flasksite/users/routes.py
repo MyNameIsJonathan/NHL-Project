@@ -96,6 +96,13 @@ def account():
                            image_file=image_file, form=form,
                            current_user_id=current_user_id)
 
+
+
+
+@users.route("/create_recurly_account")
+def create_recurly_account():
+    return render_template('create_recurly_account.html')
+
 @users.route("/subscribe", methods=['GET', 'POST'])
 def subscribe():
 
@@ -107,38 +114,8 @@ def subscribe():
 
     return render_template('subscribe.html', title='Subscribe')
 
-# POST route to handle a new subscription form
-@users.route("/api/subscriptions/new", methods=['POST'])
-def new_subscription():
 
-    # If user is not logged in, have them login or register
-    if not current_user.is_authenticated:
-        flash('Please login or register to create an account first!', 'danger')
-        return redirect(url_for('users.login'))
 
-    # We'll wrap this in a try to catch any API
-    # errors that may occur
-    try:
-
-        user_account_code = fa.create_account_code(current_user.id)
-
-        # Create the scubscription using minimal
-        # information: plan_code, account_code, currency and
-        # the token we generated on the frontend
-        subscription = recurly.Subscription(
-            plan_code='testplanname',
-            currency='USD',
-            account=recurly.Account(
-                account_code=user_account_code,
-                billing_info=recurly.BillingInfo(
-                    token_id=request.form['recurly-token'])))
-    except:
-        flash(('Sorry, our servers experienced an issue creating your'
-                'subscription. Please try again later!'), 'danger')
-    # The subscription has been created and we can redirect to a confirmation page
-    subscription.save()
-    flash('You have been successfully subscribed to the Basic Plan!', 'success')
-    return redirect(url_for('main.home'))
 
 # POST route to handle a new account form
 # From: https://github.com/recurly/recurly-js-examples/blob/master/api/python/app.py#L50-62
@@ -181,3 +158,36 @@ def update_account(account_code):
         flash('NotFoundError!')
     except recurly.ValidationError:
         flash('ValidationError!')
+
+# POST route to handle a new subscription form
+@users.route("/api/subscriptions/new", methods=['POST'])
+def new_subscription():
+
+    # If user is not logged in, have them login or register
+    if not current_user.is_authenticated:
+        flash('Please login or register to create an account first!', 'danger')
+        return redirect(url_for('users.login'))
+
+    # We'll wrap this in a try to catch any API
+    # errors that may occur
+    try:
+
+        user_account_code = fa.create_account_code(current_user.id)
+
+        # Create the scubscription using minimal
+        # information: plan_code, account_code, currency and
+        # the token we generated on the frontend
+        subscription = recurly.Subscription(
+            plan_code='testplanname',
+            currency='USD',
+            account=recurly.Account(
+                account_code=user_account_code,
+                billing_info=recurly.BillingInfo(
+                    token_id=request.form['recurly-token'])))
+    except:
+        flash(('Sorry, our servers experienced an issue creating your'
+                'subscription. Please try again later!'), 'danger')
+    # The subscription has been created and we can redirect to a confirmation page
+    subscription.save()
+    flash('You have been successfully subscribed to the Basic Plan!', 'success')
+    return redirect(url_for('main.home'))
