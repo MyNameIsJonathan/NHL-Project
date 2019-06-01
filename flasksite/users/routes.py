@@ -1,7 +1,7 @@
 import recurly
 import uuid
 import time
-from flask import render_template, url_for, flash, redirect, request, Blueprint
+from flask import render_template, url_for, flash, redirect, request, Blueprint, error_redirect
 from flask_login import login_user, current_user, logout_user, login_required
 from flasksite import db, bcrypt
 from flasksite.models import User
@@ -60,7 +60,14 @@ def login():
                 url_for('main.home')) #Ternary conditional
         else:
             flash('Incorrect Login. Please check email and password', 'danger')
-    return render_template('login.html', title='Login', form=form)
+
+    # Get the current_user's id to allow editing the user's recurly information
+    current_user_id = fa.create_account_code(current_user.id)
+
+    return render_template('login.html',
+                           title='Login',
+                           form=form,
+                           current_user_id=current_user_id)
 
 @users.route("/logout")
 def logout():
@@ -158,3 +165,18 @@ def new_recurly_account():
     except recurly.ValidationError:
         flash('ValidationError! Please try again shortly.', 'danger')
         return 'ValidationError'
+
+# PUT route to handle an account update form
+@users.route("/api/accounts/<account_code>", methods=['PUT'])
+def update_account(account_code):
+    try:
+        current_account = recurly.Account.get(account_code)
+        current_account.billing_info = recurly.BillingInfo(
+            token_id=request.form['recurly-token']
+            )
+        current_account.save()
+        return redirect(url_for('main.home'))
+    except recurly.NotFoundError as error:
+        error_redirect(error.message)
+    except recurly.ValidationError:
+        flash('ValidationError!')

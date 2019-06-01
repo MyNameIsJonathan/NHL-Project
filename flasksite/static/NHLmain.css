@@ -1,5 +1,5 @@
 
-	
+
 body:before {
   content: '';
   position: fixed;
@@ -375,6 +375,7 @@ hr {
   border-color: #FFFFFF;
   border-style: solid;
   max-width: 95%;
+  background-color: #D3D3D3;
 }
 
 .media {
@@ -442,7 +443,7 @@ hr {
   margin: 10px 5px;
 }
 
-.recurly-container-outer {
+.two-column-container-outer {
   width: 80%;
   margin-left: 10%;
   margin-right: 10%;
@@ -450,7 +451,7 @@ hr {
   flex-direction: row;
 }
 
-.recurly-container-inner {
+.two-column-container-inner {
   width: 100%;
   display: flex;
 }
