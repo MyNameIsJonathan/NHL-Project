@@ -61,13 +61,9 @@ def login():
         else:
             flash('Incorrect Login. Please check email and password', 'danger')
 
-    # Get the current_user's id to allow editing the user's recurly information
-    current_user_id = fa.create_account_code(current_user.id)
-
     return render_template('login.html',
                            title='Login',
-                           form=form,
-                           current_user_id=current_user_id)
+                           form=form)
 
 @users.route("/logout")
 def logout():
@@ -92,8 +88,13 @@ def account():
         form.username.data = current_user.username
         form.email.data = current_user.email
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
+
+    # Get the current_user's id to allow editing the user's recurly information
+    current_user_id = fa.create_account_code(current_user.id)
+
     return render_template('account.html', title='Account',
-                           image_file=image_file, form=form)
+                           image_file=image_file, form=form,
+                           current_user_id=current_user_id)
 
 @users.route("/subscribe", methods=['GET', 'POST'])
 def subscribe():
