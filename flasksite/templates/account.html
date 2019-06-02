@@ -2,88 +2,88 @@
 {% block content %}
 
     <div class="content-section account-container">
-        <div class="spanning-flex-box">
-            <img class="rounded-circle account-img" src="{{ image_file }}" alt="User Profile Picture">
+      <div class="spanning-flex-box">
+        <img class="rounded-circle account-img" src="{{ image_file }}" alt="User Profile Picture">
+      </div>
+      <div class="media">
+        <div class="media-body">
+          <h2 class="account-heading">{{ current_user.username }}</h2>
+          <p id="user_email">{{ current_user.email }}</p>
         </div>
-        <div class="media">
-            <div class="media-body">
-                <h2 class="account-heading">{{ current_user.username }}</h2>
-                <p id="user_email">{{ current_user.email }}</p>
-            </div>
-        </div>
+      </div>
 
-        <!-- Here's the outer container to create two side-by-side column divs -->
+      <!-- Here's the outer container to create two side-by-side column divs -->
 
-        <div class="two-column-container-outer">
-          <div class="two-column-container-inner">
+      <div class="two-column-container-outer">
+        <div class="two-column-container-inner">
 
           <!-- Here's the jonathanolson.us account info (left column) -->
-            <div class="recurly-section">
+          <div class="recurly-section">
 
-              <form method="POST" action="" enctype="multipart/form-data">
-                  {{ form.hidden_tag() }}
-                  <fieldset class="form-group">
-                      <legend class="border-bottom mb-4">Account Info</legend>
-                      <div class="form-group">
-                          {{ form.username.label(class="form-control-label") }}
-                          <br/>
-                          {% if form.username.errors %}
-                              {{ form.username(class="form-control form-control-lg] is-invalid") }}
-                              <div class="invalid-feedback">
-                                  {% for error in form.username.errors %}
-                                      <span>{{ error }}</span>
-                                  {% endfor %}
-                              </div>
-                          {% else %}
-                              {{ form.username(class="form-control form-control-lg") }}
-                          {% endif %}
-                      </div>
-                      <div class="form-group">
-                          {{ form.email.label(class="form-control-label") }}
-                          <br/>
-                          {% if form.email.errors %}
-                              {{ form.email(class="form-control form-control-lg is-invalid") }}
-                              <div class="invalid-feedback">
-                                  {% for error in form.email.errors %}
-                                      <span>{{ error }}</span>
-                                  {% endfor %}
-                              </div>
-                          {% else %}
-                              {{ form.email(class="form-control form-control-lg") }}
-                          {% endif %}
-                      </div>
-                    <!-- INCLUDE AN ERROR REPORT FOR THE FILE UPLOAD -->
-                    <br>
-                    <div class="form-group picture-upload-box">
-                        <div class="form-control-label">
-                            {{ form.picture.label() }}
-                        </div>
-                        <div class="centered-box choose-file-button">
-                        {{ form.picture(class="form-control-file") }}
-                        </div>
-                        {% if form.picture.errors %}
-                            {% for error in form.picture.errors %}
-                                <span class="danger">{{ error }}</span><br>
-                            {% endfor %}
-                        {% endif %}
-                    </div>
-                </fieldset>
-                <div class="form-group" id="submit">
-                    {{ form.submit(class="btn btn-outline-info") }}
+            <form method="POST" action="" enctype="multipart/form-data">
+              {{ form.hidden_tag() }}
+              <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Account Info</legend>
+                <div class="form-group">
+                  {{ form.username.label(class="form-control-label") }}
+                  <br />
+                  {% if form.username.errors %}
+                  {{ form.username(class="form-control form-control-lg] is-invalid") }}
+                  <div class="invalid-feedback">
+                    {% for error in form.username.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                  </div>
+                  {% else %}
+                  {{ form.username(class="form-control form-control-lg") }}
+                  {% endif %}
                 </div>
+                <div class="form-group">
+                  {{ form.email.label(class="form-control-label") }}
+                  <br />
+                  {% if form.email.errors %}
+                  {{ form.email(class="form-control form-control-lg is-invalid") }}
+                  <div class="invalid-feedback">
+                    {% for error in form.email.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                  </div>
+                  {% else %}
+                  {{ form.email(class="form-control form-control-lg") }}
+                  {% endif %}
+                </div>
+                <!-- INCLUDE AN ERROR REPORT FOR THE FILE UPLOAD -->
+                <br>
+                <div class="form-group picture-upload-box">
+                  <div class="form-control-label">
+                    {{ form.picture.label() }}
+                  </div>
+                  <div class="centered-box choose-file-button">
+                    {{ form.picture(class="form-control-file") }}
+                  </div>
+                  {% if form.picture.errors %}
+                  {% for error in form.picture.errors %}
+                  <span class="danger">{{ error }}</span><br>
+                  {% endfor %}
+                  {% endif %}
+                </div>
+              </fieldset>
+              <div class="form-group" id="submit">
+                {{ form.submit(class="btn btn-outline-info") }}
+              </div>
             </form>
           </div>
-        <!-- Here's the recurly account info (right column) -->
-        <div class="recurly-section">
-          <legend class="border-bottom mb-4">Subscription Info</legend>
+          <!-- Here's the recurly account info (right column) -->
+          <div class="recurly-section">
+            <legend class="border-bottom mb-4">Subscription Info</legend>
 
-          <a class="nav-item nav-link"href="/update_subscription" id=""register-logout-button>Update Subscription</a>
+            <a class="nav-item nav-link" href="/update_subscription" id="register-logout-button">Update Subscription</a>
 
+          </div>
         </div>
-        </div>
+      </div>
     </div>
-  </div>
-  </div>
+    </div>
 
 
 {% endblock content %}
