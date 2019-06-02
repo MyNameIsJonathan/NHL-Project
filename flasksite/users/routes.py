@@ -178,7 +178,6 @@ def new_subscription():
         # information: plan_code, account_code, currency and
         # the token we generated on the frontend
         subscription = recurly.Subscription(
-            plan_code='testplanname',
             currency='USD',
             account=recurly.Account(
                 account_code=user_account_code,
