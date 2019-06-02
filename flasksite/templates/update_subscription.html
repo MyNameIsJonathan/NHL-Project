@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<div class="recurly-section">
   <legend class="border-bottom mb-4">Subscription Info</legend>
     <form method="POST" action="/api/accounts/{{  current_user_id  }}">
       <label class="form-control-label" for="plan">Plan</label>
@@ -17,7 +16,6 @@
 
         <input class="btn btn-outline-info" id="submit" name="submit" type="submit" value="Update">
       </form>
-    </div>
 
 <script>
   // Configure recurly.js
