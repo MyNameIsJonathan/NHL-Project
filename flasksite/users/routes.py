@@ -177,17 +177,21 @@ def new_subscription():
     # errors that may occur
     try:
 
+        # Get the user_account
         user_account_code = fa.create_account_code(current_user.id)
+        user_account = recurly.Account.get(user_account_code)
+        billing_info = recurly.BillingInfo(
+            token_id=request.form['recurly-token'])))
+        user_account.billing_info = billing_info
 
         # Create the scubscription using minimal
         # information: plan_code, account_code, currency and
         # the token we generated on the frontend
         subscription = recurly.Subscription(
             currency='USD',
-            account=recurly.Account(
-                account_code=user_account_code,
-                billing_info=recurly.BillingInfo(
-                    token_id=request.form['recurly-token'])))
+            account=user_account,
+            plan_code='testplancode')
+
     except:
         flash(('Sorry, our servers experienced an issue creating your'
                 'subscription. Please try again later!'), 'danger')
