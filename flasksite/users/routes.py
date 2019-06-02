@@ -90,11 +90,11 @@ def account():
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
 
     # Get the current_user's id to allow editing the user's recurly information
-    current_user_id = fa.create_account_code(current_user.id)
+    current_account_code = fa.create_account_code(current_user.id)
 
     return render_template('account.html', title='Account',
                            image_file=image_file, form=form,
-                           current_user_id=current_user_id)
+                           current_account_code=current_account_code)
 
 
 
@@ -114,7 +114,9 @@ def subscribe():
 
     return render_template('subscribe.html', title='Subscribe')
 
-
+@users.route("/update_subscription")
+def update_subscription():
+    return render_template('update_subscription.html')
 
 
 # POST route to handle a new account form
