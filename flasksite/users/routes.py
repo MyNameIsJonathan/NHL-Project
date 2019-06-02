@@ -149,11 +149,15 @@ def new_recurly_account():
 @users.route("/api/accounts/<accountCode>", methods=['PUT'])
 def update_account(accountCode):
     try:
+
+        # Get the subscription
         current_account = recurly.Account.get(accountCode)
-        current_account.billing_info = recurly.BillingInfo(
-            token_id=request.form['recurly-token']
-            )
-        current_account.save()
+        subscription = current_account.subscriptions()[0]
+
+        subscription.plan_code = 'silverplan'
+        subscription.timeframe='now'
+        subscription.save()
+
         return redirect(url_for('main.home'))
     except recurly.NotFoundError as error:
         flash('NotFoundError!')

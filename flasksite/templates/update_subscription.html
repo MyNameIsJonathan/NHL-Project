@@ -2,7 +2,7 @@
 {% block content %}
 
   <legend class="border-bottom mb-4">Subscription Info</legend>
-  <form method="PUT" action="{{ url_for('users.update_account', accountCode=accountCode) }}">
+  <form method="put" action="{{ url_for('users.update_account', accountCode=accountCode) }}">
     <label class="form-control-label" for="plan">Plan</label>
 
     <div class="form-group">
@@ -14,7 +14,7 @@
       </select>
     </div>
 
-    <button class="btn btn-outline-warning" id="subscribe" name="submit" type="submit" value="Update">
+    <button class="btn btn-outline-warning" id="subscribe">Update</button>
     <input type="hidden" data-recurly="token" name="recurly-token">
   </form>
 
