@@ -153,17 +153,22 @@ def update_account(accountCode):
 
         # Get the subscription
         current_account = recurly.Account.get(accountCode)
+        print('Retrieved account')
         subscription = current_account.subscriptions()[0]
+        print(f'subscription retrieved: {subscription}')
 
         subscription.plan_code = 'silverplan'
-        subscription.timeframe='now'
+        subscription.timeframe = 'now'
         subscription.save()
+        print('subscription saved')
 
         return redirect(url_for('main.home'))
-    except recurly.NotFoundError as error:
+    except recurly.NotFoundError:
         flash('NotFoundError!')
     except recurly.ValidationError:
         flash('ValidationError!')
+    except:
+        flash('Unexpected error')
 
 # POST route to handle a new subscription form
 @users.route("/api/subscriptions/new", methods=['POST'])
@@ -195,7 +200,7 @@ def new_subscription():
 
     except:
         flash(('Sorry, our servers experienced an issue creating your'
-                'subscription. Please try again later!'), 'danger')
+               'subscription. Please try again later!'), 'danger')
     # The subscription has been created and we can redirect to a confirmation page
     subscription.save()
     flash('You have been successfully subscribed to the Basic Plan!', 'success')
