@@ -124,8 +124,6 @@ def update_subscription():
 @users.route("/api/accounts/new", methods=['POST'])
 def new_recurly_account():
 
-    print('function called to create new account!')
-
     # If user is not logged in, have them login or register
     if not current_user.is_authenticated:
         flash('Please login or register to create an account first!', 'danger')
@@ -143,29 +141,24 @@ def new_recurly_account():
             )
         new_account.save()
         flash('Account created successfully!', 'success')
-        return redirect(url_for('users.subscribe'))
+        return redirect(url_for('users.account'))
     except recurly.ValidationError:
         flash('ValidationError! Please try again shortly.', 'danger')
         return 'ValidationError'
 
 # PUT route to handle an account update form
-@users.route("/api/accounts/<accountCode>", methods=['PUT'])
+@users.route("/api/accounts/<accountCode>", methods=['GET', 'POST', 'PUT'])
 def update_account(accountCode):
-
-    print('function called!!')
 
     try:
 
         # Get the subscription
         current_account = recurly.Account.get(accountCode)
-        print('Retrieved account')
         subscription = current_account.subscriptions()[0]
-        print(f'subscription retrieved: {subscription}')
 
         subscription.plan_code = 'silverplan'
         subscription.timeframe = 'now'
         subscription.save()
-        print('subscription saved')
 
         return redirect(url_for('main.home'))
     except recurly.NotFoundError:
