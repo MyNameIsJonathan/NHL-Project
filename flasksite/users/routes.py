@@ -90,8 +90,14 @@ def account():
         form.email.data = current_user.email
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
 
+    # Get currnet_user's recurly account to pass to account.html.
+    # Will differentiate between users with subscriptions and those without
+    current_user_account_code = fa.create_account_code(current_user.id)
+    user_recurly_account = recurly.Account.get(current_user_account_code)
+
     return render_template('account.html', title='Account',
-                           image_file=image_file, form=form)
+                           image_file=image_file, form=form,
+                           user_recurly_account=user_recurly_account)
 
 
 
