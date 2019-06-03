@@ -160,7 +160,7 @@ def new_recurly_account():
         return 'ValidationError'
 
 # PUT route to handle an account update form
-@users.route("/api/accounts/<accountCode>", methods=['GET', 'POST', 'PUT'])
+@users.route("/api/accounts/<accountCode>", methods=['POST'])
 def update_account(accountCode):
 
     try:

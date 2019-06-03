@@ -2,7 +2,7 @@
 {% block content %}
 
   <legend class="border-bottom mb-4">Subscription Info</legend>
-  <form method="put" action="{{ url_for('users.update_account', accountCode=accountCode) }}">
+  <form method="post" action="{{ url_for('users.update_account', accountCode=accountCode) }}">
     <label class="form-control-label" for="plan">Plan</label>
 
     <div class="form-group">
