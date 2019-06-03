@@ -124,6 +124,8 @@ def update_subscription():
 @users.route("/api/accounts/new", methods=['POST'])
 def new_recurly_account():
 
+    print('function called to create new account!')
+
     # If user is not logged in, have them login or register
     if not current_user.is_authenticated:
         flash('Please login or register to create an account first!', 'danger')
@@ -149,6 +151,9 @@ def new_recurly_account():
 # PUT route to handle an account update form
 @users.route("/api/accounts/<accountCode>", methods=['PUT'])
 def update_account(accountCode):
+
+    print('function called!!')
+
     try:
 
         # Get the subscription
@@ -169,6 +174,7 @@ def update_account(accountCode):
         flash('ValidationError!')
     except:
         flash('Unexpected error')
+        return redirect(url_for('main.todays_players'))
 
 # POST route to handle a new subscription form
 @users.route("/api/subscriptions/new", methods=['POST'])
