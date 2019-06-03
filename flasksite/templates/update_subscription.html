@@ -2,17 +2,17 @@
 {% block content %}
 
   <legend class="border-bottom mb-4">Subscription Info</legend>
+
   <form method="post" action="{{ url_for('users.update_account', accountCode=accountCode) }}">
     <label class="form-control-label" for="plan">Plan</label>
 
-    <div data-recurly="plan" class="form-group">
+    <div name="plan" data-recurly="plan" class="form-group">
       <select data-recurly="plan" id="plan">
         <option value="bronzeplan">Bronze Plan</option>
         <option value="silverplan">Silver Plan</option>
         <option value="goldplan">Gold Plan</option>
       </select>
     </div>
-
     <button class="btn btn-outline-warning" id="subscribe">Update</button>
     <input type="hidden" data-recurly="token" name="recurly-token">
   </form>

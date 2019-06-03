@@ -169,9 +169,13 @@ def update_account(accountCode):
         current_account = recurly.Account.get(accountCode)
         subscription = current_account.subscriptions()[0]
 
-        subscription.plan_code = 'silverplan'
+        subscription.plan_code = request.form['plan']
         subscription.timeframe = 'now'
         subscription.save()
+
+        current_account.billing_info = recurly.BillingInfo(
+            token_id=request.form['recurly-token']
+        )
 
         return redirect(url_for('main.home'))
     except recurly.NotFoundError:
