@@ -1,13 +1,14 @@
-import recurly
-import uuid
 import time
+
+import recurly
+
 from flask import render_template, url_for, flash, redirect, request, Blueprint
 from flask_login import login_user, current_user, logout_user, login_required
 from flasksite import db, bcrypt
 from flasksite.models import User
 from flasksite.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
-                                   RequestResetForm, ResetPasswordForm)
-from flasksite.users.utils import save_picture, send_reset_email
+                                   RequestResetForm)
+from flasksite.users.utils import save_picture
 from flasksite.config import Config
 import flaskAccessories as fa
 
@@ -181,7 +182,7 @@ def new_subscription():
         user_account_code = fa.create_account_code(current_user.id)
         user_account = recurly.Account.get(user_account_code)
         billing_info = recurly.BillingInfo(
-            token_id=request.form['recurly-token'])))
+            token_id=request.form['recurly-token'])
         user_account.billing_info = billing_info
 
         # Create the scubscription using minimal
