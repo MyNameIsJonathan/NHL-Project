@@ -95,9 +95,16 @@ def account():
     current_user_account_code = fa.create_account_code(current_user.id)
     user_recurly_account = recurly.Account.get(current_user_account_code)
 
+    # Create a list that will be used for dynamic display in /account
+    if user_recurly_account.has_active_subscription:
+        is_subscribed = ['Yes']
+    else:
+        is_subscribed = []
+
+
     return render_template('account.html', title='Account',
                            image_file=image_file, form=form,
-                           user_recurly_account=user_recurly_account)
+                           is_subscribed=is_subscribed)
 
 
 
