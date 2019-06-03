@@ -371,7 +371,7 @@ hr {
   flex-direction: column;
   justify-content: center;
   align-content: center;
-  width: 20rem;
+  width: 100%;
 }
 
 .choose-file-button {
