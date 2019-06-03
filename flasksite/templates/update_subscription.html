@@ -5,8 +5,7 @@
   <form method="post" action="{{ url_for('users.update_account', accountCode=accountCode) }}">
     <label class="form-control-label" for="plan">Plan</label>
 
-    <div class="form-group">
-      <label for="plan"></label>
+    <div data-recurly="plan" class="form-group">
       <select data-recurly="plan" id="plan">
         <option value="bronzeplan">Bronze Plan</option>
         <option value="silverplan">Silver Plan</option>
@@ -15,7 +14,7 @@
     </div>
 
     <button class="btn btn-outline-warning" id="subscribe">Update</button>
-    <!-- <input type="hidden" data-recurly="token" name="recurly-token"> -->
+    <input type="hidden" data-recurly="token" name="recurly-token">
   </form>
 
 <script>
