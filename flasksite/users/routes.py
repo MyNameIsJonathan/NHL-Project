@@ -146,15 +146,25 @@ def new_recurly_account():
     user_account_code = fa.create_account_code(current_user.id)
 
     try:
+
+        # Create user account
         new_account = recurly.Account(
             account_code=user_account_code,
             billing_info=recurly.BillingInfo(
                 token_id=request.form['recurly-token']
                 )
             )
-        new_account.save()
-        flash('Account created successfully!', 'success')
+
+        # Create subscription
+        subscription = recurly.Subscription()
+        subscription.plan_code = request.form['plan']
+        subscription.currency = 'EUR'
+        subscription.account = new_account
+        subscription.save()
+
+        flash('Account subscribed successfully!', 'success')
         return redirect(url_for('users.account'))
+        
     except recurly.ValidationError:
         flash('ValidationError! Please try again shortly.', 'danger')
         return 'ValidationError'
