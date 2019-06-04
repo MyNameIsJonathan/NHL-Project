@@ -20,11 +20,23 @@
 <section class="two-column-container-outer">
   <form method="post" action="/api/accounts/new">
 
+
+      <!-- Credit Card input -->
         <div id="cc-container">
           <div data-recurly="card"></div>
         </div>
 
+      <!-- Plan selection dropdown -->
+        <div class="form-group">
+          <label for="plan">Plan</label>
+          <select data-recurly="plan" class="form-control" id="plan" name="plan">
+            <option value="goldplan">Gold Plan</option>
+            <option value="silverplan">Silver Plan</option>
+            <option value="bronzeplan">Bronze Plan</option>
+          </select>
+        </div>
 
+    <!-- Personal information fields -->
     <div class="two-column-container-inner">
 
         <div class="recurly-section">
