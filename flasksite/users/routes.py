@@ -158,16 +158,16 @@ def new_recurly_account():
         # Create subscription
         subscription = recurly.Subscription()
         subscription.plan_code = request.form['plan']
-        subscription.currency = 'EUR'
+        subscription.currency = 'USD'
         subscription.account = new_account
         subscription.save()
 
         flash('Account subscribed successfully!', 'success')
         return redirect(url_for('users.account'))
-        
+
     except recurly.ValidationError:
         flash('ValidationError! Please try again shortly.', 'danger')
-        return 'ValidationError'
+        return redirect(url_for('users.account'))
 
 # PUT route to handle an account update form
 @users.route("/api/accounts/<accountCode>", methods=['POST'])
