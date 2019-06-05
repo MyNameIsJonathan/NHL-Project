@@ -131,8 +131,6 @@ def update_recurly_account():
         flash('Please login or register to create an account first!', 'danger')
         return redirect(url_for('users.login'))
 
-
-
     try:
 
         # Load user account
