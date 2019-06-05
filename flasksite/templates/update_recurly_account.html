@@ -50,13 +50,13 @@
         </div>
 
         <div class="recurly-section">
-          <input class="form-control form-control-lg box-large" type="text" data-recurly="first_name" id="first_name" name="first-name">
-          <input class="form-control form-control-lg box-large" type="text" data-recurly="last_name" id="last_name" name="last-name">
-          <input class="form-control form-control-lg box-large" type="text" data-recurly="address1" id="address1" name="address1">
-          <input class="form-control form-control-lg box-small" type="text" data-recurly="city" id="city" name="city">
-          <input class="form-control form-control-lg box-small" type="text" data-recurly="state" id="state" name="state">
-          <input class="form-control form-control-lg box-small" type="text" data-recurly="country" id="country" name="country">
-          <input class="form-control form-control-lg box-small" type="text" data-recurly="postal_code" id="postal_code" name="postal-code">
+          <input class="form-control form-control-lg box-large" type="text" data-recurly="first_name" id="first_name" name="first-name" value="{{ user_account.first_name }}">
+          <input class="form-control form-control-lg box-large" type="text" data-recurly="last_name" id="last_name" name="last-name" value="{{ user_account.last_name }}">
+          <input class="form-control form-control-lg box-large" type="text" data-recurly="address1" id="address1" name="address1" value="{{ user_account.address1 }}">
+          <input class="form-control form-control-lg box-small" type="text" data-recurly="city" id="city" name="city" value="{{ user_account.city }}">
+          <input class="form-control form-control-lg box-small" type="text" data-recurly="state" id="state" name="state" value="{{ user_account.state }}">
+          <input class="form-control form-control-lg box-small" type="text" data-recurly="country" id="country" name="country" value="{{ user_account.country }}">
+          <input class="form-control form-control-lg box-small" type="text" data-recurly="postal_code" id="postal_code" name="postal-code" value="{{ user_account.postal_code }}">
         </div>
       </div>
     <button class="btn btn-outline-warning" id="subscribe">Update Account</button>

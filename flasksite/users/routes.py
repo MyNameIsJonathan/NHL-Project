@@ -110,7 +110,12 @@ def account():
 
 @users.route("/update_recurly_account")
 def update_recurly_account():
-    return render_template('update_recurly_account.html')
+
+    # Load user account
+    user_account_code = fa.create_account_code(current_user.id)
+    user_account = recurly.Account.get(user_account_code)
+
+    return render_template('update_recurly_account.html', user_account=user_account)
 
 
 @users.route("/create_recurly_account")
