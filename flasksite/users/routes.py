@@ -108,6 +108,11 @@ def account():
 
 
 
+@users.route("/update_recurly_account")
+def update_recurly_account():
+    return render_template('update_recurly_account.html')
+
+
 @users.route("/create_recurly_account")
 def create_recurly_account():
     return render_template('create_recurly_account.html')
@@ -123,8 +128,8 @@ def subscribe():
 
     return render_template('subscribe.html', title='Subscribe')
 
-@users.route("/update_recurly_account")
-def update_recurly_account():
+@users.route("/api/accounts/update")
+def api_accounts_update():
 
     # If user is not logged in, have them login or register
     if not current_user.is_authenticated:
