@@ -142,14 +142,15 @@ def api_accounts_update():
         user_account_code = fa.create_account_code(current_user.id)
         user_account = recurly.Account.get(user_account_code)
 
-        new_account = recurly.Account(
-            account_code=user_account_code,
-            billing_info=recurly.BillingInfo(
+        # Save the tokenized billing info
+        billing_info=recurly.BillingInfo(
                 token_id=request.form['recurly-token']
                 )
-            )
 
-        flash('Account subscribed successfully!', 'success')
+        # Apply it to the account
+        user_account.update_billing_info(billing_info)
+
+        flash('Account updated successfully!', 'success')
         return redirect(url_for('users.account'))
 
 
