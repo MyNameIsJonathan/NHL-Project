@@ -128,7 +128,7 @@ def subscribe():
 
     return render_template('subscribe.html', title='Subscribe')
 
-@users.route("/api/accounts/update")
+@users.route("/api/accounts/update", methods=['POST'])
 def api_accounts_update():
 
     # If user is not logged in, have them login or register
