@@ -124,7 +124,7 @@ def subscribe():
     return render_template('subscribe.html', title='Subscribe')
 
 @users.route("/update_recurly_account")
-def update_subscription():
+def update_recurly_account():
 
     # If user is not logged in, have them login or register
     if not current_user.is_authenticated:
