@@ -37,6 +37,7 @@
           <label class="form-control-label box-large" for="state">State</label>
           <label class="form-control-label box-large" for="country">Country</label>
           <label class="form-control-label box-large" for="postal_code">Postal Code</label>
+          <label class="form-control-label box-large" for="gateway_code">Gateway Code</label>
         </div>
 
         <div class="recurly-section">
@@ -46,7 +47,7 @@
           <input class="form-control form-control-lg box-small" type="text" data-recurly="city" id="city" name="city" value="{{ user_account.billing_info.city }}">
           <input class="form-control form-control-lg box-small" type="text" data-recurly="state" id="state" name="state" value="{{ user_account.billing_info.state }}">
           <input class="form-control form-control-lg box-small" type="text" data-recurly="country" id="country" name="country" value="{{ user_account.billing_info.country }}">
-          <input class="form-control form-control-lg box-small" type="text" data-recurly="postal_code" id="postal_code" name="postal-code" value="{{ user_account.billing_info.postal_code }}">
+          <input class="form-control form-control-lg box-small" type="text" data-recurly="postal_code" id="postal_code" name="postal-code" value="{{ user_account.billing_info.zip }}">
         </div>
       </div>
     <button class="btn btn-outline-warning" id="subscribe">Update Account</button>
