@@ -48,6 +48,7 @@
           <input class="form-control form-control-lg box-small" type="text" data-recurly="state" id="state" name="state" value="{{ user_account.billing_info.state }}">
           <input class="form-control form-control-lg box-small" type="text" data-recurly="country" id="country" name="country" value="{{ user_account.billing_info.country }}">
           <input class="form-control form-control-lg box-small" type="text" data-recurly="postal_code" id="postal_code" name="postal-code" value="{{ user_account.billing_info.zip }}">
+          <input class="form-control form-control-lg box-small" type="text" data-recurly="gateway_code" id="gateway_code" name="gateway-code" value="{{ user_account.billing_info.gateway_code }}">
         </div>
       </div>
     <button class="btn btn-outline-warning" id="subscribe">Update Account</button>
