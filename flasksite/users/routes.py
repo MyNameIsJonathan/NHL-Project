@@ -123,13 +123,36 @@ def subscribe():
 
     return render_template('subscribe.html', title='Subscribe')
 
-@users.route("/update_subscription")
+@users.route("/update_recurly_account")
 def update_subscription():
 
-    # Create user's account_code from hidden hash library
-    user_account_code = fa.create_account_code(current_user.id)
+    # If user is not logged in, have them login or register
+    if not current_user.is_authenticated:
+        flash('Please login or register to create an account first!', 'danger')
+        return redirect(url_for('users.login'))
 
-    return render_template('update_subscription.html', accountCode=user_account_code)
+
+
+    try:
+
+        # Load user account
+        user_account_code = fa.create_account_code(current_user.id)
+        user_account = recurly.Account.get(user_account_code)
+
+        new_account = recurly.Account(
+            account_code=user_account_code,
+            billing_info=recurly.BillingInfo(
+                token_id=request.form['recurly-token']
+                )
+            )
+
+        flash('Account subscribed successfully!', 'success')
+        return redirect(url_for('users.account'))
+
+
+    except recurly.ValidationError:
+        flash('ValidationError! Please try again shortly.', 'danger')
+        return redirect(url_for('users.account'))
 
 
 # POST route to handle a new account form
@@ -168,33 +191,6 @@ def new_recurly_account():
     except recurly.ValidationError:
         flash('ValidationError! Please try again shortly.', 'danger')
         return redirect(url_for('users.account'))
-
-# PUT route to handle an account update form
-@users.route("/api/accounts/<accountCode>", methods=['POST'])
-def update_account(accountCode):
-
-    try:
-
-        # Get the subscription
-        current_account = recurly.Account.get(accountCode)
-        subscription = current_account.subscriptions()[0]
-
-        subscription.plan_code = request.form['plan']
-        subscription.timeframe = 'now'
-        subscription.save()
-
-        current_account.billing_info = recurly.BillingInfo(
-            token_id=request.form['recurly-token']
-        )
-
-        return redirect(url_for('main.home'))
-    except recurly.NotFoundError:
-        flash('NotFoundError!')
-    except recurly.ValidationError:
-        flash('ValidationError!')
-    except:
-        flash('Unexpected error')
-        return redirect(url_for('main.todays_players'))
 
 # POST route to handle a new subscription form
 @users.route("/api/subscriptions/new", methods=['POST'])
