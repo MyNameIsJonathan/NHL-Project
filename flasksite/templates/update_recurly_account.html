@@ -30,7 +30,6 @@
     <div class="two-column-container-inner">
 
         <div class="recurly-section">
-          <label for="plan">Plan</label>
           <label class="form-control-label box-large" for="first_name">First Name</label>
           <label class="form-control-label box-large" for="last_name">Last Name</label>
           <label class="form-control-label box-large" for="address1">Address</label>
@@ -41,11 +40,6 @@
         </div>
 
         <div class="recurly-section">
-          <select data-recurly="plan" class="form-control" id="plan" name="plan">
-            <option value="goldplan">Gold Plan</option>
-            <option value="silverplan">Silver Plan</option>
-            <option value="bronzeplan">Bronze Plan</option>
-          </select>
           <input class="form-control form-control-lg box-large" type="text" data-recurly="first_name" id="first_name" name="first-name" value="{{ user_account.billing_info.first_name }}">
           <input class="form-control form-control-lg box-large" type="text" data-recurly="last_name" id="last_name" name="last-name" value="{{ user_account.billing_info.last_name }}">
           <input class="form-control form-control-lg box-large" type="text" data-recurly="address1" id="address1" name="address1" value="{{ user_account.billing_info.address1 }}">
