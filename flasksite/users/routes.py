@@ -236,3 +236,36 @@ def new_subscription():
     subscription.save()
     flash('You have been successfully subscribed to the Basic Plan!', 'success')
     return redirect(url_for('main.home'))
+
+# Create a route to the cancel subscription html page
+@users.route("/cancel_subscription")
+def html_cancel_subscription():
+
+    # Load user account
+    user_account_code = fa.create_account_code(current_user.id)
+    user_account = recurly.Account.get(user_account_code)
+
+    # If user has no subscription, just flash message and don't redirect
+    if not user_account.subscriptions():
+        flash(("Sorry, we cannot find any subscriptions associated"
+               " with this account!", 'danger'))
+
+    # Else, redirect then to the html page to cancel a subscription
+    else:
+        return render_template('cancel_subscription.html', user_account=user_account)
+
+
+# POST request to cancel input subscription
+@users.route("/api/subscriptions/cancel", methods=['POST'])
+def cancel_subscription():
+
+    # Load user account
+    user_account_code = fa.create_account_code(current_user.id)
+    user_account = recurly.Account.get(user_account_code)
+
+    # Get the subscription input in the form submitted
+    subscription_uuid = request.form['plan']
+    subscription = recurly.Subscription.get(subscription_uuid)
+
+    # Cancel the subscription
+    subscription.cancel()
