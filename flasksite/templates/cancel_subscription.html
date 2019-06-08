@@ -9,7 +9,7 @@
 </div>
 
 <br>
-<p>We hate to see you go!</p>
+<p>We're sorry to see you go!</p>
 <br>
 
 <hr>
@@ -21,20 +21,15 @@
   <form method="post" action="/api/subscriptions/cancel">
 
 
-      <!-- Credit Card input -->
-        <div id="cc-container">
-          <div data-recurly="card"></div>
-        </div>
-
     <!-- Personal information fields -->
-    <div class="two-column-container-inner">
+    <div class="two-column-container-inner centered-box">
 
       <!-- Plan selection dropdown -->
         <div class="form-group">
           <label for="plan">Plan</label>
           <select data-recurly="plan" class="form-control" id="plan" name="plan">
             {% for plan in user_account.subscriptions() %}
-              <option value="{% plan.uuid %}">{% plan.plan_code %}</option>
+              <option value="{{ plan.uuid }}">{{ plan.plan_code[0].upper() + plan.plan_code[1:-4] + ' Plan' }}</option>
             {% endfor %}
           </select>
         </div>
@@ -44,86 +39,5 @@
   </form>
 </section>
 
-<script>
-  // Configure recurly.js
-  recurly.configure({
-    publicKey: 'ewr1-hHo12A3MLPkvl5wKXIgrZO', // Set this to your own public key
-    style: {
-      all: {
-        fontFamily: 'Roboto',
-        fontSize: '1.35rem',
-        fontWeight: '100',
-        fontColor: '#ffffff'
-      }
-    }
-  });
-
-  // When a customer hits their 'enter' key while in a field
-  recurly.on('field:submit', function (event) {
-    $('form').submit();
-  });
-
-  // On form submit, we stop submission to go get the token
-  $('form').on('submit', function (event) {
-
-    // Prevent the form from submitting while we retrieve the token from Recurly
-    event.preventDefault();
-
-    // Reset the errors display
-    $('#errors').text('');
-    $('input').removeClass('error');
-
-    // Disable the submit button
-    $('button').prop('disabled', true);
-
-    var form = this;
-
-    // Now we call recurly.token with the form. It goes to Recurly servers
-    // to tokenize the credit card information, then injects the token into the
-    // data-recurly="token" field above
-    recurly.token(form, function (err, token) {
-
-      // send any errors to the error function below
-      if (err) error(err);
-
-      // Otherwise we continue with the form submission
-      else form.submit();
-
-    });
-  });
-
-  // Reconfigure font size based on window size
-  $(window).on('resize init', function (event) {
-    if ($(this).width() < 600) {
-      recurly.configure({
-        style: {
-          all: {
-            fontSize: '0.9rem'
-          }
-        }
-      });
-    } else {
-      recurly.configure({
-        style: {
-          all: {
-            fontSize: '1rem'
-          }
-        }
-      });
-    }
-  }).triggerHandler('init');
-
-  // A simple error handling function to expose errors to the customer
-  function error (err) {
-    $('#errors').text('The following fields appear to be invalid: ' + err.fields.join(', '));
-    $('button').prop('disabled', false);
-    $.each(err.fields, function (i, field) {
-      $('[data-recurly=' + field + ']').addClass('error');
-    });
-  }
-
-  // runs some simple animations for the page
-  $('body').addClass('show');
-</script>
 
 {% endblock content %}

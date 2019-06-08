@@ -241,12 +241,17 @@ def new_subscription():
 @users.route("/cancel_subscription")
 def html_cancel_subscription():
 
+    # If user is not logged in, have them login or register
+    if not current_user.is_authenticated:
+        flash('Please login or register to create an account first!', 'danger')
+        return redirect(url_for('users.login'))
+
     # Load user account
     user_account_code = fa.create_account_code(current_user.id)
     user_account = recurly.Account.get(user_account_code)
 
     # If user has no subscription, just flash message and don't redirect
-    if not user_account.subscriptions():
+    if not user_account or not user_account.subscriptions():
         flash(("Sorry, we cannot find any subscriptions associated"
                " with this account!", 'danger'))
 
@@ -259,6 +264,11 @@ def html_cancel_subscription():
 @users.route("/api/subscriptions/cancel", methods=['POST'])
 def cancel_subscription():
 
+    # If user is not logged in, have them login or register
+    if not current_user.is_authenticated:
+        flash('Please login or register to create an account first!', 'danger')
+        return redirect(url_for('users.login'))
+
     # Load user account
     user_account_code = fa.create_account_code(current_user.id)
     user_account = recurly.Account.get(user_account_code)
@@ -269,3 +279,13 @@ def cancel_subscription():
 
     # Cancel the subscription
     subscription.cancel()
+    subscription.save()
+
+    # Create formatted plan_code
+    readable_plan_code = subscription.plan_code[0].upper() + subscription.plan_code[1:-4] + ' Plan' 
+
+    # Tell the user that the subscription has been canceled
+    flash(f'Your subscription to {readable_plan_code} has been successfully canceled!', 'success')
+
+    # Redirect them back to the Accounts page
+    return redirect(url_for('users.account'))
