@@ -26,7 +26,7 @@ services:
         source: /home/jonathan/NHL-Project
         target: /NHL-Project
       - type: bind
-        source: ~/myconfigs/nhlconfig
+        source: /home/jonathan/myconfigs/nhlconfig
         target: /etc/mySecrets
     environment:
       - MYSQL_ROOT_PASSWORD_FILE=/etc/mySecrets/mysql_root_password_file
