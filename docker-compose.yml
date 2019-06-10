@@ -25,9 +25,9 @@ services:
       - type: bind
         source: /home/jonathan/NHL-Project
         target: /NHL-Project
-      - type: volume
-        source: myConfig
-        target: /etc/mySecrets # Here, we will have the file /etc/mySecrets/config.py
+      - type: bind
+        source: ~/myconfigs/nhlconfig
+        target: /etc/mySecrets
     environment:
       - MYSQL_ROOT_PASSWORD_FILE=/etc/mySecrets/mysql_root_password_file
       - MYSQL_USER_FILE=/etc/mySecrets/mysql_user_file
