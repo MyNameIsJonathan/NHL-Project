@@ -20,23 +20,7 @@ recurly.DEFAULT_CURRENCY = 'USD'
 @main.route("/")
 @main.route("/home")
 def home():
-
-    # See if user is subscribed. If not, show "Subscribe" button
-    if current_user.is_authenticated:
-        # Get the user's recurly account
-        current_user_account_code = fa.create_account_code(current_user.id)
-        # Find the user's recurly account
-        try:
-            user_recurly_account = recurly.Account.get(current_user_account_code)
-            # Get a list of the user's subscription objects
-            user_subscriptions = user_recurly_account.subscriptions()
-        # If the user has no account, set empty subscriptions list
-        except recurly.NotFoundError:
-            user_subscriptions = []
-    else:
-        user_subscriptions = []
-
-    return render_template('home.html', user_subscriptions=user_subscriptions)
+    return render_template('home.html')
 
 @main.route("/nhl_stats")
 def nhl_stats():
