@@ -11,7 +11,7 @@ import smtplib
 import logging
 
 import requests
-import inittest
+import unittest
 
 from flasksite.config import Config
 from linode_api4 import LinodeClient, Instance
