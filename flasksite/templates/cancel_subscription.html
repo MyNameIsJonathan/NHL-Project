@@ -1,0 +1,43 @@
+
+{% extends "layout.html" %}
+{% block content %}
+
+<br>
+
+<div class="container">
+  <h2>Cancel Subscription</h2>
+</div>
+
+<br>
+<p>We're sorry to see you go!</p>
+<br>
+
+<hr>
+
+<br>
+<br>
+
+<section class="two-column-container-outer">
+  <form method="post" action="/api/subscriptions/cancel">
+
+
+    <!-- Personal information fields -->
+    <div class="two-column-container-inner centered-box">
+
+      <!-- Plan selection dropdown -->
+        <div class="form-group">
+          <label for="plan">Plan</label>
+          <select data-recurly="plan" class="form-control" id="plan" name="plan">
+            {% for plan in user_account.subscriptions() %}
+              <option value="{{ plan.uuid }}">{{ plan.plan_code[0].upper() + plan.plan_code[1:-4] + ' Plan' }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+    <button class="btn btn-outline-warning" id="subscribe">Cancel Subscription</button>
+    <input type="hidden" data-recurly="token" name="recurly-token">
+  </form>
+</section>
+
+
+{% endblock content %}

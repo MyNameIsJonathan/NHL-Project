@@ -1,0 +1,141 @@
+
+{% extends "layout.html" %}
+{% block content %}
+
+<br>
+
+<div class="container">
+  <h2>Subscribe to JonathanOlson.us</h2>
+</div>
+
+<br>
+<p>Subscribe to JonathanOlson.us to receive intermittent news, updates, and more!</p>
+<br>
+
+<hr>
+
+<br>
+<br>
+
+<section class="two-column-container-outer">
+  <form method="post" action="/api/accounts/update">
+
+
+      <!-- Credit Card input -->
+        <div id="cc-container">
+          <div data-recurly="card"></div>
+        </div>
+
+    <!-- Personal information fields -->
+    <div class="two-column-container-inner">
+
+        <div class="recurly-section">
+          <label class="form-control-label box-large" for="first_name">First Name</label>
+          <label class="form-control-label box-large" for="last_name">Last Name</label>
+          <label class="form-control-label box-large" for="address1">Address</label>
+          <label class="form-control-label box-large" for="city">City</label>
+          <label class="form-control-label box-large" for="state">State</label>
+          <label class="form-control-label box-large" for="country">Country</label>
+          <label class="form-control-label box-large" for="postal_code">Postal Code</label>
+          <label class="form-control-label box-large" for="gateway_code">Gateway Code</label>
+        </div>
+
+        <div class="recurly-section">
+          <input class="form-control form-control-lg box-large" type="text" data-recurly="first_name" id="first_name" name="first-name" value="{{ user_account.billing_info.first_name }}">
+          <input class="form-control form-control-lg box-large" type="text" data-recurly="last_name" id="last_name" name="last-name" value="{{ user_account.billing_info.last_name }}">
+          <input class="form-control form-control-lg box-large" type="text" data-recurly="address1" id="address1" name="address1" value="{{ user_account.billing_info.address1 }}">
+          <input class="form-control form-control-lg box-small" type="text" data-recurly="city" id="city" name="city" value="{{ user_account.billing_info.city }}">
+          <input class="form-control form-control-lg box-small" type="text" data-recurly="state" id="state" name="state" value="{{ user_account.billing_info.state }}">
+          <input class="form-control form-control-lg box-small" type="text" data-recurly="country" id="country" name="country" value="{{ user_account.billing_info.country }}">
+          <input class="form-control form-control-lg box-small" type="text" data-recurly="postal_code" id="postal_code" name="postal-code" value="{{ user_account.billing_info.zip }}">
+          <input class="form-control form-control-lg box-small" type="text" data-recurly="gateway_code" id="gateway_code" name="gateway-code" value="{{ user_account.billing_info.gateway_code }}">
+        </div>
+      </div>
+    <button class="btn btn-outline-warning" id="subscribe">Update Account</button>
+    <input type="hidden" data-recurly="token" name="recurly-token">
+  </form>
+</section>
+
+<script>
+  // Configure recurly.js
+  recurly.configure({
+    publicKey: 'ewr1-hHo12A3MLPkvl5wKXIgrZO', // Set this to your own public key
+    style: {
+      all: {
+        fontFamily: 'Roboto',
+        fontSize: '1.35rem',
+        fontWeight: '100',
+        fontColor: '#ffffff'
+      }
+    }
+  });
+
+  // When a customer hits their 'enter' key while in a field
+  recurly.on('field:submit', function (event) {
+    $('form').submit();
+  });
+
+  // On form submit, we stop submission to go get the token
+  $('form').on('submit', function (event) {
+
+    // Prevent the form from submitting while we retrieve the token from Recurly
+    event.preventDefault();
+
+    // Reset the errors display
+    $('#errors').text('');
+    $('input').removeClass('error');
+
+    // Disable the submit button
+    $('button').prop('disabled', true);
+
+    var form = this;
+
+    // Now we call recurly.token with the form. It goes to Recurly servers
+    // to tokenize the credit card information, then injects the token into the
+    // data-recurly="token" field above
+    recurly.token(form, function (err, token) {
+
+      // send any errors to the error function below
+      if (err) error(err);
+
+      // Otherwise we continue with the form submission
+      else form.submit();
+
+    });
+  });
+
+  // Reconfigure font size based on window size
+  $(window).on('resize init', function (event) {
+    if ($(this).width() < 600) {
+      recurly.configure({
+        style: {
+          all: {
+            fontSize: '0.9rem'
+          }
+        }
+      });
+    } else {
+      recurly.configure({
+        style: {
+          all: {
+            fontSize: '1rem'
+          }
+        }
+      });
+    }
+  }).triggerHandler('init');
+
+  // A simple error handling function to expose errors to the customer
+  function error (err) {
+    $('#errors').text('The following fields appear to be invalid: ' + err.fields.join(', '));
+    $('button').prop('disabled', false);
+    $.each(err.fields, function (i, field) {
+      $('[data-recurly=' + field + ']').addClass('error');
+    });
+  }
+
+  // runs some simple animations for the page
+  $('body').addClass('show');
+</script>
+
+{% endblock content %}

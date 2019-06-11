@@ -21,6 +21,10 @@ body {
   min-width: 320px;
 }
 
+form {
+  width: 100%;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -43,6 +47,7 @@ h1 {
 
 h2 {
   text-align: center;
+  font-size: 2.5em;
 }
 
 h2.todays-players-heading {
@@ -126,6 +131,11 @@ hr {
   max-width: none;
 }
 
+#subscribe {
+  font-size: 1.3rem;
+  margin: 20px;
+}
+
 #main-nav-bar {
   color: #FFFFFF;
   font-weight: 100;
@@ -191,6 +201,10 @@ hr {
   font-size: 95%;
   color: rgb(163, 163, 163);
   height: auto;
+}
+
+.dropdown {
+  margin-bottom: 25px;
 }
 
 .home-credits {
@@ -330,6 +344,7 @@ hr {
 .form-control-label {
   font-size: 1.35rem;
   font-weight: 100;
+  text-align: right;
 }
 
 .picture-upload-box {
@@ -345,6 +360,7 @@ hr {
 
 .form-control-file {
   display: inline-block;
+  background-color: transparent;
   font-weight: 100;
   font-size: 1rem;
   flex-direction: column;
@@ -355,7 +371,7 @@ hr {
   flex-direction: column;
   justify-content: center;
   align-content: center;
-  width: 20rem;
+  width: 100%;
 }
 
 .choose-file-button {
@@ -416,6 +432,67 @@ hr {
 
 .todays-player-text {
   font-size: 1em;
+}
+
+.recurly-box {
+  color: #cccccc;
+  height: auto;
+  display: inline-block;
+  justify-content: space-around;
+  text-align: center;
+  width: 45%;
+  min-width: 25em;
+  border-spacing: 4px;
+  align-items: center;
+  margin: 10px 5px;
+}
+
+.two-column-container-outer {
+  width: 80%;
+  margin-left: 10%;
+  margin-right: 10%;
+  display: flex;
+  flex-direction: row;
+}
+
+.two-column-container-inner {
+  width: 100%;
+  display: flex;
+}
+
+.recurly-hosted-field {
+  background-color: transparent !important;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #FFFFFF;
+  margin: 0px 0px 10px 0px;
+  height: 2.9em !important;
+}
+
+.recurly-section {
+  display: flex;
+  align-items: flex-start;
+  align-content: flex-start;
+  flex-direction: column;
+  flex-grow: 1;
+  width: 50%;
+}
+
+.recurly-labels {
+  align-content: right;
+}
+
+.recurly-inputs {
+  align-content: left;
+}
+
+#cc-container {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+#cc-box {
+  padding: 30px 0px;
 }
 
 .tweet-container {
@@ -509,6 +586,7 @@ legend.border-bottom.mb-4 {
   padding-bottom: .5rem;
   font-size: 2rem;
   font-weight: 200;
+  width: 100%;
 }
 
 ::-webkit-scrollbar-track {
@@ -556,6 +634,30 @@ strong {
   color: rgba(0, 0, 0, 0.5);
   background-color: #CCCCCC;
   border-radius: 5px;
+}
+
+.box-small {
+  width: 8rem;
+  max-width: 45%;
+  margin-bottom: 10px;
+  height: 45px;
+}
+
+.box-large {
+  width: 20rem;
+  max-width: 95%;
+  margin-bottom: 10px;
+  height: 45px;
+}
+
+.form-control-label.box-large {
+  width: 100%;
+  line-height: 45px;
+}
+
+.form-control-label.box-small {
+  width: 100%;
+  line-height: 45px;
 }
 
 @media screen and (min-width: 683px) {

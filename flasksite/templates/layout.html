@@ -25,6 +25,10 @@
     <!-- Favicon link -->
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 
+    <!-- Recurly Information -->
+    <script src="https://js.recurly.com/v4/recurly.js"></script>
+    <link href="https://js.recurly.com/v4/recurly.css" rel="stylesheet" type="text/css">
+
     <!-- Page Title -->
     <title>NHL Stats</title>
 
@@ -61,8 +65,33 @@
       </div>
     </nav>
   </header>
+
+  <!-- If there are messages to show, show them -->
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul class=flashes>
+      {% for message in messages %}
+      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <span>{{ message }}</span>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      </div>
+      {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
   <main role="main" class="container">
     {% block content %}{% endblock %}
+
+    <script type="text/javascript">
+      AOS.init({
+        duration: 3000,
+      });
+    </script>
+
+
   </main>
 
   <footer class="footer">
@@ -70,12 +99,6 @@
     <div class="text-muted">2019</div>
   </footer>
 
-
-  <script type="text/javascript">
-    AOS.init({
-      duration: 3000,
-    });
-  </script>
 
 </body>
 </html>

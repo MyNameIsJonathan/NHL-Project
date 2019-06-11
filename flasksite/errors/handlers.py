@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, url_for, flash
 
 errors = Blueprint('errors', __name__)
 
@@ -12,5 +12,6 @@ def error_403(error):
 
 @errors.app_errorhandler(500)
 def error_500(error):
-    return render_template('errors/500.html'), 500
+    flash('Sorry, we are currently experiencing some difficulties!')
+    return render_template(url_for('main.home'))
 
