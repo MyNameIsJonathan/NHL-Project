@@ -1,18 +1,40 @@
-import pandas as pd
-import requests
+"""
+
+This module contains all of the functions to scrape data from the web, clean
+that data, and incorporate it into the various MySQL databases for display on
+my website at https://jonathanolson.us
+
+"""
+
+
 import datetime
 import time
 import json
+import logging
+import requests
+import pandas as pd
 import backupMaintainer as backups
 from bs4 import BeautifulSoup
 from sqlalchemy import create_engine
-from flask import current_app
 from flasksite.config import Config
+
+
+# Configure the logger
+# logger = logging.getLogger(__name__)
+# logger.setLevel(logging.INFO)
+
+# Format the messages logged
+# formatter = logging.Formatter('%(lebelname)s:%(name):3%message)s')
+
+# Specify the file to which we'll log
+# file_handler = logging.fileHandler('NHL_Scrape.log')
+# file_handler.setFormatter(formatter)
+# logger.addHandler(file_handler)
 
 '--------------- MySql Functions ---------------'
 
-def nonFlaskCreateEngine():
 
+def non_flask_create_engine():
     """
     Opens a connection to the provided table in the NHL Stats MySQL Database.
 
@@ -43,39 +65,8 @@ def nonFlaskCreateEngine():
 
     return engine
 
-def createEngine():
 
-    """
-    Opens a connection to the provided table in the NHL Stats MySQL DB
-
-    Args:
-    None
-
-    Returns:
-    sqlalchemy.engine.base.Engine - An SQLAlchemy engine connection to the
-                                    current_app's database
-
-    Raises:
-    None
-    """
-
-    myConfig = Config()
-
-    MYSQL_DATABASE = myConfig.MYSQL_DATABASE_DB
-    MYSQL_PASSWORD = myConfig.MYSQL_DATABASE_PASSWORD
-    MYSQL_PORT = myConfig.MYSQL_DATABASE_PORT
-    MYSQL_HOST = myConfig.MYSQL_DATABASE_HOST
-    MYSQL_USER = myConfig.MYSQL_DATABASE_USER
-
-    engine = create_engine((f'mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@'
-                            '{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}'))
-
-    # print('MySQL Connection Engine successfully created')
-
-    return engine
-
-def getFirstUnscrapedDay(engine):
-
+def get_first_unscraped_day(engine):
     """
     Uses the 'games' MySQL table to find the latest day whose games are
     not yet scraped
@@ -93,13 +84,13 @@ def getFirstUnscrapedDay(engine):
     """
 
     games = openMySQLTable('games', engine, myIndex=None)
-    unscrapedDays = games.loc[games['Game'].isnull()]
-    firstUnscrapedDay = unscrapedDays.loc[:, 'Date'].min().date()
+    unscraped_days = games.loc[games['Game'].isnull()]
+    first_unscraped_day = unscraped_days.loc[:, 'Date'].min().date()
 
-    return firstUnscrapedDay
+    return first_unscraped_day
+
 
 def openMySQLTable(table_name, engine, myIndex='Player'):
-
     """
     Opens MySQL table, using provided SQLAlchemy engine. Formats output based
     on which table is specified
@@ -139,8 +130,8 @@ def openMySQLTable(table_name, engine, myIndex='Player'):
             return pd.read_sql_table(table_name, engine)
         return pd.read_sql_table(table_name, engine).set_index(myIndex)
 
-def saveMySQLTable(myDF, dbName, engine, reset_index=True):
 
+def save_mysql_table(myDF, dbName, engine, reset_index=True):
     """
     Saves MySQL table after resetting index, if necessary. This prevents losing
     the index in event of loading the table without specifying the index,
@@ -153,8 +144,8 @@ def saveMySQLTable(myDF, dbName, engine, reset_index=True):
                                             NHL_Database MySQL database
     reset_index: Boolean - Instructs save method to reset/not reset index.
                            Resetting index returns sequential list [0, 1, 2...]
-                           to index and returns column of player names to normal
-                           column.
+                           to index and returns column of player names to
+                           normal column.
 
     Returns:
     None
@@ -465,7 +456,7 @@ def todaysPlayerDroughts(todaysGames, engine):
 
     # Save droughtsDF as 'todaysDroughts'. No need to reset index as the columns
     # are : 'id', 'Date', 'todaysDroughts', 'numberOfPlayersToday'
-    saveMySQLTable(droughtsDF, 'todaysDroughts', engine, reset_index=False)
+    save_mysql_table(droughtsDF, 'todaysDroughts', engine, reset_index=False)
 
 def makeTodaysHTML(engine):
 
@@ -545,7 +536,7 @@ def makeTodaysHTML(engine):
     dailyDataFrames = dailyDataFrames.append(newRow, ignore_index=True)
 
     # Save the DF to the MySQL database
-    saveMySQLTable(dailyDataFrames, 'dailyDataFrames', engine, reset_index=False)
+    save_mysql_table(dailyDataFrames, 'dailyDataFrames', engine, reset_index=False)
 
 def opentodaysHTML(engine):
 
@@ -772,7 +763,7 @@ def cleanSpecificDaysGames(date, rawGames, engine):
             (gamesDF['Home'] == homeTeam), 'Game'] = str(game)
 
     # Save gamesDF to MySQL. No need to reset index
-    saveMySQLTable(gamesDF, 'games', engine, reset_index=False)
+    save_mysql_table(gamesDF, 'games', engine, reset_index=False)
 
     print('Number of games cleaned  = {}'.format(len(cleanGames)))
 
@@ -856,7 +847,7 @@ def updateSpecificDaysLastTime(date, engine):
         lastTime.index.name = 'Player'
 
     #Save last_time_df. Reset index.
-    saveMySQLTable(lastTime, '2018_2019_LastTime', engine, reset_index=True)
+    save_mysql_table(lastTime, '2018_2019_LastTime', engine, reset_index=True)
 
 def updateSpecificGamesSince(date, engine):
 
@@ -933,7 +924,7 @@ def updateSpecificGamesSince(date, engine):
         GamesSince.index.name = 'Player'
 
     #Save GamesSince. Reset index.
-    saveMySQLTable(GamesSince, '2018_2019_GamesSince', engine, reset_index=True)
+    save_mysql_table(GamesSince, '2018_2019_GamesSince', engine, reset_index=True)
 
     print('Finished updating GamesSince for {}'.format(date))
 
@@ -991,7 +982,7 @@ def incorporateSpecificDaysStats(date, engine):
     myDF = myDF.sort_values(['G', 'A'])
 
     # Save myDF as the new stats table in MySQL. Reset index.
-    saveMySQLTable(myDF, '2018_2019_stats', engine, reset_index=True)
+    save_mysql_table(myDF, '2018_2019_stats', engine, reset_index=True)
 
 '--------------- Aggregate Scraping, Updating Functions ---------------'
 
@@ -1020,7 +1011,7 @@ def scrapeToToday(engine):
     backups.cleanupBackups()
 
     #Find last scraped day; indicated by presence of that day's myDF
-    date = getFirstUnscrapedDay(engine)
+    date = get_first_unscraped_day(engine)
     today = pd.to_datetime('today').date()
 
     #Iteratively scrape each day

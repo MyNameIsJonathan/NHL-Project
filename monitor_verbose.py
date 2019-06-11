@@ -6,9 +6,10 @@ This module is used to periodically check my website's functionality
 3 - Restart linode server
 
 """
-
+import datetime
 import smtplib
 import logging
+
 
 import requests
 import inittest
@@ -33,9 +34,10 @@ LINODE_ID = myConfig.NHL_LINODE_ID
 # formatter = logging.Formatter('%(lebelname)s:%(name):3%message)s')
 
 # Specify the file to which we'll log
-# file_handler = logging.fileHandler('NHL_Scrape.log')
+# file_handler = logging.FileHandler('NHL_Scrape.log')
 # file_handler.setFormatter(formatter)
 # logger.addHandler(file_handler)
+
 
 # Define functions to send email and reset server
 def notify_user():
@@ -70,7 +72,8 @@ def notify_user():
 
         # Create email contents
         subject = 'Your site is down'
-        body = 'Make sure the server successfully restarted and is now functional'
+        body = ('Make sure the server successfully restarted and is '
+                'now functional')
         msg = f'Subject: {subject}\n\n{body}'
 
         smtp.sendmail(EMAIL_ADDRESS, 'jonathanholson@gmail.com', msg)
@@ -126,19 +129,34 @@ if __name__ == '__main__':
     # Check each URL from the list above
     for url in my_urls:
 
+        print(f'Attempting to connect to url: {url}')
+
         try:
             # Make a request to my homepage; timeout after 5 secs
             r = requests.get(url, timeout=5)
 
-            # Make sure this response is successful. If not, notify user and restart
+            print(f'Connection to url: {url} successful')
+
+            print(f'Status code for url: {url} = r.status_code')
+
+            # Make sure this response is successful. If not, notify and reboot
             if r.status_code != 200:
+                print((f'Status code for url: {url} == 200. Notifying user '
+                       'via email.'))
                 notify_user()
+                print((f'Status code for url: {url} == 200. Rebooting '
+                       'server now.'))
                 reboot_server()
 
         # If cannot connect, notify user and reboot server
-        except Exception:
+        except Exception as e:
+            print((f'Exception caught in requesting url: {url} -- '
+                   f'Exception = {e}'))
+            print(f'Exception caught in requesting url: {url}. Notifying user')
             notify_user()
+            print((f'Exception caught in requesting url: {url}. '
+                   'Rebooting server now.'))
             reboot_server()
             break
 
-    print('All pages passed tests!')
+    print(f'\nAll pages successfully passed all tests on {datetime.datetime.today().strftime("%b %d %Y %H:%M:%S")}')

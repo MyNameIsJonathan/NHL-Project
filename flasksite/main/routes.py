@@ -24,7 +24,7 @@ def home():
 def nhl_stats():
 
     # Create engine connection to DB
-    nhlengine = nhl.nonFlaskCreateEngine()
+    nhlengine = nhl.non_flask_create_engine()
 
     # Select top scorers and return as DF
     mydf = pd.read_sql_query(("SELECT * FROM 2018_2019_stats ORDER BY G DESC, "
@@ -73,7 +73,7 @@ def nhl_stats():
 def todays_players():
 
     # Create engine
-    nhlengine = nhl.nonFlaskCreateEngine()
+    nhlengine = nhl.non_flask_create_engine()
 
     # Open dict of todays drought leaders and int of number of players today.
     today = pd.to_datetime('today').date()
@@ -96,7 +96,7 @@ def todays_players():
 def stamkostweets():
 
     # Create engine
-    nhlengine = nhl.nonFlaskCreateEngine()
+    nhlengine = nhl.non_flask_create_engine()
 
     #Open tweets mentioning stamkos from the last week
     myTweets = nhlengine.execute("SELECT * FROM stamkosTweets")
