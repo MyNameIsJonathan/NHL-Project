@@ -1,10 +1,11 @@
-""" This module is used to periodically check my website's funcionality
+"""
+This module is used to periodically check my website's functionality
 
 1 - Check if all parts of website are functional, returning 200 responses
 2 - Email me if an error is detected
 3 - Restart linode server
 
- """
+"""
 
 import smtplib
 
@@ -119,11 +120,10 @@ if __name__ == '__main__':
                 notify_user()
                 reboot_server()
 
-            else:
-                print('All pages passed tests!')
-
         # If cannot connect, notify user and reboot server
         except Exception:
             notify_user()
             reboot_server()
             break
+
+    print('All pages passed tests!')
