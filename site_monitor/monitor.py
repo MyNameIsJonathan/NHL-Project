@@ -100,6 +100,9 @@ if __name__ == '__main__':
             notify_user()
             reboot_server()
 
+        else:
+            print('All pages passed tests!')
+
     # If cannot connect, notify user and reboot server
     except Exception:
         notify_user()
