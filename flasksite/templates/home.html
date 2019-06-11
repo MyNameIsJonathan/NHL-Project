@@ -4,6 +4,8 @@
 <div class="container" id="primary-container">
     <div class="bg-text">
 
+      <!-- If user has no recurly account, show the Subscribe button here -->
+      {% if {{ user_subscriptions }} %}
       <h2>Subscribe</h2>
         <hr>
         <div class="container">
@@ -12,6 +14,10 @@
               <a href="https://jonathanolson.us/create_recurly_account" class="btn btn-outline-warning" id="subscribe">Subscribe</a>
             <br>
         </div>
+        <div class="container">
+          <p class="text-muted">**Note: News, updates, and more sent on a bi-centennial schedule</p>
+        </div>
+      {% endif %}
 
     <h1>Welcome to Jonathan's NHL Statistics Page!</h1>
     <div class="stamkos-div">
@@ -22,10 +28,6 @@
 
 <div class="container" id="primary-container">
     <div class="bg-text">
-
-        <div class="container">
-          <p class="text-muted">**Note: News, updates, and more sent on a bi-centennial schedule</p>
-        </div>
 
         <br>
 
