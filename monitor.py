@@ -26,16 +26,16 @@ LINODE_ID = myConfig.NHL_LINODE_ID
 
 
 # Configure the logger
-# logger = logging.getLogger(__name__)
-# logger.setLevel(logging.INFO)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 # Format the messages logged
-# formatter = logging.Formatter('%(lebelname)s:%(name):3%message)s')
+formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
 
 # Specify the file to which we'll log
-# file_handler = logging.fileHandler('NHL_Scrape.log')
-# file_handler.setFormatter(formatter)
-# logger.addHandler(file_handler)
+file_handler = logging.FileHandler('site_monitor_logs.txt')
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
 
 # Define functions to send email and reset server
 def notify_user():
@@ -141,4 +141,4 @@ if __name__ == '__main__':
             reboot_server()
             break
 
-    print('All pages passed tests!')
+    logger.debug('All pages passed tests!')

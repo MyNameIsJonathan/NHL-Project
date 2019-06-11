@@ -113,7 +113,7 @@ if __name__ == '__main__':
 
     # Create a list of URLs to check
     my_urls = [
-        'https://jonathanolson.us',
+        'https://jonathanolson.us/',
         'https://jonathanolson.us/home',
         'https://jonathanolson.us/login',
         'https://jonathanolson.us/register',
@@ -129,7 +129,7 @@ if __name__ == '__main__':
     # Check each URL from the list above
     for url in my_urls:
 
-        print(f'Attempting to connect to url: {url}')
+        print(f'\nAttempting to connect to url: {url}')
 
         try:
             # Make a request to my homepage; timeout after 5 secs
@@ -137,7 +137,7 @@ if __name__ == '__main__':
 
             print(f'Connection to url: {url} successful')
 
-            print(f'Status code for url: {url} = r.status_code')
+            print(f'Status code for url: {url} = {r.status_code}')
 
             # Make sure this response is successful. If not, notify and reboot
             if r.status_code != 200:
@@ -159,4 +159,6 @@ if __name__ == '__main__':
             reboot_server()
             break
 
-    print(f'\nAll pages successfully passed all tests on {datetime.datetime.today().strftime("%b %d %Y %H:%M:%S")}')
+    current_time_pdt = (datetime.datetime.today() - datetime.timedelta(hours=7)).strftime("%b %d %Y %H:%M:%S")
+
+    print(f'\nAll pages successfully passed all tests on {current_time_pdt}')
