@@ -111,6 +111,11 @@ def account():
 @users.route("/update_recurly_account")
 def update_recurly_account():
 
+    # If user is not logged in, have them login or register
+    if not current_user.is_authenticated:
+        flash('Please login or register to create an account first!', 'danger')
+        return redirect(url_for('users.login'))
+
     # Load user account
     user_account_code = fa.create_account_code(current_user.id)
     user_account = recurly.Account.get(user_account_code)
@@ -128,7 +133,6 @@ def subscribe():
     # If user is not logged in, have them login or register
     if not current_user.is_authenticated:
         flash('Please login or register to create an account first!', 'danger')
-        time.sleep(1)
         return redirect(url_for('users.login'))
 
     return render_template('subscribe.html', title='Subscribe')
@@ -282,7 +286,7 @@ def cancel_subscription():
     subscription.save()
 
     # Create formatted plan_code
-    readable_plan_code = subscription.plan_code[0].upper() + subscription.plan_code[1:-4] + ' Plan' 
+    readable_plan_code = subscription.plan_code[0].upper() + subscription.plan_code[1:-4] + ' Plan'
 
     # Tell the user that the subscription has been canceled
     flash(f'Your subscription to {readable_plan_code} has been successfully canceled!', 'success')
