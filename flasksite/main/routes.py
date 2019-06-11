@@ -4,6 +4,7 @@ from flask import render_template, Blueprint
 import NHL_scrape_functions as nhl
 import recurly
 from flasksite.config import Config
+from flask_login import current_user
 
 # Create a blueprint for the Flask site
 main = Blueprint('main', __name__)
