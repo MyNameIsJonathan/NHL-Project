@@ -91,19 +91,39 @@ def reboot_server(server_id=LINODE_ID):
 
 
 if __name__ == '__main__':
-    try:
-        # Make a request to my homepage; timeout after 5 secs
-        r = requests.get('https://jonathanolson.us', timeout=5)
 
-        # Make sure this response is successful. If not, notify user and restart
-        if r.status_code != 200:
+    # Create a list of URLs to check
+    my_urls = [
+        'https://jonathanolson.us',
+        'https://jonathanolson.us/home',
+        'https://jonathanolson.us/login',
+        'https://jonathanolson.us/register',
+        'https://jonathanolson.us/nhl_stats',
+        'https://jonathanolson.us/todays_players',
+        'https://jonathanolson.us/stamkostweets',
+        'https://jonathanolson.us/account',
+        'https://jonathanolson.us/create_recurly_account',
+        'https://jonathanolson.us/update_recurly_account',
+        'https://jonathanolson.us/cancel_subscription'
+        ]
+
+    # Check each URL from the list above
+    for url in my_urls:
+
+        try:
+            # Make a request to my homepage; timeout after 5 secs
+            r = requests.get(url, timeout=5)
+
+            # Make sure this response is successful. If not, notify user and restart
+            if r.status_code != 200:
+                notify_user()
+                reboot_server()
+
+            else:
+                print('All pages passed tests!')
+
+        # If cannot connect, notify user and reboot server
+        except Exception:
             notify_user()
             reboot_server()
-
-        else:
-            print('All pages passed tests!')
-
-    # If cannot connect, notify user and reboot server
-    except Exception:
-        notify_user()
-        reboot_server()
+            break
